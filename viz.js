@@ -8,9 +8,9 @@ function drawProjectiveRealsLine(svgSelection, width, height) {
     console.assert(width === height);
 
     // Create a defs block; define arrowhead marker.
-    var marker = createMarker();
-    var markerId = d3.select(marker).attr('id');
-    container.append('defs').append(function () {return marker;});
+    var arrowheadMarker = createArrowheadMarker();
+    var arrowheadMarkerId = d3.select(arrowheadMarker).attr('id');
+    container.append('defs').append(function () {return arrowheadMarker;});
 
     var fill = 'none';
     var stroke = 'black';
@@ -29,14 +29,15 @@ function drawProjectiveRealsLine(svgSelection, width, height) {
         .attr('fill', fill)
         .attr('stroke', stroke)
         .attr('stroke-width', strokeWidth)
-        .attr('marker-end', 'url(#' + markerId + ')');
+        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
 }
 
 /**
- * Create a <marker> element to be appended to an <svg> (within a <defs>).
+ * Create an arrowhead <marker> element to be appended to an <svg> (within a
+ * <defs>).
  * See https://vanseodesign.com/web-design/svg-markers/.
  */
-function createMarker() {
+function createArrowheadMarker() {
     var id = 'arrowhead';
     var markerWidth = '10';
     var markerHeight = '10';
