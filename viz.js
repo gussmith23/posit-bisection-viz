@@ -10,6 +10,8 @@ function drawProjectiveRealsLine(svgSelection, width, height) {
     // Create a defs block; define arrowhead marker.
     var arrowheadMarker = createArrowheadMarker();
     var arrowheadMarkerId = d3.select(arrowheadMarker).attr('id');
+    // This weird syntax is what d3 expects:
+    // https://stackoverflow.com/questions/23110366/d3-append-with-variable
     container.append('defs').append(function () {return arrowheadMarker;});
 
     var fill = 'none';
