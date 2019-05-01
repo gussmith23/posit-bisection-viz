@@ -1,6 +1,7 @@
 <html>
     <head>
         <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="viz.js"></script>
     </head>
     <body></body>
     <script type="text/javascript">
@@ -9,18 +10,6 @@
                        .attr('width', width)
                        .attr('height', height);
 
-     var origin = {x : width/2, y : height};
-     var dest = {x : width/2, y : 0};
-     var radius = width/2;
-     container.append('path')
-              .attr('d',
-                    'M' + origin.x + ' ' + origin.y + ' '
-                    + 'A' + radius + ' ' + radius + ' '
-                    + '0' + ' '
-                    + '0 0' + ' '
-                    + dest.x + ' ' + dest.y + ' ')
-              .attr('fill','none')
-              .attr('stroke', 'black')
-              .attr('stroke-width', '2');
+     drawProjectiveRealsLine(container);
     </script>
 </html>
