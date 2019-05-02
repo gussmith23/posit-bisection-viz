@@ -62,3 +62,12 @@ function parsePositFromBitstring(bitstring, n, es) {
 
     return positBitfields;
 }
+
+expect(
+    parsePositFromBitstring([0,0,0,0,1,1,0,1,1,1,0,1,1,1,0,1], 16, 3))
+    .to.eql({
+        sign : [0],
+        regime : [0,0,0,1],
+        exponent : [1,0,1],
+        fraction : [1,1,0,1,1,1,0,1]
+    });
