@@ -12,7 +12,7 @@
  * where each bitfield is a bitstring.
  */
 
-function parsePositFromBitstring(bitstring, n, es) {
+function positBitfieldsFromBitstring(bitstring, n, es) {
     console.assert(bitstring.length === n);
     for (i in bitstring) console.assert(bitstring[i] === 0 || bitstring[i] === 1);
     console.assert(n >= 0);
@@ -64,7 +64,7 @@ function parsePositFromBitstring(bitstring, n, es) {
 }
 
 expect(
-    parsePositFromBitstring([0,0,0,0,1,1,0,1,1,1,0,1,1,1,0,1], 16, 3))
+    positBitfieldsFromBitstring([0,0,0,0,1,1,0,1,1,1,0,1,1,1,0,1], 16, 3))
     .to.eql({
         sign : [0],
         regime : [0,0,0,1],
