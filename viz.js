@@ -7,12 +7,17 @@ function drawProjectiveRealsLine(svgSelection, width, height) {
     // An assumption I'm making right now.
     console.assert(width === height);
 
-    // Create a defs block; define arrowhead marker.
+    // Create a defs block; define arrowhead and dot markers.
     var arrowheadMarker = createArrowheadMarker();
     var arrowheadMarkerId = d3.select(arrowheadMarker).attr('id');
+    var dotMarker = createDotMarker();
+    var dotMarkerId = d3.select(dotMarker).attr('id');
+
     // This weird syntax is what d3 expects:
     // https://stackoverflow.com/questions/23110366/d3-append-with-variable
-    container.append('defs').append(function () {return arrowheadMarker;});
+    var defs = container.append('defs');
+    defs.append(function () {return arrowheadMarker;});
+    defs.append(function(){return dotMarker;});
 
     var fill = 'none';
     var stroke = 'black';
@@ -31,7 +36,8 @@ function drawProjectiveRealsLine(svgSelection, width, height) {
         .attr('fill', fill)
         .attr('stroke', stroke)
         .attr('stroke-width', strokeWidth)
-        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
+        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')')
+        .attr('marker-mid', 'url(#' + dotMarkerId + ')');
 }
 
 /**
@@ -68,3 +74,33 @@ function createArrowheadMarker() {
     return marker;
 }
 
+/**
+ * Create a dot <marker> element to be appended to an <svg> (within a <defs>).
+ */
+function createDotMarker() {
+    var id = 'dot';
+    var markerWidth = '10';
+    var markerHeight = '10';
+    var refX = '5';
+    var refY = '5';
+    var orient = 'auto';
+    var markerUnits = 'strokeWidth';
+    var radius = '3';
+
+    var marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    d3.select(marker)
+        .attr('id', id)
+        .attr('markerWidth', markerWidth)
+        .attr('markerHeight', markerHeight)
+        .attr('refX', refX)
+        .attr('refY', refY)
+        .attr('orient', orient)
+        .attr('markerUnits', markerUnits)
+        .append('circle')
+        .attr('cx', '5')
+        .attr('cy', '5')
+        .attr('r', radius)
+        .attr('fill', 'black');
+
+    return marker;
+}
