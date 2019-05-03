@@ -32,6 +32,14 @@
                        .append('g')
                        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+     // Create a title
+     d3.selectAll('text').style("font-family", "sans-serif")
+     title = container.append('text')
+                .attr("transform", `translate(${(width)/2},-20)`)
+                .style('text-anchor', 'middle')
+                .style('font-weight', 700)
+                .text("Posits!");
+
      drawProjectiveRealsLine(container, width, height, n, es);
 
      d3.select('#decrement-n')
