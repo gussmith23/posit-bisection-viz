@@ -7,10 +7,6 @@
 function update(n, es) {
     const posits = generatePositsOfLength(n, es);
 
-    const positCompare = function(posit1, posit2) {
-        return unsignedIntegerFromBitstring(posit1.bitstring) - unsignedIntegerFromBitstring(posit2.bitstring);
-    };
-
     const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
           .sort(positCompare);
     const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
@@ -33,13 +29,15 @@ function update(n, es) {
  * Draw the projective reals line on an SVG.
  * @param svgSelection - the d3 selection of the SVG element.
  */
-function drawProjectiveRealsLine(svgSelection, width, height) {
+function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
     // An assumption I'm making right now.
     console.assert(width === height);
 
     // Create a defs block; define arrowhead and dot markers.
     var arrowheadMarker = createArrowheadMarker();
     var arrowheadMarkerId = d3.select(arrowheadMarker).attr('id');
+    var reverseArrowheadMarker = createReverseArrowheadMarker();
+    var reverseArrowheadMarkerId = d3.select(reverseArrowheadMarker).attr('id');
     var dotMarker = createDotMarker();
     var dotMarkerId = d3.select(dotMarker).attr('id');
 
@@ -49,25 +47,104 @@ function drawProjectiveRealsLine(svgSelection, width, height) {
     defs.append(function () {return arrowheadMarker;});
     defs.append(function(){return dotMarker;});
 
+    const posits = generatePositsOfLength(n, es);
+
+    const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
+          .sort(positCompare);
+    const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
+          .sort(positCompare);
+    const infinity = posits.filter(p => p.value === Infinity);
     var fill = 'none';
     var stroke = 'black';
     var strokeWidth = '2';
 
-    var origin = {x : width/2, y : height};
-    var dest = {x : width/2, y : 0};
     var radius = (width)/2;
-    container.append('path')
-        .attr('d',
-              'M' + origin.x + ' ' + origin.y + ' '
-              + 'A' + radius + ' ' + radius + ' '
-              + '0' + ' '
-              + '0 0' + ' '
-              + dest.x + ' ' + dest.y + ' ')
+    var dtheta = 180/(1 << (n-1));
+
+    var positivePaths = container.selectAll('.positivePositPath').data(positivePosits);
+    
+    var paths = positivePaths.enter()
+                .append('path')
+                .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius, 
+                                               dtheta, 0, d)) 
+                .attr('class', 'positivePositPath')
+                .attr('fill', fill)
+                .attr('stroke', stroke)
+                .attr('stroke-width', strokeWidth)
+        .attr('marker-end', 'url(#' + dotMarkerId + ')');
+    // add the last arc with the arrowhead
+    console.log(infinity[0])
+    var infinity_path = container.append('path')
+        .attr('d', generateArcFromPosit(width/2, height/2, radius, 
+                                        dtheta, 0, infinity[0]))
+        .attr('class', 'positivePositPath')
         .attr('fill', fill)
         .attr('stroke', stroke)
         .attr('stroke-width', strokeWidth)
-        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')')
-        .attr('marker-mid', 'url(#' + dotMarkerId + ')');
+        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
+
+
+    /* This isn't quite right and needs fixing. We should probably just reverse the 
+     * describeArc so we can draw from the bottom of the circle up
+    var negativePaths = container.selectAll('.negativePositPath').data(negativePosits);
+    var paths = negativePaths.enter()
+                .append('path')
+                .attr('class', 'negativePositPath')
+                .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius,
+                                                       dtheta, 1, d))
+                .attr('fill', fill)
+                .attr('stroke', 'blue')
+                .attr('stroke-width', strokeWidth)
+                .attr('marker-start', 'url(#' + dotMarkerId + ')');
+
+    var neg_infinity_path = container.append('path')
+        .attr('d', generateArcFromPosit(width/2, height/2, radius, 
+                                        dtheta, 1, infinity[0]))
+        .attr('class', 'negativePositPath')
+        .attr('fill', fill)
+        .attr('stroke', 'blue')
+        .attr('stroke-width', strokeWidth)
+        .attr('marker-start', 'url(#' + reverseArrowheadMarkerId + ')');
+        */
+}
+
+function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
+    // draw arcs in the positive direction
+    if (sign === 0) {
+        var posit_as_int = unsignedIntegerFromBitstring(posit.bitstring);
+        var start_angle = 180 - (dtheta * (posit_as_int - 1))
+        var end_angle = 180 - (dtheta * posit_as_int)
+        return describeArc(width/2, height/2, radius, start_angle, end_angle)
+    }
+}
+
+// Following two functions based on this: 
+// https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+  var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+
+  return {
+    x: centerX + (radius * Math.cos(angleInRadians)),
+    y: centerY + (radius * Math.sin(angleInRadians))
+  };
+}
+
+
+// This function is a bit fussy. Angles start at the top of the circle and go clockwise, but 
+// circles are drawn counter clockwise. Feel free to fix this, so it's more logical
+// x and y are coordinates of the center
+function describeArc(x, y, radius, startAngle, endAngle){
+    var start = polarToCartesian(x, y, radius, startAngle);
+    var end = polarToCartesian(x, y, radius, endAngle);
+
+    var largeArcFlag = startAngle - endAngle <= 180 ? "0" : "1";
+
+    var d = [
+        "M", start.x, start.y, 
+        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+    ].join(" ");
+
+    return d;       
 }
 
 /**
@@ -103,6 +180,7 @@ function createArrowheadMarker() {
 
     return marker;
 }
+
 
 /**
  * Create a dot <marker> element to be appended to an <svg> (within a <defs>).
