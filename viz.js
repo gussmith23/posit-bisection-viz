@@ -4,7 +4,7 @@
  * Regenerates set of posits, splits them into positive, negative, zero, and
  * infinity; attaches new set of data to the viz.
  */
-function update(n, es) {
+function update(svgSelection, width, height, n, es) {
     const posits = generatePositsOfLength(n, es);
 
     const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
@@ -16,6 +16,7 @@ function update(n, es) {
     console.assert(zero && infinity);
     console.assert(positivePosits.length === negativePosits.length);
     console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
+    drawProjectiveRealsLine(svgSelection, width, height, n, es);
 
     // Here, we need to use d3 to select markers along the number lines, and
     // assign the data to the markers.
@@ -23,6 +24,21 @@ function update(n, es) {
     // line, and a .negativeDot class for the dots on the negative line.
     // Then, we need to set the markers' position attributes based on the
     // posit's position in the sorted list.
+}
+
+function setAttrs(nodes, width, height, dtheta, dotMarkerId) {
+    var fill = 'none';
+    var stroke = 'black';
+    var strokeWidth = '2';
+    var radius = width / 2;
+    nodes
+        .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius,
+                                               dtheta, 0, d))
+        .attr('class', 'positivePositPath')
+        .attr('fill', fill)
+        .attr('stroke', stroke)
+        .attr('stroke-width', strokeWidth)
+        .attr('marker-end', 'url(#' + dotMarkerId + ')');
 }
 
 /**
@@ -58,11 +74,20 @@ function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
     var stroke = 'black';
     var strokeWidth = '2';
 
-    var radius = (width)/2;
+    var radius = (width)/(2);
     var dtheta = 180/(1 << (n-1));
 
-    var positivePaths = container.selectAll('.positivePositPath').data(positivePosits);
+    var positivePaths = container.selectAll('.positivePositPath')
+        .data(positivePosits)
+        .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius, 
+                                        dtheta, 0, d)) 
+        .attr('class', 'positivePositPath')
+        .attr('fill', fill)
+        .attr('stroke', stroke)
+        .attr('stroke-width', strokeWidth)
+        .attr('marker-end', 'url(#' + dotMarkerId + ')');
     
+    positivePaths.exit().remove();
     var paths = positivePaths.enter()
                 .append('path')
                 .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius, 
@@ -72,8 +97,8 @@ function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
                 .attr('stroke', stroke)
                 .attr('stroke-width', strokeWidth)
         .attr('marker-end', 'url(#' + dotMarkerId + ')');
+
     // add the last arc with the arrowhead
-    console.log(infinity[0])
     var infinity_path = container.append('path')
         .attr('d', generateArcFromPosit(width/2, height/2, radius, 
                                         dtheta, 0, infinity[0]))
@@ -143,7 +168,6 @@ function describeArc(x, y, radius, startAngle, endAngle){
         "M", start.x, start.y, 
         "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
     ].join(" ");
-
     return d;       
 }
 

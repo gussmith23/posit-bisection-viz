@@ -14,11 +14,11 @@
     </body>
     <script type="text/javascript">
      // Posit parameters
-     var n = 8; var es = 1;
-     const nLowerBound = 2; const nUpperBound = 16;
+     var n = 4; var es = 1;
+     const nLowerBound = 2; const nUpperBound = 8;
      const esLowerBound = 0;
 
-     var width = 600; var height = 600;
+     var width = 400; var height = 400;
      // An assumption I'm making.
      console.assert(width === height);
 
@@ -38,28 +38,28 @@
        .on('click', function(){
            if (n > nLowerBound && n > es) {
                --n;
-               update(n, es);
+               update(container, width, height, n, es);
            }
        });
      d3.select('#increment-n')
        .on('click', function(){
            if (n < nUpperBound) {
                ++n;
-               update(n, es);
+               update(container, width, height, n, es);
            }
        });
      d3.select('#decrement-es')
        .on('click', function(){
            if (es > esLowerBound) {
                --es;
-               update(n, es);
+               update(container, width, height, n, es);
            }
        });
      d3.select('#increment-es')
        .on('click', function(){
            if (es < n) {
                ++es;
-               update(n, es);
+               update(container, width, height, n, es);
            }
        });
 
