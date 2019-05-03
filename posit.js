@@ -53,8 +53,6 @@ function decodePosit(bitstring, n, es) {
     } else {
         actualValueBitfields = rawBitfields;
     }
-    // Reset the sign bit to the correct (unflipped) value.
-    actualValueBitfields.sign = rawBitfields.sign;
 
     var sign = (actualValueBitfields.sign[0] === 0 ? 1.0 : -1.0);
     var useed = useedFromEs(es);
