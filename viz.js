@@ -8,9 +8,9 @@ function update(svgSelection, width, height, n, es) {
     const posits = generatePositsOfLength(n, es);
 
     const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
-          .sort(positCompare);
+        .sort(positCompare);
     const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
-          .sort(positCompare);
+        .sort(positCompare);
     const zero = posits.filter(p => p.value === 0.0);
     const infinity = posits.filter(p => p.value === Infinity);
     console.assert(zero && infinity);
@@ -26,10 +26,6 @@ function update(svgSelection, width, height, n, es) {
     // posit's position in the sorted list.
 }
 
-    // var infinity_path = container.append('path')
-    //     .attr('d', generateArcFromPosit(width/2, height/2, radius, 
-    //                                     dtheta, 0, infinity[0]))
-
 function setAttrs(nodes, width, dtheta, markerId) {
     var height = width;
     var fill = 'none';
@@ -38,7 +34,7 @@ function setAttrs(nodes, width, dtheta, markerId) {
     var radius = width / 2;
     nodes
         .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius,
-                                               dtheta, 0, d))
+            dtheta, 0, d))
         .attr('class', 'positivePositPath')
         .attr('fill', fill)
         .attr('stroke', stroke)
@@ -71,9 +67,9 @@ function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
     const posits = generatePositsOfLength(n, es);
 
     const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
-          .sort(positCompare);
+        .sort(positCompare);
     const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
-          .sort(positCompare);
+        .sort(positCompare);
     const infinity = posits.filter(p => p.value === Infinity);
 
     var dtheta = 180/(1 << (n-1));
@@ -87,7 +83,7 @@ function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
     var finalArc = container.append('path').data(infinity)
     setAttrs(finalArc, width, dtheta, arrowheadMarkerId);
 
-    /* This isn't quite right and needs fixing. We should probably just reverse the 
+    /* This isn't quite right and needs fixing. We should probably just reverse the
      * describeArc so we can draw from the bottom of the circle up
     var negativePaths = container.selectAll('.negativePositPath').data(negativePosits);
     var paths = negativePaths.enter()
@@ -101,7 +97,7 @@ function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
                 .attr('marker-start', 'url(#' + dotMarkerId + ')');
 
     var neg_infinity_path = container.append('path')
-        .attr('d', generateArcFromPosit(width/2, height/2, radius, 
+        .attr('d', generateArcFromPosit(width/2, height/2, radius,
                                         dtheta, 1, infinity[0]))
         .attr('class', 'negativePositPath')
         .attr('fill', fill)
@@ -121,19 +117,19 @@ function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
     }
 }
 
-// Following two functions based on this: 
+// Following two functions based on this:
 // https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-  var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+    var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
 
-  return {
-    x: centerX + (radius * Math.cos(angleInRadians)),
-    y: centerY + (radius * Math.sin(angleInRadians))
-  };
+    return {
+        x: centerX + (radius * Math.cos(angleInRadians)),
+        y: centerY + (radius * Math.sin(angleInRadians))
+    };
 }
 
 
-// This function is a bit fussy. Angles start at the top of the circle and go clockwise, but 
+// This function is a bit fussy. Angles start at the top of the circle and go clockwise, but
 // circles are drawn counter clockwise. Feel free to fix this, so it's more logical
 // x and y are coordinates of the center
 function describeArc(x, y, radius, startAngle, endAngle){
@@ -143,10 +139,10 @@ function describeArc(x, y, radius, startAngle, endAngle){
     var largeArcFlag = startAngle - endAngle <= 180 ? "0" : "1";
 
     var d = [
-        "M", start.x, start.y, 
+        "M", start.x, start.y,
         "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
     ].join(" ");
-    return d;       
+    return d;
 }
 
 /**

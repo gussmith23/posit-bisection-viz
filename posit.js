@@ -86,9 +86,9 @@ function generatePositsOfLength(n, es) {
 
     var arr = new Array(2**n);
     for (var i = 0; i < arr.length; i++) {
-	var bitstring = i.toString(2).padStart(n, '0').split('');
-	var bitarray = bitstring.map(bit => parseInt(bit));
-	arr[i] = decodePosit(bitarray, n, es);
+        var bitstring = i.toString(2).padStart(n, '0').split('');
+        var bitarray = bitstring.map(bit => parseInt(bit));
+        arr[i] = decodePosit(bitarray, n, es);
     }
 
     return arr;
