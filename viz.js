@@ -26,7 +26,12 @@ function update(svgSelection, width, height, n, es) {
     // posit's position in the sorted list.
 }
 
-function setAttrs(nodes, width, height, dtheta, dotMarkerId) {
+    // var infinity_path = container.append('path')
+    //     .attr('d', generateArcFromPosit(width/2, height/2, radius, 
+    //                                     dtheta, 0, infinity[0]))
+
+function setAttrs(nodes, width, dtheta, markerId) {
+    var height = width;
     var fill = 'none';
     var stroke = 'black';
     var strokeWidth = '2';
@@ -38,7 +43,7 @@ function setAttrs(nodes, width, height, dtheta, dotMarkerId) {
         .attr('fill', fill)
         .attr('stroke', stroke)
         .attr('stroke-width', strokeWidth)
-        .attr('marker-end', 'url(#' + dotMarkerId + ')');
+        .attr('marker-end', 'url(#' + markerId + ')');
 }
 
 /**
@@ -70,44 +75,17 @@ function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
     const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
           .sort(positCompare);
     const infinity = posits.filter(p => p.value === Infinity);
-    var fill = 'none';
-    var stroke = 'black';
-    var strokeWidth = '2';
 
-    var radius = (width)/(2);
     var dtheta = 180/(1 << (n-1));
 
     var positivePaths = container.selectAll('.positivePositPath')
-        .data(positivePosits)
-        .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius, 
-                                        dtheta, 0, d)) 
-        .attr('class', 'positivePositPath')
-        .attr('fill', fill)
-        .attr('stroke', stroke)
-        .attr('stroke-width', strokeWidth)
-        .attr('marker-end', 'url(#' + dotMarkerId + ')');
-    
+        .data(positivePosits);
+    setAttrs(positivePaths, width, dtheta, dotMarkerId);
+    setAttrs(positivePaths.enter().append('path'), width, dtheta, dotMarkerId);
     positivePaths.exit().remove();
-    var paths = positivePaths.enter()
-                .append('path')
-                .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius, 
-                                               dtheta, 0, d)) 
-                .attr('class', 'positivePositPath')
-                .attr('fill', fill)
-                .attr('stroke', stroke)
-                .attr('stroke-width', strokeWidth)
-        .attr('marker-end', 'url(#' + dotMarkerId + ')');
-
     // add the last arc with the arrowhead
-    var infinity_path = container.append('path')
-        .attr('d', generateArcFromPosit(width/2, height/2, radius, 
-                                        dtheta, 0, infinity[0]))
-        .attr('class', 'positivePositPath')
-        .attr('fill', fill)
-        .attr('stroke', stroke)
-        .attr('stroke-width', strokeWidth)
-        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
-
+    var finalArc = container.append('path').data(infinity)
+    setAttrs(finalArc, width, dtheta, arrowheadMarkerId);
 
     /* This isn't quite right and needs fixing. We should probably just reverse the 
      * describeArc so we can draw from the bottom of the circle up
