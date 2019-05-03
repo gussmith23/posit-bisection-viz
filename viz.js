@@ -1,8 +1,32 @@
 /**
  * Update data with new posit parameters.
+ *
+ * Regenerates set of posits, splits them into positive, negative, zero, and
+ * infinity; attaches new set of data to the viz.
  */
 function update(n, es) {
-    console.log(n + " " + es);
+    const posits = generatePositsOfLength(n, es);
+
+    const positCompare = function(posit1, posit2) {
+        return unsignedIntegerFromBitstring(posit1.bitstring) - unsignedIntegerFromBitstring(posit2.bitstring);
+    };
+
+    const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
+          .sort(positCompare);
+    const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
+          .sort(positCompare);
+    const zero = posits.filter(p => p.value === 0.0);
+    const infinity = posits.filter(p => p.value === Infinity);
+    console.assert(zero && infinity);
+    console.assert(positivePosits.length === negativePosits.length);
+    console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
+
+    // Here, we need to use d3 to select markers along the number lines, and
+    // assign the data to the markers.
+    // I think we'll have a .positiveDot class for the dots on the positive
+    // line, and a .negativeDot class for the dots on the negative line.
+    // Then, we need to set the markers' position attributes based on the
+    // posit's position in the sorted list.
 }
 
 /**
