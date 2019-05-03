@@ -36,8 +36,8 @@ function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
     // Create a defs block; define arrowhead and dot markers.
     var arrowheadMarker = createArrowheadMarker();
     var arrowheadMarkerId = d3.select(arrowheadMarker).attr('id');
-    var reverseArrowheadMarker = createReverseArrowheadMarker();
-    var reverseArrowheadMarkerId = d3.select(reverseArrowheadMarker).attr('id');
+    // var reverseArrowheadMarker = createReverseArrowheadMarker();
+    // var reverseArrowheadMarkerId = d3.select(reverseArrowheadMarker).attr('id');
     var dotMarker = createDotMarker();
     var dotMarkerId = d3.select(dotMarker).attr('id');
 

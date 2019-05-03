@@ -13,6 +13,13 @@
  */
 
 /**
+ * Compare two posits for sorting.
+ */
+function positCompare(posit1, posit2) {
+    return unsignedIntegerFromBitstring(posit1.bitstring) - unsignedIntegerFromBitstring(posit2.bitstring);
+};
+
+/**
  * Decode any posit (passed as a bitstring).
  */
 function decodePosit(bitstring, n, es) {
