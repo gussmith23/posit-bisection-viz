@@ -32,14 +32,25 @@ function setAttrs(nodes, sign, width, dtheta, markerId) {
     var stroke = 'black';
     var strokeWidth = '2';
     var radius = width / 2;
-    nodes
-        .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius,
-            dtheta, sign, d))
-        .attr('class', 'positivePositPath')
-        .attr('fill', fill)
-        .attr('stroke', stroke)
-        .attr('stroke-width', strokeWidth)
-        .attr('marker-end', 'url(#' + markerId + ')');
+    if (sign) {
+        nodes
+            .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius,
+                dtheta, sign, d))
+            .attr('class', 'negativePositPath')
+            .attr('fill', fill)
+            .attr('stroke', stroke)
+            .attr('stroke-width', strokeWidth)
+            .attr('marker-end', 'url(#' + markerId + ')');
+    } else {
+        nodes
+            .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius,
+                dtheta, sign, d))
+            .attr('class', 'positivePositPath')
+            .attr('fill', fill)
+            .attr('stroke', stroke)
+            .attr('stroke-width', strokeWidth)
+            .attr('marker-end', 'url(#' + markerId + ')');
+    }
 }
 
 /**
@@ -103,8 +114,8 @@ function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
         start_angle = 180 - (dtheta * (posit_as_int - 1))
         end_angle = 180 - (dtheta * posit_as_int)
     } else {
-        // Semi-hacky correction so that negative posits go from most negative to least
-        // negative
+        // Semi-hacky correction so that negative posits go
+        // from most negative to least negative
         if (posit.value != Infinity) { posit_as_int -= infVal;}
         start_angle = 180 + (dtheta * (posit_as_int - 1))
         end_angle = 180 + (dtheta * (posit_as_int))
@@ -128,7 +139,10 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
 /* Angles start at the top of the circle and go clockwise, we drawn arcs for positive
  * numbers counter-clockwise and arcs for negative numbers clockwise.
  * If sign is 0, the arc is drawn from start->end otherwise we drawn from end->start
- * x and y are coordinates of the center */
+ * x and y are coordinates of the center
+ *
+ * https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+ */
 function describeArc(x, y, radius, sign, startAngle, endAngle){
     var start = polarToCartesian(x, y, radius, startAngle);
     var end = polarToCartesian(x, y, radius, endAngle);
