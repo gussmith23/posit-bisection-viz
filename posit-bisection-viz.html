@@ -6,8 +6,18 @@
         <script src="posit.js"></script>
         <script src="viz.js"></script>
     </head>
-    <body></body>
+    <body>
+        <button id='decrement-n'>&lt;&lt; <i>n</i></button>
+        <button id='increment-n'>&gt;&gt; <i>n</i></button>
+        <button id='decrement-es'>&lt;&lt; <i>es</i></button>
+        <button id='increment-es'>&gt;&gt; <i>es</i></button>
+    </body>
     <script type="text/javascript">
+     // Posit parameters
+     var n = 8; var es = 1;
+     const nLowerBound = 2; const nUpperBound = 16;
+     const esLowerBound = 0;
+
      var width = 600; var height = 600;
      // An assumption I'm making.
      console.assert(width === height);
@@ -22,7 +32,36 @@
                        .append('g')
                        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-
      drawProjectiveRealsLine(container, width, height);
+
+     d3.select('#decrement-n')
+       .on('click', function(){
+           if (n > nLowerBound && n > es) {
+               --n;
+               update(n, es);
+           }
+       });
+     d3.select('#increment-n')
+       .on('click', function(){
+           if (n < nUpperBound) {
+               ++n;
+               update(n, es);
+           }
+       });
+     d3.select('#decrement-es')
+       .on('click', function(){
+           if (es > esLowerBound) {
+               --es;
+               update(n, es);
+           }
+       });
+     d3.select('#increment-es')
+       .on('click', function(){
+           if (es < n) {
+               ++es;
+               update(n, es);
+           }
+       });
+
     </script>
 </html>

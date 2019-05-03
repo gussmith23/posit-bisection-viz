@@ -1,3 +1,9 @@
+/**
+ * Update data with new posit parameters.
+ */
+function update(n, es) {
+    console.log(n + " " + es);
+}
 
 /**
  * Draw the projective reals line on an SVG.
