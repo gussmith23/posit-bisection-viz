@@ -68,6 +68,30 @@ function decodePosit(bitstring, n, es) {
     return out;
 };
 
+/* 
+ * Generates posits of length n with a fixed exponent size
+ *
+ * Returns an array of all possible posits
+ */
+function generatePositsOfLength(n, es) {
+    console.assert(n >= 2);
+    console.assert(es >= 0);
+
+    var arr = new Array(2**n);
+    for (var i = 0; i < arr.length; i++) {
+	var bitstring = i.toString(2).padStart(n, '0').split('');
+	var bitarray = bitstring.map(bit => parseInt(bit));
+	arr[i] = decodePosit(bitarray, n, es);
+    }
+
+    return arr;
+}
+
+//console.log(generatePositsOfLength(4, 1));
+//console.log(generatePositsOfLength(4, 2));
+//console.log(generatePositsOfLength(5, 2));
+//console.log(generatePositsOfLength(16, 2));
+
 expect(decodePosit([0,0,0,0], 4, 3).value).to.be(0.0);
 expect(decodePosit([1,0,0,0], 4, 3).value).to.be(Infinity);
 expect(decodePosit([0,1,1,1,0,0,1,0,1,0,0,0,0,0,0,0], 16, 0).value).to.be(5.25);
