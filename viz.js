@@ -26,7 +26,7 @@ function update(svgSelection, width, height, n, es) {
     // posit's position in the sorted list.
 }
 
-function setAttrs(nodes, width, dtheta, markerId) {
+function setAttrs(nodes, sign, width, dtheta, markerId) {
     var height = width;
     var fill = 'none';
     var stroke = 'black';
@@ -34,7 +34,7 @@ function setAttrs(nodes, width, dtheta, markerId) {
     var radius = width / 2;
     nodes
         .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius,
-            dtheta, 0, d))
+            dtheta, sign, d))
         .attr('class', 'positivePositPath')
         .attr('fill', fill)
         .attr('stroke', stroke)
@@ -76,49 +76,46 @@ function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
 
     var positivePaths = container.selectAll('.positivePositPath')
         .data(positivePosits);
-    setAttrs(positivePaths, width, dtheta, dotMarkerId);
-    setAttrs(positivePaths.enter().append('path'), width, dtheta, dotMarkerId);
+    setAttrs(positivePaths, 0, width, dtheta, dotMarkerId);
+    setAttrs(positivePaths.enter().append('path'), 0, width, dtheta, dotMarkerId);
     positivePaths.exit().remove();
-    // add the last arc with the arrowhead
-    var finalArc = container.append('path').data(infinity)
-    setAttrs(finalArc, width, dtheta, arrowheadMarkerId);
+    // add the last arc with an arrowhead
+    var posFinalArc = container.append('path').data(infinity)
+    setAttrs(posFinalArc, 0, width, dtheta, arrowheadMarkerId);
 
-    /* This isn't quite right and needs fixing. We should probably just reverse the
-     * describeArc so we can draw from the bottom of the circle up
-    var negativePaths = container.selectAll('.negativePositPath').data(negativePosits);
-    var paths = negativePaths.enter()
-                .append('path')
-                .attr('class', 'negativePositPath')
-                .attr('d', (d) => generateArcFromPosit(width/2, height/2, radius,
-                                                       dtheta, 1, d))
-                .attr('fill', fill)
-                .attr('stroke', 'blue')
-                .attr('stroke-width', strokeWidth)
-                .attr('marker-start', 'url(#' + dotMarkerId + ')');
-
-    var neg_infinity_path = container.append('path')
-        .attr('d', generateArcFromPosit(width/2, height/2, radius,
-                                        dtheta, 1, infinity[0]))
-        .attr('class', 'negativePositPath')
-        .attr('fill', fill)
-        .attr('stroke', 'blue')
-        .attr('stroke-width', strokeWidth)
-        .attr('marker-start', 'url(#' + reverseArrowheadMarkerId + ')');
-        */
+    var negativePaths = container.selectAll('.negativePositPath')
+        .data(negativePosits);
+    setAttrs(negativePaths, 1, width, dtheta, dotMarkerId);
+    setAttrs(negativePaths.enter().append('path'), 1, width, dtheta, dotMarkerId);
+    negativePaths.exit().remove();
+    // Add the final arc with an arrowhead
+    var negFinalArc = container.append('path').data(infinity)
+    setAttrs(negFinalArc, 1, width, dtheta, arrowheadMarkerId);
 }
 
 function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
+    var posit_as_int, start_angle, end_angle;
+    var infinity = 4;
     // draw arcs in the positive direction
+    var posit_as_int = unsignedIntegerFromBitstring(posit.bitstring);
+    var infVal = 2**(posit.bitstring.length - 1);
     if (sign === 0) {
-        var posit_as_int = unsignedIntegerFromBitstring(posit.bitstring);
-        var start_angle = 180 - (dtheta * (posit_as_int - 1))
-        var end_angle = 180 - (dtheta * posit_as_int)
-        return describeArc(width/2, height/2, radius, start_angle, end_angle)
+        start_angle = 180 - (dtheta * (posit_as_int - 1))
+        end_angle = 180 - (dtheta * posit_as_int)
+    } else {
+        // Semi-hacky correction so that negative posits go from most negative to least
+        // negative
+        if (posit.value != Infinity) { posit_as_int -= infVal;}
+        start_angle = 180 + (dtheta * (posit_as_int - 1))
+        end_angle = 180 + (dtheta * (posit_as_int))
     }
+    return describeArc(x_center, y_center, radius, sign, start_angle, end_angle)
 }
 
-// Following two functions based on this:
-// https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+/**
+ * Following two functions based on this:
+ * https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+ */
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
 
@@ -128,19 +125,17 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     };
 }
 
-
-// This function is a bit fussy. Angles start at the top of the circle and go clockwise, but
-// circles are drawn counter clockwise. Feel free to fix this, so it's more logical
-// x and y are coordinates of the center
-function describeArc(x, y, radius, startAngle, endAngle){
+/* Angles start at the top of the circle and go clockwise, we drawn arcs for positive
+ * numbers counter-clockwise and arcs for negative numbers clockwise.
+ * If sign is 0, the arc is drawn from start->end otherwise we drawn from end->start
+ * x and y are coordinates of the center */
+function describeArc(x, y, radius, sign, startAngle, endAngle){
     var start = polarToCartesian(x, y, radius, startAngle);
     var end = polarToCartesian(x, y, radius, endAngle);
 
-    var largeArcFlag = startAngle - endAngle <= 180 ? "0" : "1";
-
     var d = [
         "M", start.x, start.y,
-        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+        "A", radius, radius, 0, 0, sign, end.x, end.y
     ].join(" ");
     return d;
 }
