@@ -68,7 +68,7 @@ function decodePosit(bitstring, n, es) {
     return out;
 };
 
-/* 
+/**
  * Generates posits of length n with a fixed exponent size
  *
  * Returns an array of all possible posits
