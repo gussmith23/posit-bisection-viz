@@ -110,7 +110,7 @@ function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) 
     } else {
         // Semi-hacky correction so that negative posits go
         // from most negative to least negative
-        if (posit.value != Infinity) { posit_as_int -= infVal;}
+        if (posit.value != Infinity) { posit_as_int = Math.abs(infVal - (posit_as_int - infVal));}
         end_angle = 180 + (dtheta * (posit_as_int))
     }
     return polarToCartesian(x_center, y_center, radius, end_angle);
@@ -180,7 +180,7 @@ function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
     } else {
         // Semi-hacky correction so that negative posits go
         // from most negative to least negative
-        if (posit.value != Infinity) { posit_as_int -= infVal;}
+        if (posit.value != Infinity) { posit_as_int = Math.abs(infVal - (posit_as_int - infVal));}
         start_angle = 180 + (dtheta * (posit_as_int - 1))
         end_angle = 180 + (dtheta * (posit_as_int))
     }
