@@ -54,7 +54,7 @@ function setAttrs(nodes, sign, width, dtheta, markerId) {
 }
 
 function drawLabels(container, width, height, dtheta, posits, sign) {
-    radius = width/2 + 30
+    radius = width/2 + 15 + 5 * (posits[0].bitstring.length - 2)
     var texts;
     if (sign) {
         texts = container.selectAll('.negativeDot').data(posits)
