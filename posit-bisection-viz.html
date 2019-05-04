@@ -8,8 +8,17 @@
         <script src="viz.js"></script>
     </head>
     <body>
-        <div>n: <div id="slider-n"></div> </div>
-        <div>es: <div id="slider-es"></div></div>
+        <table style="margin-left:auto; margin-right:auto">
+            <tr>
+                <td><div id=n-text></td>
+                <td> <div style="text-align:center;" id="slider-n"></div> </td>
+            </tr>
+            <tr>
+                <td><div id=es-text></td>
+                <td> <div style="text-align:center;" id="slider-es"></div> </td>
+            </tr>
+        </table>
+        <div id="circle-viz" style="text-align:center;"></div>
     </body>
     <script type="text/javascript">
      // Posit parameters
@@ -25,7 +34,7 @@
 
      var margin = {left : 50, top : 50, right : 50, bottom : 50};
 
-     var container = d3.select(document.body).append('svg')
+     var container = d3.select("#circle-viz").append('svg')
                        .attr('width', margin.left + width + margin.right)
                        .attr('height', margin.top + height + margin.bottom)
      // A trick to make a margin without needing the drawing logic to reason about it.
@@ -81,16 +90,30 @@
         .attr('width', 500)
         .attr('height', 100)
         .append('g')
-        .attr('transform', 'translate(30,30)')
+        .attr('transform', 'translate(100,50)')
         .call(sliderN);
 
     d3.select('#slider-es')
         .append('svg')
         .attr('width', 500)
         .attr('height', 100)
+        .attr('align', 'center')
         .append('g')
-        .attr('transform', 'translate(30,30)')
+        .attr('transform', 'translate(100,50)')
+        .attr('id', 'es-group')
         .call(sliderES);
 
+
+     d3.select("#n-text").append('text')
+                .attr("transform", `translate(${(width)/2},-20)`)
+                .style('text-anchor', 'middle')
+                .style('font-weight', 700)
+                .text("N:");
+     
+     d3.select("#es-text").append('text')
+                .attr("transform", `translate(${(width)/2},-20)`)
+                .style('text-anchor', 'middle')
+                .style('font-weight', 700)
+                .text("ES:");
     </script>
 </html>
