@@ -54,16 +54,35 @@ function setAttrs(nodes, sign, width, dtheta, markerId) {
     }
 }
 
-function drawLabels(container, width, height, n, es, posits, sign) {
+function drawLabels(container, width, height, dtheta, posits, sign) {
     radius = width/2 + 30
-    dtheta = 180/(1 << (n-1));
-    var posTexts = container.selectAll('.positiveDot')
-        .data(posits).enter().append('text')
-        .attr('x', (d) => getDotCoordsFromPosit(width/2, height/2, radius,
-            dtheta, sign, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(width/2, height/2, radius,
-            dtheta, sign, d).y)
-        .text((d) => d.bitstring.join(""))
+    var texts;
+    if (sign) {
+        texts = container.selectAll('.negativeDot').data(posits)
+        texts
+            .enter().append('text')
+            .attr('x', (d) => getDotCoordsFromPosit(width/2, height/2,
+                radius, dtheta, sign, d).x)
+            .attr('y', (d) => getDotCoordsFromPosit(width/2, height/2,
+                radius, dtheta, sign, d).y)
+            .attr('font-family', 'sans-serif')
+            .attr('text-anchor', 'middle')
+            .attr('class', 'negativeDot')
+            .text((d) => d.bitstring.join(""));
+    } else {
+        texts = container.selectAll('.positiveDot').data(posits)
+        texts
+            .enter().append('text')
+            .attr('x', (d) => getDotCoordsFromPosit(width/2, height/2,
+                radius, dtheta, sign, d).x)
+            .attr('y', (d) => getDotCoordsFromPosit(width/2, height/2,
+                radius, dtheta, sign, d).y)
+            .attr('font-family', 'sans-serif')
+            .attr('text-anchor', 'middle')
+            .attr('class', 'positiveDot')
+            .text((d) => d.bitstring.join(""));
+    }
+    texts.exit().remove()
 }
 
 function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
@@ -129,8 +148,8 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
     // Add the final arc with an arrowhead
     var negFinalArc = container.append('path').data(infinity)
     setAttrs(negFinalArc, 1, width, dtheta, arrowheadMarkerId);
-    drawLabels(container, width, height, n, es, positivePosits, 0);
-    drawLabels(container, width, height, n, es, negativePosits, 1);
+    drawLabels(container, width, height, dtheta, positivePosits, 0);
+    drawLabels(container, width, height, dtheta, negativePosits, 1);
 }
 
 function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
