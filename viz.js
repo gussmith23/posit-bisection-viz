@@ -18,7 +18,6 @@ function update(contianer, width, height, n, es) {
     console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
     drawProjectiveRealsLine(container, width, height, n, es);
 
-
     // Here, we need to use d3 to select markers along the number lines, and
     // assign the data to the markers.
     // I think we'll have a .positiveDot class for the dots on the positive
@@ -69,10 +68,28 @@ function drawLabels(container, width, height, dtheta, posits, sign) {
             .attr('text-anchor', 'middle')
             .attr('class', 'negativeDot')
             .text((d) => d.bitstring.join(""));
+        texts
+            .attr('x', (d) => getDotCoordsFromPosit(width/2, height/2,
+                radius, dtheta, sign, d).x)
+            .attr('y', (d) => getDotCoordsFromPosit(width/2, height/2,
+                radius, dtheta, sign, d).y)
+            .attr('font-family', 'sans-serif')
+            .attr('text-anchor', 'middle')
+            .attr('class', 'negativeDot')
+            .text((d) => d.bitstring.join(""));
     } else {
         texts = container.selectAll('.positiveDot').data(posits)
         texts
             .enter().append('text')
+            .attr('x', (d) => getDotCoordsFromPosit(width/2, height/2,
+                radius, dtheta, sign, d).x)
+            .attr('y', (d) => getDotCoordsFromPosit(width/2, height/2,
+                radius, dtheta, sign, d).y)
+            .attr('font-family', 'sans-serif')
+            .attr('text-anchor', 'middle')
+            .attr('class', 'positiveDot')
+            .text((d) => d.bitstring.join(""));
+        texts
             .attr('x', (d) => getDotCoordsFromPosit(width/2, height/2,
                 radius, dtheta, sign, d).x)
             .attr('y', (d) => getDotCoordsFromPosit(width/2, height/2,
