@@ -4,7 +4,7 @@
  * Regenerates set of posits, splits them into positive, negative, zero, and
  * infinity; attaches new set of data to the viz.
  */
-function update(svgSelection, width, height, n, es) {
+function update(contianer, width, height, n, es) {
     const posits = generatePositsOfLength(n, es);
 
     const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
@@ -16,7 +16,8 @@ function update(svgSelection, width, height, n, es) {
     console.assert(zero && infinity);
     console.assert(positivePosits.length === negativePosits.length);
     console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
-    drawProjectiveRealsLine(svgSelection, width, height, n, es);
+    drawProjectiveRealsLine(container, width, height, n, es);
+
 
     // Here, we need to use d3 to select markers along the number lines, and
     // assign the data to the markers.
@@ -53,11 +54,38 @@ function setAttrs(nodes, sign, width, dtheta, markerId) {
     }
 }
 
+function drawLabels(container, width, height, n, es, posits, sign) {
+    radius = width/2 + 30
+    dtheta = 180/(1 << (n-1));
+    var posTexts = container.selectAll('.positiveDot')
+        .data(posits).enter().append('text')
+        .attr('x', (d) => getDotCoordsFromPosit(width/2, height/2, radius,
+            dtheta, sign, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(width/2, height/2, radius,
+            dtheta, sign, d).y)
+        .text((d) => d.bitstring.join(""))
+}
+
+function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
+    var posit_as_int = unsignedIntegerFromBitstring(posit.bitstring);
+    var infVal = 2**(posit.bitstring.length - 1);
+    var end_angle;
+    if (sign === 0) {
+        end_angle = 180 - (dtheta * posit_as_int)
+    } else {
+        // Semi-hacky correction so that negative posits go
+        // from most negative to least negative
+        if (posit.value != Infinity) { posit_as_int -= infVal;}
+        end_angle = 180 + (dtheta * (posit_as_int))
+    }
+    return polarToCartesian(x_center, y_center, radius, end_angle);
+}
+
 /**
  * Draw the projective reals line on an SVG.
  * @param svgSelection - the d3 selection of the SVG element.
  */
-function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
+function drawProjectiveRealsLine(container, width, height, n, es) {
     // An assumption I'm making right now.
     console.assert(width === height);
 
@@ -89,7 +117,6 @@ function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
         .data(positivePosits);
     setAttrs(positivePaths, 0, width, dtheta, dotMarkerId);
     setAttrs(positivePaths.enter().append('path'), 0, width, dtheta, dotMarkerId);
-    positivePaths.exit().remove();
     // add the last arc with an arrowhead
     var posFinalArc = container.append('path').data(infinity)
     setAttrs(posFinalArc, 0, width, dtheta, arrowheadMarkerId);
@@ -102,11 +129,12 @@ function drawProjectiveRealsLine(svgSelection, width, height, n, es) {
     // Add the final arc with an arrowhead
     var negFinalArc = container.append('path').data(infinity)
     setAttrs(negFinalArc, 1, width, dtheta, arrowheadMarkerId);
+    drawLabels(container, width, height, n, es, positivePosits, 0);
+    drawLabels(container, width, height, n, es, negativePosits, 1);
 }
 
 function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
     var posit_as_int, start_angle, end_angle;
-    var infinity = 4;
     // draw arcs in the positive direction
     var posit_as_int = unsignedIntegerFromBitstring(posit.bitstring);
     var infVal = 2**(posit.bitstring.length - 1);
