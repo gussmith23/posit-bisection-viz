@@ -156,6 +156,7 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
     // add the last arc with an arrowhead
     var posFinalArc = container.append('path').data(infinity)
     setAttrs(posFinalArc, 0, width, dtheta, arrowheadMarkerId);
+    positivePaths.exit().remove();
 
     var negativePaths = container.selectAll('.negativePositPath')
         .data(negativePosits);
