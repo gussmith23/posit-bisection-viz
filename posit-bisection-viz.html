@@ -2,21 +2,22 @@
 <html>
     <head>
         <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://unpkg.com/d3-simple-slider"></script>
         <script src="expect.js/index.js"></script>
         <script src="posit.js"></script>
         <script src="viz.js"></script>
     </head>
     <body>
-        <button id='decrement-n'>&lt;&lt; <i>n</i></button>
-        <button id='increment-n'>&gt;&gt; <i>n</i></button>
-        <button id='decrement-es'>&lt;&lt; <i>es</i></button>
-        <button id='increment-es'>&gt;&gt; <i>es</i></button>
+        <div>n: <div id="slider-n"></div> </div>
+        <div>es: <div id="slider-es"></div></div>
     </body>
     <script type="text/javascript">
      // Posit parameters
      var n = 4; var es = 1;
      const nLowerBound = 2; const nUpperBound = 8;
      const esLowerBound = 0;
+     const sliderLowerBound = esLowerBound; 
+     const sliderUpperBound = nUpperBound;
 
      var width = 400; var height = 400;
      // An assumption I'm making.
@@ -42,34 +43,58 @@
 
      drawProjectiveRealsLine(container, width, height, n, es);
 
-     d3.select('#decrement-n')
-       .on('click', function(){
-           if (n > nLowerBound && n > es) {
-               --n;
-               update(container, width, height, n, es);
-           }
-       });
-     d3.select('#increment-n')
-       .on('click', function(){
-           if (n < nUpperBound) {
-               ++n;
-               update(container, width, height, n, es);
-           }
-       });
-     d3.select('#decrement-es')
-       .on('click', function(){
-           if (es > esLowerBound) {
-               --es;
-               update(container, width, height, n, es);
-           }
-       });
-     d3.select('#increment-es')
-       .on('click', function(){
-           if (es < n) {
-               ++es;
-               update(container, width, height, n, es);
-           }
-       });
+    // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
+    var sliderES = d3
+        .sliderBottom()
+        .domain([sliderLowerBound, sliderUpperBound])
+        .step(1)
+        .ticks(sliderUpperBound - sliderLowerBound)
+        .width(300)
+        .default(2)
+        .displayFormat(d3.format('d'))
+        .tickFormat(d3.format('d'))
+        .on('onchange', val => {
+            if (val >= n) {
+                sliderES.silentValue(n-1);
+            } else {
+                es = val;    
+            }
+            update(container, width, height, n, es);
+        });
+
+    var sliderN = d3
+        .sliderBottom()
+        .domain([sliderLowerBound, sliderUpperBound])
+        .step(1)
+        .ticks(sliderUpperBound - sliderLowerBound)
+        .width(300)
+        .default(4)
+        .displayFormat(d3.format('d'))
+        .tickFormat(d3.format('d'))
+        .on('onchange', val => {
+            if ((val < nLowerBound) || (val <= es)) {
+                sliderN.silentValue(Math.max(nLowerBound, es+1));
+            } else {
+                n = val;
+            }
+            update(container, width, height, n, es);
+        });
+
+    d3.select('#slider-n')
+        .append('svg')
+        .attr('width', 500)
+        .attr('height', 100)
+        .append('g')
+        .attr('transform', 'translate(30,30)')
+        .call(sliderN);
+    
+    d3.select('#slider-es')
+        .append('svg')
+        .attr('width', 500)
+        .attr('height', 100)
+        .append('g')
+        .attr('transform', 'translate(30,30)')
+        .call(sliderES);
 
     </script>
 </html>
