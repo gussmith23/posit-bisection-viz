@@ -29,7 +29,6 @@ function update(contianer, width, height, n, es) {
 function setAttrs(nodes, sign, width, dtheta, markerId) {
     var height = width;
     var fill = 'none';
-    var stroke = 'black';
     var strokeWidth = '2';
     var radius = width / 2;
     if (sign) {
@@ -38,7 +37,7 @@ function setAttrs(nodes, sign, width, dtheta, markerId) {
                 dtheta, sign, d))
             .attr('class', 'negativePositPath')
             .attr('fill', fill)
-            .attr('stroke', stroke)
+            .attr('stroke', 'orange')
             .attr('stroke-width', strokeWidth)
             .attr('marker-end', 'url(#' + markerId + ')');
     } else {
@@ -47,7 +46,7 @@ function setAttrs(nodes, sign, width, dtheta, markerId) {
                 dtheta, sign, d))
             .attr('class', 'positivePositPath')
             .attr('fill', fill)
-            .attr('stroke', stroke)
+            .attr('stroke', 'blue')
             .attr('stroke-width', strokeWidth)
             .attr('marker-end', 'url(#' + markerId + ')');
     }
