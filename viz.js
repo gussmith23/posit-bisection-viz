@@ -228,7 +228,7 @@ function createArrowheadMarker() {
     var id = 'arrowhead';
     var markerWidth = '10';
     var markerHeight = '10';
-    var refX = '0';
+    var refX = '7';
     var refY = '3';
     var orient = 'auto';
     var markerUnits = 'strokeWidth';

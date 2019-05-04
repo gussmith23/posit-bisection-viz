@@ -16,7 +16,7 @@
      var n = 4; var es = 1;
      const nLowerBound = 2; const nUpperBound = 8;
      const esLowerBound = 0;
-     const sliderLowerBound = esLowerBound; 
+     const sliderLowerBound = esLowerBound;
      const sliderUpperBound = nUpperBound;
 
      var width = 400; var height = 400;
@@ -54,25 +54,21 @@
         .displayFormat(d3.format('d'))
         .tickFormat(d3.format('d'))
         .on('onchange', val => {
-            if (val >= n) {
-                sliderES.silentValue(n-1);
-            } else {
-                es = val;    
-            }
+            es = val;
             update(container, width, height, n, es);
         });
 
     var sliderN = d3
         .sliderBottom()
-        .domain([sliderLowerBound, sliderUpperBound])
+        .domain([nLowerBound, sliderUpperBound])
         .step(1)
-        .ticks(sliderUpperBound - sliderLowerBound)
+        .ticks(sliderUpperBound - nLowerBound)
         .width(300)
         .default(4)
         .displayFormat(d3.format('d'))
         .tickFormat(d3.format('d'))
         .on('onchange', val => {
-            if ((val < nLowerBound) || (val <= es)) {
+            if (val < nLowerBound) {
                 sliderN.silentValue(Math.max(nLowerBound, es+1));
             } else {
                 n = val;
@@ -87,7 +83,7 @@
         .append('g')
         .attr('transform', 'translate(30,30)')
         .call(sliderN);
-    
+
     d3.select('#slider-es')
         .append('svg')
         .attr('width', 500)
