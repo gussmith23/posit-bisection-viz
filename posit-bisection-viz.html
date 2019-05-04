@@ -1,4 +1,5 @@
 <meta charset="utf-8"/>
+<link rel="stylesheet" type="text/css" href="posit-bisection-viz.css">
 <html>
     <head>
         <script src="https://d3js.org/d3.v5.min.js"></script>
@@ -8,6 +9,7 @@
         <script src="viz.js"></script>
     </head>
     <body>
+        <h1>Posits!</h1>
         <table style="margin-left:auto; margin-right:auto">
             <tr>
                 <td><div id=n-text></td>
@@ -28,7 +30,7 @@
      const sliderLowerBound = esLowerBound;
      const sliderUpperBound = nUpperBound;
 
-     var width = 400; var height = 400;
+     var width = n*100; var height = n*100;
      // An assumption I'm making.
      console.assert(width === height);
 
@@ -43,12 +45,14 @@
                        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
      // Create a title
+     /*
      d3.selectAll('text').style("font-family", "sans-serif")
      title = container.append('text')
                 .attr("transform", `translate(${(width)/2},-20)`)
                 .style('text-anchor', 'middle')
                 .style('font-weight', 700)
                 .text("Posits!");
+                */
 
      drawProjectiveRealsLine(container, width, height, n, es);
 
@@ -59,7 +63,7 @@
         .step(1)
         .ticks(sliderUpperBound - sliderLowerBound)
         .width(300)
-        .default(2)
+        .default(es)
         .displayFormat(d3.format('d'))
         .tickFormat(d3.format('d'))
         .on('onchange', val => {
@@ -73,7 +77,7 @@
         .step(1)
         .ticks(sliderUpperBound - nLowerBound)
         .width(300)
-        .default(4)
+        .default(n)
         .displayFormat(d3.format('d'))
         .tickFormat(d3.format('d'))
         .on('onchange', val => {
@@ -87,19 +91,19 @@
 
     d3.select('#slider-n')
         .append('svg')
-        .attr('width', 500)
+        .attr('width', 400)
         .attr('height', 100)
         .append('g')
-        .attr('transform', 'translate(100,50)')
+        .attr('transform', 'translate(50,50)')
         .call(sliderN);
 
     d3.select('#slider-es')
         .append('svg')
-        .attr('width', 500)
+        .attr('width', 400)
         .attr('height', 100)
         .attr('align', 'center')
         .append('g')
-        .attr('transform', 'translate(100,50)')
+        .attr('transform', 'translate(50,50)')
         .attr('id', 'es-group')
         .call(sliderES);
 
