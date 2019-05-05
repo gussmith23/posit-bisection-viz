@@ -53,6 +53,7 @@ function setAttrs(nodes, sign, width, dtheta, markerId) {
 }
 
 function drawLabels(container, width, height, dtheta, posits, sign) {
+    console.log(posits)
     radius = width/2 + 15 + 5 * (posits[0].bitstring.length - 2)
     var texts;
     if (sign) {
@@ -66,7 +67,16 @@ function drawLabels(container, width, height, dtheta, posits, sign) {
             .attr('font-family', 'sans-serif')
             .attr('text-anchor', 'middle')
             .attr('class', 'negativeDot')
-            .text((d) => d.bitstring.join(""));
+            .text((d) => d.rawBitfields.sign.join(""))
+            .append("tspan")
+            .style("fill", "blue")
+            .text((d) => d.rawBitfields.regime.join(""))
+            .append("tspan")
+            .style("fill", "red")
+            .text((d) => d.rawBitfields.exponent.join(""))
+            .append("tspan")
+            .style("fill", "green")
+            .text((d) => d.rawBitfields.fraction.join(""));
         texts
             .attr('x', (d) => getDotCoordsFromPosit(width/2, height/2,
                 radius, dtheta, sign, d).x)
@@ -75,7 +85,16 @@ function drawLabels(container, width, height, dtheta, posits, sign) {
             .attr('font-family', 'sans-serif')
             .attr('text-anchor', 'middle')
             .attr('class', 'negativeDot')
-            .text((d) => d.bitstring.join(""));
+            .text((d) => d.rawBitfields.sign.join(""))
+            .append("tspan")
+            .style("fill", "blue")
+            .text((d) => d.rawBitfields.regime.join(""))
+            .append("tspan")
+            .style("fill", "red")
+            .text((d) => d.rawBitfields.exponent.join(""))
+            .append("tspan")
+            .style("fill", "green")
+            .text((d) => d.rawBitfields.fraction.join(""));
     } else {
         texts = container.selectAll('.positiveDot').data(posits)
         texts
@@ -87,7 +106,16 @@ function drawLabels(container, width, height, dtheta, posits, sign) {
             .attr('font-family', 'sans-serif')
             .attr('text-anchor', 'middle')
             .attr('class', 'positiveDot')
-            .text((d) => d.bitstring.join(""));
+            .text((d) => d.rawBitfields.sign.join(""))
+            .append("tspan")
+            .style("fill", "blue")
+            .text((d) => d.rawBitfields.regime.join(""))
+            .append("tspan")
+            .style("fill", "red")
+            .text((d) => d.rawBitfields.exponent.join(""))
+            .append("tspan")
+            .style("fill", "green")
+            .text((d) => d.rawBitfields.fraction.join(""));
         texts
             .attr('x', (d) => getDotCoordsFromPosit(width/2, height/2,
                 radius, dtheta, sign, d).x)
@@ -96,7 +124,16 @@ function drawLabels(container, width, height, dtheta, posits, sign) {
             .attr('font-family', 'sans-serif')
             .attr('text-anchor', 'middle')
             .attr('class', 'positiveDot')
-            .text((d) => d.bitstring.join(""));
+            .text((d) => d.rawBitfields.sign.join(""))
+            .append("tspan")
+            .style("fill", "blue")
+            .text((d) => d.rawBitfields.regime.join(""))
+            .append("tspan")
+            .style("fill", "red")
+            .text((d) => d.rawBitfields.exponent.join(""))
+            .append("tspan")
+            .style("fill", "green")
+            .text((d) => d.rawBitfields.fraction.join(""));
     }
     texts.exit().remove()
 }
@@ -165,6 +202,7 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
     // Add the final arc with an arrowhead
     var negFinalArc = container.append('path').data(infinity)
     setAttrs(negFinalArc, 1, width, dtheta, arrowheadMarkerId);
+
     drawLabels(container, width, height, dtheta, positivePosits, 0);
     drawLabels(container, width, height, dtheta, negativePosits, 1);
 }
