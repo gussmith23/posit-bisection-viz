@@ -50,9 +50,87 @@ function setAttrs(nodes, sign, x_center, y_center, dtheta, markerId, radius) {
     }
 }
 
+function drawInfinityDot(container, x_center, y_center, radius, infinity) {
+    var infinityDot = container.selectAll('.infDot').data(infinity);
+    var text_radius = radius + 15 + 5 * (infinity[0].bitstring.length - 2)
+
+    infinityDot.enter().append('circle')
+        .attr('class', 'infDot')
+        .attr('cx', x_center)
+        .attr('cy', y_center - radius)
+        .attr('r', 5)
+        .attr('fill', 'black');
+    
+    infinityDot
+        .attr('class', 'infDot')
+        .attr('cx', x_center)
+        .attr('cy', y_center - radius)
+        .attr('r', 5)
+        .attr('fill', 'black');
+
+    infinityDot.exit().remove();
+
+    text = container.selectAll('.infText').data(infinity)
+    text.enter().append('text')
+        .attr('class', 'infText')
+        .attr('x', x_center)
+        .attr('y', y_center - text_radius)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .text((d) => d.bitstring.join(""));
+        
+    text
+        .attr('class', 'infText')
+        .attr('x', x_center)
+        .attr('y', y_center - text_radius)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .text((d) => d.bitstring.join(""));
+
+    text.exit().remove()
+}
+
+function drawZero(container, x_center, y_center, radius, zero) {
+    var zeroDot = container.selectAll('.zeroDot').data(zero);
+    var text_radius = radius + 15 + 5 * (zero[0].bitstring.length - 2)
+
+    zeroDot.enter().append('circle')
+        .attr('class', 'zeroDot')
+        .attr('cx', x_center)
+        .attr('cy', y_center + radius)
+        .attr('r', 5)
+        .attr('fill', 'black');
+
+    zeroDot.attr('class', 'zeroDot')
+        .attr('cx', x_center)
+        .attr('cy', y_center + radius)
+        .attr('r', 5)
+        .attr('fill', 'black');
+
+    zeroDot.exit().remove();
+
+    text = container.selectAll('.zeroText').data(zero);
+    text.enter().append('text')
+        .attr('class', 'zeroText')
+        .attr('x', x_center)
+        .attr('y', y_center + text_radius)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .text((d) => d.bitstring.join(""));
+
+    text.attr('class', 'zeroText')
+        .attr('x', x_center)
+        .attr('y', y_center + text_radius)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .text((d) => d.bitstring.join(""));
+
+    text.exit().remove();
+}
+
 function drawLabels(container, x_center, y_center, dtheta, posits, sign, radius) {
     console.log(posits)
-    text_radius = radius + 15 + 5 * (posits[0].bitstring.length - 2)
+    var text_radius = radius + 15 + 5 * (posits[0].bitstring.length - 2)
     var texts;
     if (sign) {
         texts = container.selectAll('.negativeDot').data(posits)
@@ -180,11 +258,12 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
     const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
         .sort(positCompare);
     const infinity = posits.filter(p => p.value === Infinity);
+    const zero = posits.filter(p => p.value === 0.0);
 
-    var dtheta = 180/(1 << (n-1));
+    var dtheta = 178/(1 << (n-1));
     var radius = ((n/2) * 100) + (n**1.2 * 5);
     var x_center = width/2;
-    var y_center = (n * 100) - 200;
+    var y_center = radius;
 
     var positivePaths = container.selectAll('.positivePositPath')
         .data(positivePosits);
@@ -200,7 +279,7 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
         .data(negativePosits);
     setAttrs(negativePaths, 1, x_center, y_center, dtheta, dotMarkerId, radius);
     setAttrs(negativePaths.enter().append('path'), 1, 
-             x_center, y_center, dtheta, dotMarkerId, radius);
+        x_center, y_center, dtheta, dotMarkerId, radius);
     negativePaths.exit().remove();
     // Add the final arc with an arrowhead
     var negFinalArc = container.append('path').data(infinity)
@@ -208,6 +287,9 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
 
     drawLabels(container, x_center, y_center, dtheta, positivePosits, 0, radius);
     drawLabels(container, x_center, y_center, dtheta, negativePosits, 1, radius);
+
+    drawZero(container, x_center, y_center, radius, zero)
+    drawInfinityDot(container, x_center, y_center, radius, infinity)
 }
 
 function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
