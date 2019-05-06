@@ -8,7 +8,7 @@ COLORS = ["black", "blue", "red", "green"]
  * Regenerates set of posits, splits them into positive, negative, zero, and
  * infinity; attaches new set of data to the viz.
  */
-function update(contianer, width, height, n, es) {
+function update(contianer, width, height, n, es, format) {
     const posits = generatePositsOfLength(n, es);
 
     const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
@@ -20,7 +20,7 @@ function update(contianer, width, height, n, es) {
     console.assert(zero && infinity);
     console.assert(positivePosits.length === negativePosits.length);
     console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
-    drawProjectiveRealsLine(container, width, height, n, es);
+    drawProjectiveRealsLine(container, width, height, n, es, format);
     createLegend(container);
 
     // Here, we need to use d3 to select markers along the number lines, and
@@ -55,10 +55,12 @@ function setAttrs(nodes, sign, x_center, y_center, dtheta, markerId, radius) {
     }
 }
 
-function drawInfinityDot(container, x_center, y_center, radius, infinity) {
+function drawInfinityDot(container, x_center, y_center, radius, infinity, format) {
     var infinityDot = container.selectAll('.infDot').data(infinity);
     var text_radius = radius + 15 + 5 * (infinity[0].bitstring.length - 2)
 
+
+    var dotText = (format == label_format.FRACTION) ? "Infinity" : ((d) => d.bitstring.join(""));
     infinityDot.enter().append('circle')
         .attr('class', 'infDot')
         .attr('cx', x_center)
@@ -82,7 +84,7 @@ function drawInfinityDot(container, x_center, y_center, radius, infinity) {
         .attr('y', y_center - text_radius)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .text((d) => d.bitstring.join(""));
+        .text(dotText);
 
     text
         .attr('class', 'infText')
@@ -90,12 +92,12 @@ function drawInfinityDot(container, x_center, y_center, radius, infinity) {
         .attr('y', y_center - text_radius)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .text((d) => d.bitstring.join(""));
+        .text(dotText);
 
     text.exit().remove()
 }
 
-function drawZero(container, x_center, y_center, radius, zero) {
+function drawZero(container, x_center, y_center, radius, zero, format) {
     var zeroDot = container.selectAll('.zeroDot').data(zero);
     var text_radius = radius + 15 + 5 * (zero[0].bitstring.length - 2)
 
@@ -113,6 +115,7 @@ function drawZero(container, x_center, y_center, radius, zero) {
         .attr('fill', 'black');
 
     zeroDot.exit().remove();
+    zero_text = (format == label_format.FRACTION) ? "0" : ((d) => d.bitstring.join(""));
 
     text = container.selectAll('.zeroText').data(zero);
     text.enter().append('text')
@@ -121,14 +124,14 @@ function drawZero(container, x_center, y_center, radius, zero) {
         .attr('y', y_center + text_radius)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .text((d) => d.bitstring.join(""));
+        .text(zero_text);
 
     text.attr('class', 'zeroText')
         .attr('x', x_center)
         .attr('y', y_center + text_radius)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .text((d) => d.bitstring.join(""));
+        .text(zero_text);
     text.exit().remove();
 }
 
@@ -352,7 +355,7 @@ function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) 
  * Draw the projective reals line on an SVG.
  * @param svgSelection - the d3 selection of the SVG element.
  */
-function drawProjectiveRealsLine(container, width, height, n, es) {
+function drawProjectiveRealsLine(container, width, height, n, es, format) {
     // An assumption I'm making right now.
     console.assert(width === height);
 
@@ -411,8 +414,8 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
         drawBitstringLabels(container, width, height, n, es);
     }
 
-    drawZero(container, x_center, y_center, radius, zero)
-    drawInfinityDot(container, x_center, y_center, radius, infinity)
+    drawZero(container, x_center, y_center, radius, zero, format)
+    drawInfinityDot(container, x_center, y_center, radius, infinity, format)
 }
 
 function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {

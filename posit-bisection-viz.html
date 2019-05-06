@@ -54,22 +54,21 @@
                        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 
-    drawProjectiveRealsLine(container, width, height, n, es);
-    createLegend(container);
+    update(container, width, height, n, es, displayFormat)
 
     var selectFractionButton = d3.select("#fraction-button")
                                .append('button')
                                .text('Fraction Values')
                                .on('click', function (d) {
                                    displayFormat = label_format.FRACTION;
-                                   drawFractionLabels(container, width, height, n, es)
+                                    update(container, width, height, n, es, displayFormat)
                                 });
     var selectBitstringButton = d3.select("#bitstring-button")
                                .append('button')
                                .text('Bitstring Values')
                                .on('click', function(d) {
                                     displayFormat = label_format.BITSTRING;
-                                    drawBitstringLabels(container, width, height, n ,es)
+                                    update(container, width, height, n, es, displayFormat)
                                })
 
     // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
@@ -84,7 +83,7 @@
         .tickFormat(d3.format('d'))
         .on('onchange', val => {
             es = val;
-            update(container, width, height, n, es);
+            update(container, width, height, n, es, displayFormat);
         });
 
     var sliderN = d3
@@ -102,7 +101,7 @@
             } else {
                 n = val;
             }
-            update(container, width, height, n, es);
+            update(container, width, height, n, es, displayFormat);
         });
 
     d3.select('#slider-n')
