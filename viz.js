@@ -1,3 +1,7 @@
+
+COLORS = ["black", "blue", "red", "green"]
+
+
 /**
  * Update data with new posit parameters.
  *
@@ -17,6 +21,7 @@ function update(contianer, width, height, n, es) {
     console.assert(positivePosits.length === negativePosits.length);
     console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
     drawProjectiveRealsLine(container, width, height, n, es);
+    createLegend(container);
 
     // Here, we need to use d3 to select markers along the number lines, and
     // assign the data to the markers.
@@ -60,7 +65,7 @@ function drawInfinityDot(container, x_center, y_center, radius, infinity) {
         .attr('cy', y_center - radius)
         .attr('r', 5)
         .attr('fill', 'black');
-    
+
     infinityDot
         .attr('class', 'infDot')
         .attr('cx', x_center)
@@ -78,7 +83,7 @@ function drawInfinityDot(container, x_center, y_center, radius, infinity) {
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .text((d) => d.bitstring.join(""));
-        
+
     text
         .attr('class', 'infText')
         .attr('x', x_center)
@@ -161,15 +166,16 @@ function drawLabels(container, x_center, y_center, dtheta, posits, sign, radius)
             .attr('font-family', 'sans-serif')
             .attr('text-anchor', 'middle')
             .attr('class', 'negativeDot')
+            .style("fill", COLORS[0])
             .text((d) => d.rawBitfields.sign.join(""))
             .append("tspan")
-            .style("fill", "blue")
+            .style("fill", COLORS[1])
             .text((d) => d.rawBitfields.regime.join(""))
             .append("tspan")
-            .style("fill", "red")
+            .style("fill", COLORS[2])
             .text((d) => d.rawBitfields.exponent.join(""))
             .append("tspan")
-            .style("fill", "green")
+            .style("fill", COLORS[3])
             .text((d) => d.rawBitfields.fraction.join(""));
     } else {
         texts = container.selectAll('.positiveDot').data(posits)
@@ -182,15 +188,16 @@ function drawLabels(container, x_center, y_center, dtheta, posits, sign, radius)
             .attr('font-family', 'sans-serif')
             .attr('text-anchor', 'middle')
             .attr('class', 'positiveDot')
+            .style("fill", COLORS[0])
             .text((d) => d.rawBitfields.sign.join(""))
             .append("tspan")
-            .style("fill", "blue")
+            .style("fill", COLORS[2])
             .text((d) => d.rawBitfields.regime.join(""))
             .append("tspan")
-            .style("fill", "red")
+            .style("fill", COLORS[3])
             .text((d) => d.rawBitfields.exponent.join(""))
             .append("tspan")
-            .style("fill", "green")
+            .style("fill", COLORS[4])
             .text((d) => d.rawBitfields.fraction.join(""));
         texts
             .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -200,19 +207,54 @@ function drawLabels(container, x_center, y_center, dtheta, posits, sign, radius)
             .attr('font-family', 'sans-serif')
             .attr('text-anchor', 'middle')
             .attr('class', 'positiveDot')
+            .style("fill", COLORS[0])
             .text((d) => d.rawBitfields.sign.join(""))
             .append("tspan")
-            .style("fill", "blue")
+            .style("fill", COLORS[1])
             .text((d) => d.rawBitfields.regime.join(""))
             .append("tspan")
-            .style("fill", "red")
+            .style("fill", COLORS[2])
             .text((d) => d.rawBitfields.exponent.join(""))
             .append("tspan")
-            .style("fill", "green")
+            .style("fill", COLORS[3])
             .text((d) => d.rawBitfields.fraction.join(""));
     }
     texts.exit().remove()
 }
+
+function createLegend(container) {
+    const color = d3.scaleOrdinal()
+        .range([COLORS[0], COLORS[1], COLORS[2], COLORS[3]])
+        .domain(["Sign","Regime","Exponent","Fraction"]);
+
+    const legend = container
+        .selectAll(".legend")
+        .data(color.domain())
+        .enter()
+        .append('g')
+        .attr("class", "legend")
+        .attr("transform", function(d,i) {
+            return `translate(0, ${i * 20})`;
+        });
+
+    legend.append('rect')
+        .attr('class', 'legend-rect')
+        .attr('x', width + margin.right-12)
+        .attr('y', 65)
+        .attr('width', 12)
+        .attr('height', 12)
+        .style('fill', color)
+
+    legend.append("text")
+        .attr('class', 'legend-text')
+        .attr("x", width + margin.right-22)
+        .attr("y", 70)
+        .style('font-size', "12px")
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text(function(d) { return d;});
+}
+
 
 function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
     var posit_as_int = unsignedIntegerFromBitstring(posit.bitstring);
@@ -268,8 +310,8 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
     var positivePaths = container.selectAll('.positivePositPath')
         .data(positivePosits);
     setAttrs(positivePaths, 0, x_center, y_center, dtheta, dotMarkerId, radius);
-    setAttrs(positivePaths.enter().append('path'), 0, 
-             x_center, y_center, dtheta, dotMarkerId, radius);
+    setAttrs(positivePaths.enter().append('path'), 0,
+        x_center, y_center, dtheta, dotMarkerId, radius);
     // add the last arc with an arrowhead
     var posFinalArc = container.append('path').data(infinity)
     setAttrs(posFinalArc, 0, x_center, y_center, dtheta, arrowheadMarkerId, radius);
@@ -278,7 +320,7 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
     var negativePaths = container.selectAll('.negativePositPath')
         .data(negativePosits);
     setAttrs(negativePaths, 1, x_center, y_center, dtheta, dotMarkerId, radius);
-    setAttrs(negativePaths.enter().append('path'), 1, 
+    setAttrs(negativePaths.enter().append('path'), 1,
         x_center, y_center, dtheta, dotMarkerId, radius);
     negativePaths.exit().remove();
     // Add the final arc with an arrowhead
