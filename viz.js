@@ -1,5 +1,5 @@
 
-COLORS = ["black", "blue", "red", "green"]
+COLORS = ["brown", "blue", "red", "green"]
 
 
 /**
@@ -229,15 +229,16 @@ function drawBitstringLabels(container, width, height, n, es) {
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .attr('class', 'negativeText')
+        .style("fill", COLORS[0])
         .text((d) => d.rawBitfields.sign.join(""))
         .append("tspan")
-        .style("fill", "blue")
+        .style("fill", COLORS[1])
         .text((d) => d.rawBitfields.regime.join(""))
         .append("tspan")
-        .style("fill", "red")
+        .style("fill", COLORS[2])
         .text((d) => d.rawBitfields.exponent.join(""))
         .append("tspan")
-        .style("fill", "green")
+        .style("fill", COLORS[3])
         .text((d) => d.rawBitfields.fraction.join(""));
     texts
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
