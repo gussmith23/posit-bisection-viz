@@ -437,7 +437,6 @@ function drawPositiveDots(container, x_center, y_center, posits, n, es) {
     var radius = calculateRadius(n)
     var dtheta = calculateDTheta(n)
 
-    console.log(posits)
     var dots = container.selectAll('.positiveDot').data(posits)
     dots.enter().append('circle')
         .attr('class', 'positiveDot')
@@ -458,7 +457,6 @@ function drawNegativeDots(container, x_center, y_center, posits, n, es) {
     var radius = calculateRadius(n)
     var dtheta = calculateDTheta(n)
 
-    console.log(posits)
     var dots = container.selectAll('.negativeDot').data(posits)
     dots.enter().append('circle')
         .attr('class', 'negativeDot')
