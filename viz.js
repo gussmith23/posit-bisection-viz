@@ -214,7 +214,6 @@ function drawBitstringLabels(container, width, height, n, es) {
     var y_center = radius;
     
     const posits = generatePositsOfLength(n, es);
-    console.log(posits)
     const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
         .sort(positCompare);
     const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
