@@ -10,11 +10,13 @@ The [IEEE 754 floating-point standard](https://en.wikipedia.org/wiki/IEEE_754) h
  - A _sign_, indicating whether the datatype is positive or negative,
  - An _exponent_, encoding the order of magnitude of the number, and
  - A _fraction_, encoding the bits after the decimal point.
+
 The resulting number is then calculated (roughly) as `sign * 2^exponent * 1.fraction`. This format has worked quite well in the general case, and is able to encode a large range of numbers. However, with the rise of machine learning and other compute-intensive, acceleration-amenable workloads, researchers have been exploring new numerical datatype formats with desirable properties in specific domains.
 
 [_Posits_](http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf) are just one example of a new numerical datatype developed to compete with the standard IEEE format, and are the datatype we focus on in this project. Posits add a number of very interesting features over IEEE floating point, but the most interesting at a high level are
  1. The addition of the `es` parameter, and
  2. The addition of the "regime" bitfield.
+
 IEEE floating point numbers have only one parameter, `n`, which describes their length (generally 32 or 64). In addition to `n`, posits have another parameter `es`. `es` determines two things:
  - The maximum length of the exponent field, and
  - The value of a constant `k` that is used in calculating the value of the posit, where `k` is `2^2^es`.
