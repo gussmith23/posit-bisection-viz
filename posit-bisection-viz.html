@@ -14,17 +14,26 @@
             <tr>
                 <td><div id=n-text></td>
                 <td> <div style="text-align:center;" id="slider-n"></div> </td>
+                <td><div id=bitstring-button></div></td>
             </tr>
             <tr>
                 <td><div id=es-text></td>
                 <td> <div style="text-align:center;" id="slider-es"></div> </td>
+                <td><div id=fraction-button></div></td>
             </tr>
         </table>
         <div id="circle-viz" style="text-align:center;"></div>
     </body>
     <script type="text/javascript">
+
+     const label_format = {
+        FRACTION: 'fraction',
+        BITSTRING: 'bitstring'
+     };
+
      // Posit parameters
      var n = 4; var es = 1;
+     var displayFormat = label_format.BITSTRING;
      const nLowerBound = 2; const nUpperBound = 8;
      const esLowerBound = 0;
      const sliderLowerBound = esLowerBound;
@@ -44,18 +53,24 @@
                        .append('g')
                        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-     // Create a title
-     /*
-     d3.selectAll('text').style("font-family", "sans-serif")
-     title = container.append('text')
-                .attr("transform", `translate(${(width)/2},-20)`)
-                .style('text-anchor', 'middle')
-                .style('font-weight', 700)
-                .text("Posits!");
-                */
 
     drawProjectiveRealsLine(container, width, height, n, es);
     createLegend(container);
+
+    var selectFractionButton = d3.select("#fraction-button")
+                               .append('button')
+                               .text('Fraction Values')
+                               .on('click', function (d) {
+                                   displayFormat = label_format.FRACTION;
+                                   drawFractionLabels(container, width, height, n, es)
+                                });
+    var selectBitstringButton = d3.select("#bitstring-button")
+                               .append('button')
+                               .text('Bitstring Values')
+                               .on('click', function(d) {
+                                    displayFormat = label_format.BITSTRING;
+                                    drawBitstringLabels(container, width, height, n ,es)
+                               })
 
     // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
     var sliderES = d3

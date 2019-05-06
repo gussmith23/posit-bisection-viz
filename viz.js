@@ -129,96 +129,174 @@ function drawZero(container, x_center, y_center, radius, zero) {
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .text((d) => d.bitstring.join(""));
-
     text.exit().remove();
 }
 
-function drawLabels(container, x_center, y_center, dtheta, posits, sign, radius) {
+
+function calculateRadius(n) {
+    var radius = ((n/2) * 100) + (n**1.2 * 5);
+    return radius
+}
+
+function calculateDTheta(n) {
+    var dtheta = 178/(1 << (n-1));
+    return dtheta;
+}
+
+function drawFractionLabels(container, width, height, n, es) {
+    var dtheta = calculateDTheta(n)
+    var radius = calculateRadius(n)
+    var x_center = width/2;
+    var y_center = radius;
+    
+    const posits = generatePositsOfLength(n, es);
+    const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
+        .sort(positCompare);
+    const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
+        .sort(positCompare);
+    var text_radius = radius + 15 + 5 * (posits[0].bitstring.length - 2)
+
+    var texts = container.selectAll('.negativeDot').data(negativePosits);
+    texts.enter().append('text')
+        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).y)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('class', 'negativeDot')
+        .text((d) => decodePosit(d.bitstring, n, es).value);
+    texts
+        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).y)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('class', 'negativeDot')
+        .text((d) => decodePosit(d.bitstring, n, es).value);
+
+    texts.exit().remove();
+
+    texts = container.selectAll('.positiveDot').data(positivePosits);
+    texts.enter().append('text')
+        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 0, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 0, d).y)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('class', 'positiveDot')
+        .text((d) => decodePosit(d.bitstring, n, es).value);
+    texts
+        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 0, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 0, d).y)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('class', 'positiveDot')
+        .text((d) => decodePosit(d.bitstring, n, es).value);
+    texts.exit().remove();
+}
+
+function drawBitstringLabels(container, width, height, n, es) {
+    var dtheta = calculateDTheta(n)
+    var radius = calculateRadius(n)
+    var x_center = width/2;
+    var y_center = radius;
+    
+    const posits = generatePositsOfLength(n, es);
     console.log(posits)
+    const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
+        .sort(positCompare);
+    const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
+        .sort(positCompare);
     var text_radius = radius + 15 + 5 * (posits[0].bitstring.length - 2)
     var texts;
-    if (sign) {
-        texts = container.selectAll('.negativeDot').data(posits)
-        texts
-            .enter().append('text')
-            .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-                text_radius, dtheta, sign, d).x)
-            .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-                text_radius, dtheta, sign, d).y)
-            .attr('font-family', 'sans-serif')
-            .attr('text-anchor', 'middle')
-            .attr('class', 'negativeDot')
-            .text((d) => d.rawBitfields.sign.join(""))
-            .append("tspan")
-            .style("fill", "blue")
-            .text((d) => d.rawBitfields.regime.join(""))
-            .append("tspan")
-            .style("fill", "red")
-            .text((d) => d.rawBitfields.exponent.join(""))
-            .append("tspan")
-            .style("fill", "green")
-            .text((d) => d.rawBitfields.fraction.join(""));
-        texts
-            .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-                text_radius, dtheta, sign, d).x)
-            .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-                text_radius, dtheta, sign, d).y)
-            .attr('font-family', 'sans-serif')
-            .attr('text-anchor', 'middle')
-            .attr('class', 'negativeDot')
-            .style("fill", COLORS[0])
-            .text((d) => d.rawBitfields.sign.join(""))
-            .append("tspan")
-            .style("fill", COLORS[1])
-            .text((d) => d.rawBitfields.regime.join(""))
-            .append("tspan")
-            .style("fill", COLORS[2])
-            .text((d) => d.rawBitfields.exponent.join(""))
-            .append("tspan")
-            .style("fill", COLORS[3])
-            .text((d) => d.rawBitfields.fraction.join(""));
-    } else {
-        texts = container.selectAll('.positiveDot').data(posits)
-        texts
-            .enter().append('text')
-            .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-                text_radius, dtheta, sign, d).x)
-            .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-                text_radius, dtheta, sign, d).y)
-            .attr('font-family', 'sans-serif')
-            .attr('text-anchor', 'middle')
-            .attr('class', 'positiveDot')
-            .style("fill", COLORS[0])
-            .text((d) => d.rawBitfields.sign.join(""))
-            .append("tspan")
-            .style("fill", COLORS[2])
-            .text((d) => d.rawBitfields.regime.join(""))
-            .append("tspan")
-            .style("fill", COLORS[3])
-            .text((d) => d.rawBitfields.exponent.join(""))
-            .append("tspan")
-            .style("fill", COLORS[4])
-            .text((d) => d.rawBitfields.fraction.join(""));
-        texts
-            .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-                text_radius, dtheta, sign, d).x)
-            .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-                text_radius, dtheta, sign, d).y)
-            .attr('font-family', 'sans-serif')
-            .attr('text-anchor', 'middle')
-            .attr('class', 'positiveDot')
-            .style("fill", COLORS[0])
-            .text((d) => d.rawBitfields.sign.join(""))
-            .append("tspan")
-            .style("fill", COLORS[1])
-            .text((d) => d.rawBitfields.regime.join(""))
-            .append("tspan")
-            .style("fill", COLORS[2])
-            .text((d) => d.rawBitfields.exponent.join(""))
-            .append("tspan")
-            .style("fill", COLORS[3])
-            .text((d) => d.rawBitfields.fraction.join(""));
-    }
+
+    // negative labels
+    texts = container.selectAll('.negativeDot').data(negativePosits)
+    texts
+        .enter().append('text')
+        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).y)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('class', 'negativeDot')
+        .text((d) => d.rawBitfields.sign.join(""))
+        .append("tspan")
+        .style("fill", "blue")
+        .text((d) => d.rawBitfields.regime.join(""))
+        .append("tspan")
+        .style("fill", "red")
+        .text((d) => d.rawBitfields.exponent.join(""))
+        .append("tspan")
+        .style("fill", "green")
+        .text((d) => d.rawBitfields.fraction.join(""));
+    texts
+        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).y)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('class', 'negativeDot')
+        .style("fill", COLORS[0])
+        .text((d) => d.rawBitfields.sign.join(""))
+        .append("tspan")
+        .style("fill", COLORS[1])
+        .text((d) => d.rawBitfields.regime.join(""))
+        .append("tspan")
+        .style("fill", COLORS[2])
+        .text((d) => d.rawBitfields.exponent.join(""))
+        .append("tspan")
+        .style("fill", COLORS[3])
+        .text((d) => d.rawBitfields.fraction.join(""));
+    texts.exit().remove()
+
+    texts = container.selectAll('.positiveDot').data(positivePosits)
+    texts
+        .enter().append('text')
+        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).y)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('class', 'positiveDot')
+        .style("fill", COLORS[0])
+        .text((d) => d.rawBitfields.sign.join(""))
+        .append("tspan")
+        .style("fill", COLORS[2])
+        .text((d) => d.rawBitfields.regime.join(""))
+        .append("tspan")
+        .style("fill", COLORS[3])
+        .text((d) => d.rawBitfields.exponent.join(""))
+        .append("tspan")
+        .style("fill", COLORS[4])
+        .text((d) => d.rawBitfields.fraction.join(""));
+    texts
+        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
+            text_radius, dtheta, 1, d).y)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('class', 'positiveDot')
+        .style("fill", COLORS[0])
+        .text((d) => d.rawBitfields.sign.join(""))
+        .append("tspan")
+        .style("fill", COLORS[1])
+        .text((d) => d.rawBitfields.regime.join(""))
+        .append("tspan")
+        .style("fill", COLORS[2])
+        .text((d) => d.rawBitfields.exponent.join(""))
+        .append("tspan")
+        .style("fill", COLORS[3])
+        .text((d) => d.rawBitfields.fraction.join(""));
     texts.exit().remove()
 }
 
@@ -254,7 +332,6 @@ function createLegend(container) {
         .style("text-anchor", "end")
         .text(function(d) { return d;});
 }
-
 
 function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
     var posit_as_int = unsignedIntegerFromBitstring(posit.bitstring);
@@ -302,8 +379,8 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
     const infinity = posits.filter(p => p.value === Infinity);
     const zero = posits.filter(p => p.value === 0.0);
 
-    var dtheta = 178/(1 << (n-1));
-    var radius = ((n/2) * 100) + (n**1.2 * 5);
+    var dtheta = calculateDTheta(n);
+    var radius = calculateRadius(n); 
     var x_center = width/2;
     var y_center = radius;
 
@@ -327,8 +404,12 @@ function drawProjectiveRealsLine(container, width, height, n, es) {
     var negFinalArc = container.append('path').data(infinity)
     setAttrs(negFinalArc, 1, x_center, y_center, dtheta, arrowheadMarkerId, radius);
 
-    drawLabels(container, x_center, y_center, dtheta, positivePosits, 0, radius);
-    drawLabels(container, x_center, y_center, dtheta, negativePosits, 1, radius);
+    if (displayFormat === label_format.FRACTION) {
+        drawFractionLabels(container, width, height, n, es);
+    }
+    else {
+        drawBitstringLabels(container, width, height, n, es);
+    }
 
     drawZero(container, x_center, y_center, radius, zero)
     drawInfinityDot(container, x_center, y_center, radius, infinity)
