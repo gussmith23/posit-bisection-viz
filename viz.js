@@ -34,6 +34,10 @@ function update(contianer, width, height, n, es, format) {
 function setAttrs(nodes, sign, x_center, y_center, dtheta, markerId, radius) {
     var fill = 'none';
     var strokeWidth = '2';
+    var arcGenerator = d3.svg.arc()
+                         .innerRadius(radius - 10)
+                         .outerRadius(radius);
+
     if (sign) {
         nodes
             .attr('d', (d) => generateArcFromPosit(x_center, y_center, radius,
@@ -159,7 +163,7 @@ function drawFractionLabels(container, width, height, n, es) {
         .sort(positCompare);
     var text_radius = radius + 15 + 5 * (posits[0].bitstring.length - 2)
 
-    var texts = container.selectAll('.negativeDot').data(negativePosits);
+    var texts = container.selectAll('.negativeLabel').data(negativePosits);
     texts.enter().append('text')
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
             text_radius, dtheta, 1, d).x)
@@ -167,7 +171,7 @@ function drawFractionLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'negativeDot')
+        .attr('class', 'negativeLabel')
         .text((d) => decodePosit(d.bitstring, n, es).value);
     texts
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -176,12 +180,12 @@ function drawFractionLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'negativeDot')
+        .attr('class', 'negativeLabel')
         .text((d) => decodePosit(d.bitstring, n, es).value);
 
     texts.exit().remove();
 
-    texts = container.selectAll('.positiveDot').data(positivePosits);
+    texts = container.selectAll('.positiveLabel').data(positivePosits);
     texts.enter().append('text')
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
             text_radius, dtheta, 0, d).x)
@@ -189,7 +193,7 @@ function drawFractionLabels(container, width, height, n, es) {
             text_radius, dtheta, 0, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'positiveDot')
+        .attr('class', 'positiveLabel')
         .text((d) => decodePosit(d.bitstring, n, es).value);
     texts
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -198,7 +202,7 @@ function drawFractionLabels(container, width, height, n, es) {
             text_radius, dtheta, 0, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'positiveDot')
+        .attr('class', 'positiveLabel')
         .text((d) => decodePosit(d.bitstring, n, es).value);
     texts.exit().remove();
 }
@@ -219,7 +223,7 @@ function drawBitstringLabels(container, width, height, n, es) {
     var texts;
 
     // negative labels
-    texts = container.selectAll('.negativeDot').data(negativePosits)
+    texts = container.selectAll('.negativeLabel').data(negativePosits)
     texts
         .enter().append('text')
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -228,7 +232,7 @@ function drawBitstringLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'negativeDot')
+        .attr('class', 'negativeLabel')
         .text((d) => d.rawBitfields.sign.join(""))
         .append("tspan")
         .style("fill", "blue")
@@ -246,7 +250,7 @@ function drawBitstringLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'negativeDot')
+        .attr('class', 'negativeLabel')
         .style("fill", COLORS[0])
         .text((d) => d.rawBitfields.sign.join(""))
         .append("tspan")
@@ -260,7 +264,7 @@ function drawBitstringLabels(container, width, height, n, es) {
         .text((d) => d.rawBitfields.fraction.join(""));
     texts.exit().remove()
 
-    texts = container.selectAll('.positiveDot').data(positivePosits)
+    texts = container.selectAll('.positiveLabel').data(positivePosits)
     texts
         .enter().append('text')
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -269,7 +273,7 @@ function drawBitstringLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'positiveDot')
+        .attr('class', 'positiveLabel')
         .style("fill", COLORS[0])
         .text((d) => d.rawBitfields.sign.join(""))
         .append("tspan")
@@ -288,7 +292,7 @@ function drawBitstringLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'positiveDot')
+        .attr('class', 'positiveLabel')
         .style("fill", COLORS[0])
         .text((d) => d.rawBitfields.sign.join(""))
         .append("tspan")
@@ -387,25 +391,11 @@ function drawProjectiveRealsLine(container, width, height, n, es, format) {
     var x_center = width/2;
     var y_center = radius;
 
-    var positivePaths = container.selectAll('.positivePositPath')
-        .data(positivePosits);
-    setAttrs(positivePaths, 0, x_center, y_center, dtheta, dotMarkerId, radius);
-    setAttrs(positivePaths.enter().append('path'), 0,
-        x_center, y_center, dtheta, dotMarkerId, radius);
-    // add the last arc with an arrowhead
-    var posFinalArc = container.append('path').data(infinity)
-    setAttrs(posFinalArc, 0, x_center, y_center, dtheta, arrowheadMarkerId, radius);
-    positivePaths.exit().remove();
+    drawPositivePath(container, x_center, y_center, radius, zero, arrowheadMarkerId)
+    drawNegativePath(container, x_center, y_center, radius, zero, arrowheadMarkerId)
 
-    var negativePaths = container.selectAll('.negativePositPath')
-        .data(negativePosits);
-    setAttrs(negativePaths, 1, x_center, y_center, dtheta, dotMarkerId, radius);
-    setAttrs(negativePaths.enter().append('path'), 1,
-        x_center, y_center, dtheta, dotMarkerId, radius);
-    negativePaths.exit().remove();
-    // Add the final arc with an arrowhead
-    var negFinalArc = container.append('path').data(infinity)
-    setAttrs(negFinalArc, 1, x_center, y_center, dtheta, arrowheadMarkerId, radius);
+    drawPositiveDots(container, x_center, y_center, positivePosits, n, es) 
+    drawNegativeDots(container, x_center, y_center, negativePosits, n, es) 
 
     if (displayFormat === label_format.FRACTION) {
         drawFractionLabels(container, width, height, n, es);
@@ -416,6 +406,89 @@ function drawProjectiveRealsLine(container, width, height, n, es, format) {
 
     drawZero(container, x_center, y_center, radius, zero, format)
     drawInfinityDot(container, x_center, y_center, radius, infinity, format)
+}
+
+function drawPositiveDots(container, x_center, y_center, posits, n, es) {
+    var radius = calculateRadius(n)
+    var dtheta = calculateDTheta(n)
+
+    console.log(posits)
+    var dots = container.selectAll('.positiveDot').data(posits)
+    dots.enter().append('circle')
+        .attr('class', 'positiveDot')
+        .attr('cx', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d).x)
+        .attr('cy', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d).y)
+        .attr('r', 5)
+        .attr('fill', 'black');
+    dots
+        .attr('class', 'positiveDot')
+        .attr('cx', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d).x)
+        .attr('cy', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d).y)
+        .attr('r', 5)
+        .attr('fill', 'black');
+    dots.exit().remove()
+}
+
+function drawNegativeDots(container, x_center, y_center, posits, n, es) {
+    var radius = calculateRadius(n)
+    var dtheta = calculateDTheta(n)
+
+    console.log(posits)
+    var dots = container.selectAll('.negativeDot').data(posits)
+    dots.enter().append('circle')
+        .attr('class', 'negativeDot')
+        .attr('cx', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d).x)
+        .attr('cy', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d).y)
+        .attr('r', 5)
+        .attr('fill', 'black');
+    dots
+        .attr('class', 'negativeDot')
+        .attr('cx', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d).x)
+        .attr('cy', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d).y)
+        .attr('r', 5)
+        .attr('fill', 'black');
+    dots.exit().remove()
+}
+
+function drawPositivePath(container, x_center, y_center, radius, zero, arrowheadMarkerId) {
+    var positivePath = container.selectAll('.positivePositPath').data(zero);
+    positivePath.enter().append('path')
+        .attr('class', 'positivePositPath')
+        .attr('d', describeArc(x_center, y_center, radius, 0, 180, 3))
+        .attr('stroke-width', '3')
+        .attr('stroke', 'orange')
+        .attr('fill', 'none')
+        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
+    positivePath
+        .attr('class', 'positivePositPath')
+        .attr('d', describeArc(x_center, y_center, radius, 0, 180, 3))
+        .attr('stroke-width', '3')
+        .attr('stroke', 'orange')
+        .attr('fill', 'none')
+        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
+    positivePath.exit().remove()
+
+}
+
+function drawNegativePath(container, x_center, y_center, radius, zero, arrowheadMarkerId) {
+    // negative arc
+    var negativePath = container.selectAll('.negativePositPath').data(zero);
+    negativePath.enter().append('path')
+        .attr('class', 'negativePositPath')
+        .attr('d', describeArc(x_center, y_center, radius, 1, 180, 357))
+        .attr('stroke-width', '3')
+        .attr('stroke', 'blue')
+        .attr('fill', 'none')
+        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
+    negativePath
+        .attr('class', 'negativePositPath')
+        .attr('d', describeArc(x_center, y_center, radius, 1, 180, 357))
+        .attr('stroke-width', '3')
+        .attr('stroke', 'blue')
+        .attr('fill', 'none')
+        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
+    negativePath.exit().remove()
+
 }
 
 function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
