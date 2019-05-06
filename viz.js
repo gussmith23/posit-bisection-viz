@@ -22,7 +22,7 @@ function update(contianer, width, height, n, es, format) {
     console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
     drawProjectiveRealsLine(container, width, height, n, es, format);
     createLegend(container);
-
+    createTooltip(container);
     // Here, we need to use d3 to select markers along the number lines, and
     // assign the data to the markers.
     // I think we'll have a .positiveDot class for the dots on the positive
@@ -159,7 +159,7 @@ function drawFractionLabels(container, width, height, n, es) {
         .sort(positCompare);
     var text_radius = radius + 15 + 5 * (posits[0].bitstring.length - 2)
 
-    var texts = container.selectAll('.negativeDot').data(negativePosits);
+    var texts = container.selectAll('.negativeText').data(negativePosits);
     texts.enter().append('text')
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
             text_radius, dtheta, 1, d).x)
@@ -167,7 +167,7 @@ function drawFractionLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'negativeDot')
+        .attr('class', 'negativeText')
         .text((d) => decodePosit(d.bitstring, n, es).value);
     texts
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -176,12 +176,12 @@ function drawFractionLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'negativeDot')
+        .attr('class', 'negativeText')
         .text((d) => decodePosit(d.bitstring, n, es).value);
 
     texts.exit().remove();
 
-    texts = container.selectAll('.positiveDot').data(positivePosits);
+    texts = container.selectAll('.positiveText').data(positivePosits);
     texts.enter().append('text')
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
             text_radius, dtheta, 0, d).x)
@@ -189,7 +189,7 @@ function drawFractionLabels(container, width, height, n, es) {
             text_radius, dtheta, 0, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'positiveDot')
+        .attr('class', 'positiveText')
         .text((d) => decodePosit(d.bitstring, n, es).value);
     texts
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -198,7 +198,7 @@ function drawFractionLabels(container, width, height, n, es) {
             text_radius, dtheta, 0, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'positiveDot')
+        .attr('class', 'positiveText')
         .text((d) => decodePosit(d.bitstring, n, es).value);
     texts.exit().remove();
 }
@@ -219,7 +219,7 @@ function drawBitstringLabels(container, width, height, n, es) {
     var texts;
 
     // negative labels
-    texts = container.selectAll('.negativeDot').data(negativePosits)
+    texts = container.selectAll('.negativeText').data(negativePosits)
     texts
         .enter().append('text')
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -228,7 +228,7 @@ function drawBitstringLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'negativeDot')
+        .attr('class', 'negativeText')
         .text((d) => d.rawBitfields.sign.join(""))
         .append("tspan")
         .style("fill", "blue")
@@ -246,7 +246,7 @@ function drawBitstringLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'negativeDot')
+        .attr('class', 'negativeText')
         .style("fill", COLORS[0])
         .text((d) => d.rawBitfields.sign.join(""))
         .append("tspan")
@@ -260,7 +260,7 @@ function drawBitstringLabels(container, width, height, n, es) {
         .text((d) => d.rawBitfields.fraction.join(""));
     texts.exit().remove()
 
-    texts = container.selectAll('.positiveDot').data(positivePosits)
+    texts = container.selectAll('.positiveText').data(positivePosits)
     texts
         .enter().append('text')
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -269,7 +269,7 @@ function drawBitstringLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'positiveDot')
+        .attr('class', 'positiveText')
         .style("fill", COLORS[0])
         .text((d) => d.rawBitfields.sign.join(""))
         .append("tspan")
@@ -288,7 +288,7 @@ function drawBitstringLabels(container, width, height, n, es) {
             text_radius, dtheta, 1, d).y)
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
-        .attr('class', 'positiveDot')
+        .attr('class', 'positiveText')
         .style("fill", COLORS[0])
         .text((d) => d.rawBitfields.sign.join(""))
         .append("tspan")
@@ -334,6 +334,31 @@ function createLegend(container) {
         .attr("dy", ".35em")
         .style("text-anchor", "end")
         .text(function(d) { return d;});
+}
+function createTooltip(contianer) {
+    const tip = d3.tip()
+        .attr('class', "d3-tip")
+        .style("color", "white")
+        .style("background-color", "black")
+        .style("padding", "6px")
+        .style("border-radius", "4px")
+        .style("font-size", "12px")
+        .offset([-10, 0])
+        .html(function(d) { return `<strong>${d3.format(',')(d.value)}</strong>`; });
+    container.call(tip);
+
+    container.selectAll('.positivePositPath')
+        .on('mouseover', function(d) { tip.show(d, this);})
+        .on('mouseout', function(d) { tip.hide();});
+    container.selectAll('.negativePositPath')
+        .on('mouseover', function(d) { tip.show(d, this);})
+        .on('mouseout', function(d) { tip.hide();});
+    container.selectAll('.zeroDot')
+        .on('mouseover', function(d) { tip.show(d, this);})
+        .on('mouseout', function(d) { tip.hide();});
+    container.selectAll('.infDot')
+        .on('mouseover', function(d) { tip.show(d, this);})
+        .on('mouseout', function(d) { tip.hide();});
 }
 
 function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
