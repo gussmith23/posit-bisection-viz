@@ -108,7 +108,11 @@ function drawZero(container, x_center, y_center, radius, zero, format) {
 
 function calculateRadius(n) {
     // TODO(gus) magic numbers
-    return ((n/2) * 100) + (n**1.2 * 5);
+    return ((n/2) * 100) + (2**(n/2) * 3);
+}
+
+function calculateYCenter(n) {
+    return calculateRadius(n) + (n * 5);
 }
 
 function calculateDTheta(n) {
@@ -149,7 +153,7 @@ function drawFractionLabels(container, width, height, n, es) {
         .sort(positCompare);
     var params = {
         x_center: width/2,
-        y_center: radius,
+        y_center: calculateYCenter(n),
         text_radius: radius + 15 + 5 * (posits[0].bitstring.length - 2),
         dtheta: calculateDTheta(n),
         n: n,
@@ -207,7 +211,7 @@ function drawBitstringLabels(container, width, height, n, es) {
         .sort(positCompare);
     var params = {
         x_center: width/2,
-        y_center: radius,
+        y_center: calculateYCenter(n),
         text_radius: radius + 15 + 5 * (posits[0].bitstring.length - 2),
         n:n,
         es:es,
@@ -336,7 +340,7 @@ function drawProjectiveRealsLine(container, width, height, n, es, format) {
     var dtheta = calculateDTheta(n);
     var radius = calculateRadius(n);
     var x_center = width/2;
-    var y_center = radius;
+    var y_center = calculateYCenter(n);
 
     drawPositivePath(container, x_center, y_center, radius, zero, arrowheadMarkerId)
     drawNegativePath(container, x_center, y_center, radius, zero, arrowheadMarkerId)
