@@ -73,6 +73,32 @@
                 </p>
             </section>
 
+            <section>
+                <p>
+                    <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf"><i>Posits</i></a> are a new numerical datatype developed to compete with the standard IEEE 754 format. Posits add a number of very interesting features over IEEE floating point, but the most interesting at a high level are (1) the addition of the <tt>es</tt> parameter, and (2) the addition of the <i>regime</i> bitfield.
+                </p>
+
+                <p>
+                    IEEE floating point numbers have only one parameter, <tt>n</tt>, which describes their length (generally 32 or 64). In addition to <tt>n</tt>, posits have another parameter <tt>es</tt>. <tt>es</tt> determines two things:
+                    <ul>
+                        <li>The maximum length of the exponent field, and</li>
+                        <li>The value of a constant <tt>useed</tt> that is used in calculating the value of the posit, where <tt>useed</tt> is <tt>2^2^es</tt>.</li>
+                    </ul>
+                </p>
+
+                <p>
+                    The <i>regime</i> bitfield is a varying-length, unary-encoded field which comes just after the posit's sign field. The field is encoded as a number of 0s ending with a 1, or a number of 1s ending with a 0: <tt>001</tt> or <tt>1110</tt>, for example. The number of 1s or 0s translates to the sign and value of <tt>k</tt>, a number used to calculate the value of the posit.
+                </p>
+
+                <p>
+                    The final posit is calculated as <tt>sign * useed^k * 2^exponent * 1.fraction</tt>.
+                </p>
+
+                <p>
+                    In this project, we present an interactive version of the visualization shown on page 2 of <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf">John Gustafson's original posit paper</a> and page 16 of <a href="https://posithub.org/conga/2019/docs/13/1000-PeterLindstrom.pdf">Peter Lindstrom's CoNGA 2019 slides</a>. This visualization shows the posits laid out on the <i>projectively-extended real number line</i>, which is the real number line we are used to, but with both infinities being represented by the same point. This makes sense for posits, as posits only have one representation for infinity. The process of filling out the values on this circle is often called <i>posit bisection</i>, hence the title of this visualization.
+                </p>
+            </section>
+
             <table style="margin-left:auto; margin-right:auto">
                 <tr>
                     <td><div id=n-text></div></td>
