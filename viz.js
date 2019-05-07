@@ -426,9 +426,10 @@ function drawPositivePath(container, x_center, y_center, radius, zero, arrowhead
         .attr('stroke-width', '3')
         .attr('stroke', 'orange')
         .attr('fill', 'none')
-        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
+        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')')
+        .each(function(d) { this._current_n = d.bitstring.length; }) ;
     positivePath
-        .attr('d', describeArc(x_center, y_center, radius, 0, 180, 3))
+        .transition().duration(750).attrTween('d', positivePathTween)
     positivePath.exit().remove()
 
 }
@@ -442,12 +443,52 @@ function drawNegativePath(container, x_center, y_center, radius, zero, arrowhead
         .attr('stroke-width', '3')
         .attr('stroke', 'blue')
         .attr('fill', 'none')
-        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
+        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')')
+        .each(function(d) { this._current_n = d.bitstring.length; }) ;
     negativePath
-        .attr('d', describeArc(x_center, y_center, radius, 1, 180, 357))
+        .transition().duration(750).attrTween('d', negativePathTween)
     negativePath.exit().remove()
 
 }
+
+function positivePathTween(a) {
+    var current_n = this._current_n;
+    var next_n = a.bitstring.length;
+    var current_arc_params = 
+                      {x_center: width/2,
+                      y_center: calculateYCenter(current_n),
+                      radius: calculateRadius(current_n)};
+    var next_arc_params = 
+                      {x_center: width/2,
+                       y_center: calculateYCenter(next_n),
+                          radius: calculateRadius(next_n)};
+    var inter = d3.interpolateObject(current_arc_params, next_arc_params);
+    this._current_n = next_n;
+    return function(t) {
+        return describeArc(inter(t).x_center, inter(t).y_center,
+            inter(t).radius, 0, 180, 3);
+    };
+}
+
+function negativePathTween(a) {
+    var current_n = this._current_n;
+    var next_n = a.bitstring.length;
+    var current_arc_params = 
+                      {x_center: width/2,
+                      y_center: calculateYCenter(current_n),
+                      radius: calculateRadius(current_n)};
+    var next_arc_params = 
+                      {x_center: width/2,
+                       y_center: calculateYCenter(next_n),
+                          radius: calculateRadius(next_n)};
+    var inter = d3.interpolateObject(current_arc_params, next_arc_params);
+    this._current_n = next_n;
+    return function(t) {
+        return describeArc(inter(t).x_center, inter(t).y_center,
+            inter(t).radius, 1, 180, 357);
+    };
+}
+
 
 /**
  * Following two functions based on this:
