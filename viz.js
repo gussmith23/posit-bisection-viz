@@ -172,6 +172,7 @@ function drawFractionLabels(container, width, height, n, es) {
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .attr('class', 'negativeText')
+        .style("fill", COLORS[0])
         .text((d) => decodePosit(d.bitstring, n, es).value);
     texts
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -181,6 +182,7 @@ function drawFractionLabels(container, width, height, n, es) {
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .attr('class', 'negativeText')
+        .style("fill", COLORS[0])
         .text((d) => decodePosit(d.bitstring, n, es).value);
 
     texts.exit().remove();
@@ -194,6 +196,7 @@ function drawFractionLabels(container, width, height, n, es) {
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .attr('class', 'positiveText')
+        .style("fill", "black")
         .text((d) => decodePosit(d.bitstring, n, es).value);
     texts
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -203,6 +206,7 @@ function drawFractionLabels(container, width, height, n, es) {
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .attr('class', 'positiveText')
+        .style("fill", "black")
         .text((d) => decodePosit(d.bitstring, n, es).value);
     texts.exit().remove();
 }
@@ -348,13 +352,19 @@ function createTooltip(contianer) {
         .style("border-radius", "4px")
         .style("font-size", "12px")
         .offset([-10, 0])
-        .html(function(d) { return `<strong>${d3.format(',')(d.value)}</strong>`; });
+        .html(function(d) {
+            if (displayFormat == label_format.FRACTION) {
+                return `<strong>${(d.value)}</strong>`;
+            } else {
+                return `<strong>${(d.bitstring.join(""))}</strong>`;
+            }
+        });
     container.call(tip);
 
-    container.selectAll('.positivePositPath')
+    container.selectAll('.positiveDot')
         .on('mouseover', function(d) { tip.show(d, this);})
         .on('mouseout', function(d) { tip.hide();});
-    container.selectAll('.negativePositPath')
+    container.selectAll('.negativeDot')
         .on('mouseover', function(d) { tip.show(d, this);})
         .on('mouseout', function(d) { tip.hide();});
     container.selectAll('.zeroDot')
