@@ -23,12 +23,6 @@ function update(contianer, width, height, n, es, format) {
     drawProjectiveRealsLine(container, width, height, n, es, format);
     createLegend(container);
     createTooltip(container);
-    // Here, we need to use d3 to select markers along the number lines, and
-    // assign the data to the markers.
-    // I think we'll have a .positiveDot class for the dots on the positive
-    // line, and a .negativeDot class for the dots on the negative line.
-    // Then, we need to set the markers' position attributes based on the
-    // posit's position in the sorted list.
 }
 
 
@@ -114,173 +108,100 @@ function drawZero(container, x_center, y_center, radius, zero, format) {
 
 
 function calculateRadius(n) {
-    var radius = ((n/2) * 100) + (n**1.2 * 5);
-    return radius
+    return ((n/2) * 100) + (n**1.2 * 5);
 }
 
 function calculateDTheta(n) {
-    var dtheta = 178/(1 << (n-1));
-    return dtheta;
+    return 178/(1 << (n-1));
+}
+
+function setFracTextAttrs(text_var, params, sign, classString) {
+    text_var
+        .attr('x', (d) => getDotCoordsFromPosit(params.x_center,
+            params.y_center, params.text_radius, params.dtheta, sign, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(params.x_center,
+            params.y_center, params.text_radius, params.dtheta, sign, d).y)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('class', classString)
+        .style("fill", "black")
+        .text((d) => decodePosit(d.bitstring, params.n, params.es).value);
 }
 
 function drawFractionLabels(container, width, height, n, es) {
-    var dtheta = calculateDTheta(n)
     var radius = calculateRadius(n)
-    var x_center = width/2;
-    var y_center = radius;
-    
+
     const posits = generatePositsOfLength(n, es);
     const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
         .sort(positCompare);
     const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
         .sort(positCompare);
-    var text_radius = radius + 15 + 5 * (posits[0].bitstring.length - 2)
+    var params = {
+        x_center: width/2,
+        y_center: radius,
+        text_radius: radius + 15 + 5 * (posits[0].bitstring.length - 2),
+        dtheta: calculateDTheta(n),
+        n: n,
+        es: es
+    };
 
     var texts = container.selectAll('.negativeText').data(negativePosits);
-    texts.enter().append('text')
-        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).y)
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
-        .attr('class', 'negativeText')
-        .style("fill", COLORS[0])
-        .text((d) => decodePosit(d.bitstring, n, es).value);
-    texts
-        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).y)
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
-        .attr('class', 'negativeText')
-        .style("fill", COLORS[0])
-        .text((d) => decodePosit(d.bitstring, n, es).value);
-
+    setFracTextAttrs(texts.enter().append('text'), params, 1, 'negativeText');
+    setFracTextAttrs(texts, params, 1, 'negativeText');
     texts.exit().remove();
-
     texts = container.selectAll('.positiveText').data(positivePosits);
-    texts.enter().append('text')
-        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 0, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 0, d).y)
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
-        .attr('class', 'positiveText')
-        .style("fill", "black")
-        .text((d) => decodePosit(d.bitstring, n, es).value);
-    texts
-        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 0, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 0, d).y)
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
-        .attr('class', 'positiveText')
-        .style("fill", "black")
-        .text((d) => decodePosit(d.bitstring, n, es).value);
+    setFracTextAttrs(texts.enter().append('text'), params, 0, 'positiveText');
+    setFracTextAttrs(texts, params, 0, 'positiveText');
     texts.exit().remove();
 }
 
+function setBitstringTextAttrs(text_var, params, sign, classString) {
+    text_var
+        .attr('x', (d) => getDotCoordsFromPosit(params.x_center,
+            params.y_center, params.text_radius, params.dtheta, sign, d).x)
+        .attr('y', (d) => getDotCoordsFromPosit(params.x_center, params.y_center,
+            params.text_radius, params.dtheta, sign, d).y)
+        .attr('font-family', 'sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('class', classString)
+        .style("fill", COLORS[0])
+        .text((d) => d.rawBitfields.sign.join(""))
+        .append("tspan")
+        .style("fill", COLORS[1])
+        .text((d) => d.rawBitfields.regime.join(""))
+        .append("tspan")
+        .style("fill", COLORS[2])
+        .text((d) => d.rawBitfields.exponent.join(""))
+        .append("tspan")
+        .style("fill", COLORS[3])
+        .text((d) => d.rawBitfields.fraction.join(""))
+}
+
 function drawBitstringLabels(container, width, height, n, es) {
-    var dtheta = calculateDTheta(n)
     var radius = calculateRadius(n)
-    var x_center = width/2;
-    var y_center = radius;
-    
+
     const posits = generatePositsOfLength(n, es);
     const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
         .sort(positCompare);
     const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
         .sort(positCompare);
-    var text_radius = radius + 15 + 5 * (posits[0].bitstring.length - 2)
-    var texts;
+    var params = {
+        x_center: width/2,
+        y_center: radius,
+        text_radius: radius + 15 + 5 * (posits[0].bitstring.length - 2),
+        n:n,
+        es:es,
+        dtheta:calculateDTheta(n),
+    }
 
-    // negative labels
-    texts = container.selectAll('.negativeText').data(negativePosits)
-    texts
-        .enter().append('text')
-        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).y)
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
-        .attr('class', 'negativeText')
-        .style("fill", COLORS[0])
-        .text((d) => d.rawBitfields.sign.join(""))
-        .append("tspan")
-        .style("fill", COLORS[1])
-        .text((d) => d.rawBitfields.regime.join(""))
-        .append("tspan")
-        .style("fill", COLORS[2])
-        .text((d) => d.rawBitfields.exponent.join(""))
-        .append("tspan")
-        .style("fill", COLORS[3])
-        .text((d) => d.rawBitfields.fraction.join(""));
-    texts
-        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).y)
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
-        .attr('class', 'negativeText')
-        .style("fill", COLORS[0])
-        .text((d) => d.rawBitfields.sign.join(""))
-        .append("tspan")
-        .style("fill", COLORS[1])
-        .text((d) => d.rawBitfields.regime.join(""))
-        .append("tspan")
-        .style("fill", COLORS[2])
-        .text((d) => d.rawBitfields.exponent.join(""))
-        .append("tspan")
-        .style("fill", COLORS[3])
-        .text((d) => d.rawBitfields.fraction.join(""));
+    var texts = container.selectAll('.negativeText').data(negativePosits)
+    setBitstringTextAttrs(texts.enter().append('text'), params, 1, 'negativeText')
+    setBitstringTextAttrs(texts, params, 1, 'negativeText')
     texts.exit().remove()
 
     texts = container.selectAll('.positiveText').data(positivePosits)
-    texts
-        .enter().append('text')
-        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).y)
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
-        .attr('class', 'positiveText')
-        .style("fill", COLORS[0])
-        .text((d) => d.rawBitfields.sign.join(""))
-        .append("tspan")
-        .style("fill", COLORS[1])
-        .text((d) => d.rawBitfields.regime.join(""))
-        .append("tspan")
-        .style("fill", COLORS[2])
-        .text((d) => d.rawBitfields.exponent.join(""))
-        .append("tspan")
-        .style("fill", COLORS[3])
-        .text((d) => d.rawBitfields.fraction.join(""));
-    texts
-        .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(x_center, y_center,
-            text_radius, dtheta, 1, d).y)
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
-        .attr('class', 'positiveText')
-        .style("fill", COLORS[0])
-        .text((d) => d.rawBitfields.sign.join(""))
-        .append("tspan")
-        .style("fill", COLORS[1])
-        .text((d) => d.rawBitfields.regime.join(""))
-        .append("tspan")
-        .style("fill", COLORS[2])
-        .text((d) => d.rawBitfields.exponent.join(""))
-        .append("tspan")
-        .style("fill", COLORS[3])
-        .text((d) => d.rawBitfields.fraction.join(""));
+    setBitstringTextAttrs(texts.enter().append('text'), params, 0, 'positiveText')
+    setBitstringTextAttrs(texts, params, 0, 'positiveText')
     texts.exit().remove()
 }
 
@@ -360,7 +281,11 @@ function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) 
         if (posit.value != Infinity) { posit_as_int = Math.abs(infVal - (posit_as_int - infVal));}
         end_angle = 180 + (dtheta * (posit_as_int))
     }
-    return polarToCartesian(x_center, y_center, radius, end_angle);
+    return {
+        endAngle:end_angle,
+        x:polarToCartesian(x_center, y_center, radius, end_angle).x,
+        y:polarToCartesian(x_center, y_center, radius, end_angle).y
+    };
 }
 
 /**
