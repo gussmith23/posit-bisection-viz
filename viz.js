@@ -107,13 +107,17 @@ function drawZero(container, x_center, y_center, radius, zero, format) {
 
 
 function calculateRadius(n) {
+    // TODO(gus) magic numbers
     return ((n/2) * 100) + (n**1.2 * 5);
 }
 
 function calculateDTheta(n) {
+    // TODO(gus) magic numbers
     return 178/(1 << (n-1));
 }
 
+// TODO(gus) do we need so much separation between drawing labels as fractions
+// or as bitstrings?
 function setFracTextAttrs(text_var, params, sign, classString) {
     text_var
         .attr('x', (d) => getDotCoordsFromPosit(params.x_center,
@@ -130,6 +134,7 @@ function setFracTextAttrs(text_var, params, sign, classString) {
 function drawFractionLabels(container, width, height, n, es) {
     var radius = calculateRadius(n)
 
+    // TODO(gus) we should try to generate the posits in just one place---where should that be?
     const posits = generatePositsOfLength(n, es);
     const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
         .sort(positCompare);
