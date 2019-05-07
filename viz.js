@@ -1,5 +1,5 @@
 
-COLORS = ["brown", "blue", "red", "green"]
+COLORS = ["#FF2100", "#C98700", "#2867FF", "#000000"]
 
 
 /**
@@ -31,33 +31,6 @@ function update(contianer, width, height, n, es, format) {
     // posit's position in the sorted list.
 }
 
-function setAttrs(nodes, sign, x_center, y_center, dtheta, markerId, radius) {
-    var fill = 'none';
-    var strokeWidth = '2';
-    var arcGenerator = d3.svg.arc()
-                         .innerRadius(radius - 10)
-                         .outerRadius(radius);
-
-    if (sign) {
-        nodes
-            .attr('d', (d) => generateArcFromPosit(x_center, y_center, radius,
-                dtheta, sign, d))
-            .attr('class', 'negativePositPath')
-            .attr('fill', fill)
-            .attr('stroke', 'orange')
-            .attr('stroke-width', strokeWidth)
-            .attr('marker-end', 'url(#' + markerId + ')');
-    } else {
-        nodes
-            .attr('d', (d) => generateArcFromPosit(x_center, y_center, radius,
-                dtheta, sign, d))
-            .attr('class', 'positivePositPath')
-            .attr('fill', fill)
-            .attr('stroke', 'blue')
-            .attr('stroke-width', strokeWidth)
-            .attr('marker-end', 'url(#' + markerId + ')');
-    }
-}
 
 function drawInfinityDot(container, x_center, y_center, radius, infinity, format) {
     var infinityDot = container.selectAll('.infDot').data(infinity);
@@ -281,13 +254,13 @@ function drawBitstringLabels(container, width, height, n, es) {
         .style("fill", COLORS[0])
         .text((d) => d.rawBitfields.sign.join(""))
         .append("tspan")
-        .style("fill", COLORS[2])
+        .style("fill", COLORS[1])
         .text((d) => d.rawBitfields.regime.join(""))
         .append("tspan")
-        .style("fill", COLORS[3])
+        .style("fill", COLORS[2])
         .text((d) => d.rawBitfields.exponent.join(""))
         .append("tspan")
-        .style("fill", COLORS[4])
+        .style("fill", COLORS[3])
         .text((d) => d.rawBitfields.fraction.join(""));
     texts
         .attr('x', (d) => getDotCoordsFromPosit(x_center, y_center,
@@ -522,24 +495,6 @@ function drawNegativePath(container, x_center, y_center, radius, zero, arrowhead
         .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
     negativePath.exit().remove()
 
-}
-
-function generateArcFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
-    var posit_as_int, start_angle, end_angle;
-    // draw arcs in the positive direction
-    var posit_as_int = unsignedIntegerFromBitstring(posit.bitstring);
-    var infVal = 2**(posit.bitstring.length - 1);
-    if (sign === 0) {
-        start_angle = 180 - (dtheta * (posit_as_int - 1))
-        end_angle = 180 - (dtheta * posit_as_int)
-    } else {
-        // Semi-hacky correction so that negative posits go
-        // from most negative to least negative
-        if (posit.value != Infinity) { posit_as_int = Math.abs(infVal - (posit_as_int - infVal));}
-        start_angle = 180 + (dtheta * (posit_as_int - 1))
-        end_angle = 180 + (dtheta * (posit_as_int))
-    }
-    return describeArc(x_center, y_center, radius, sign, start_angle, end_angle)
 }
 
 /**
