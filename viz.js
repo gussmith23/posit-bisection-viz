@@ -125,8 +125,11 @@ function setFracTextAttrs(text_var, params, sign, classString) {
                                               params.y_center,
                                               params.text_radius,
                                               params.dtheta, sign, d);
+            var rotate = d.actualValueBitfields.sign[0] === 1 ?
+                coord.endAngle + 90 : coord.endAngle - 90;
             // Note: order of transforms matters!
-            return "translate(" + coord.x +"," + coord.y + ") rotate(0)";
+            return "translate(" + coord.x +"," + coord.y + ")"
+                + " rotate(" + rotate + ")";
         })
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
@@ -172,8 +175,11 @@ function setBitstringTextAttrs(text_var, params, sign, classString) {
                                               params.y_center,
                                               params.text_radius,
                                               params.dtheta, sign, d);
+            var rotate = d.actualValueBitfields.sign[0] === 1 ?
+                coord.endAngle + 90 : coord.endAngle - 90;
             // Note: order of transforms matters!
-            return "translate(" + coord.x +"," + coord.y + ") rotate(0)";
+            return "translate(" + coord.x +"," + coord.y + ")"
+                + " rotate(" + rotate + ")";
         })
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
