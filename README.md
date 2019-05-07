@@ -37,7 +37,7 @@ When choosing the bounds for our `n` and `es` sliders, we were primarily limited
 
 We decided to add an additional layer of interactivity via tooltips which appear as you hover over individual numbers.
 
-There were additionally a number of non-interactivity design decisions to be made. Color coding of the bitfields within the posits was an improvement lifted from previous posit representations; both Gustafson's and Lindstrom's works bring life to the otherwise uninterpretable bitstring by color-coding the fields. We tried to choose colors that contrasted with each other, so the bitfields could be easily distinguished. We went through several iterations of color, as while palettes with too high contrast were highly distinguishable, they were harsh on the eyes. A standard color legend provides the color encodings of the bit fields.
+There were additionally a number of non-interactivity design decisions to be made. Color coding of the bitfields within the posits was an improvement lifted from previous posit representations; both Gustafson's and Lindstrom's works bring life to the otherwise uninterpretable bitstring by color-coding the fields. We tried to choose colors that contrasted with each other, so the bitfields could be easily distinguished. We went through several iterations of color as while palettes with too high contrast were highly distinguishable, they were harsh on the eyes. A standard color legend provides the color encodings of the bit fields.
 
 ## Development Process
 
