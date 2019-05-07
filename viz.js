@@ -120,10 +120,14 @@ function calculateDTheta(n) {
 // or as bitstrings?
 function setFracTextAttrs(text_var, params, sign, classString) {
     text_var
-        .attr('x', (d) => getDotCoordsFromPosit(params.x_center,
-            params.y_center, params.text_radius, params.dtheta, sign, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(params.x_center,
-            params.y_center, params.text_radius, params.dtheta, sign, d).y)
+        .attr('transform', function(d, i) {
+            var coord = getDotCoordsFromPosit(params.x_center,
+                                              params.y_center,
+                                              params.text_radius,
+                                              params.dtheta, sign, d);
+            // Note: order of transforms matters!
+            return "translate(" + coord.x +"," + coord.y + ") rotate(0)";
+        })
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .attr('class', classString)
@@ -161,10 +165,16 @@ function drawFractionLabels(container, width, height, n, es) {
 
 function setBitstringTextAttrs(text_var, params, sign, classString) {
     text_var
-        .attr('x', (d) => getDotCoordsFromPosit(params.x_center,
-            params.y_center, params.text_radius, params.dtheta, sign, d).x)
-        .attr('y', (d) => getDotCoordsFromPosit(params.x_center, params.y_center,
-            params.text_radius, params.dtheta, sign, d).y)
+    // For whatever reason, 'transform' rotate doesn't play well with x and y
+    // attrs. So we just use translate instead of x and y.
+        .attr('transform', function(d, i) {
+            var coord = getDotCoordsFromPosit(params.x_center,
+                                              params.y_center,
+                                              params.text_radius,
+                                              params.dtheta, sign, d);
+            // Note: order of transforms matters!
+            return "translate(" + coord.x +"," + coord.y + ") rotate(0)";
+        })
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .attr('class', classString)
