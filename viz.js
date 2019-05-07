@@ -1,4 +1,3 @@
-
 COLORS = ["#FF2100", "#C98700", "#2867FF", "#000000"]
 
 
@@ -255,18 +254,12 @@ function createTooltip(contianer) {
         });
     container.call(tip);
 
-    container.selectAll('.positiveDot')
-        .on('mouseover', function(d) { tip.show(d, this);})
-        .on('mouseout', function(d) { tip.hide();});
-    container.selectAll('.negativeDot')
-        .on('mouseover', function(d) { tip.show(d, this);})
-        .on('mouseout', function(d) { tip.hide();});
-    container.selectAll('.zeroDot')
-        .on('mouseover', function(d) { tip.show(d, this);})
-        .on('mouseout', function(d) { tip.hide();});
-    container.selectAll('.infDot')
-        .on('mouseover', function(d) { tip.show(d, this);})
-        .on('mouseout', function(d) { tip.hide();});
+    var classNames = ['.positiveDot', '.negativeDot', '.zeroDot', '.infDot'];
+    for (var i = 0; i < classNames.length; i++) {
+        container.selectAll(classNames[i])
+            .on('mouseover', function(d) { tip.show(d, this);})
+            .on('mouseout', function(d) { tip.hide();});
+    }
 }
 
 function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
@@ -320,15 +313,15 @@ function drawProjectiveRealsLine(container, width, height, n, es, format) {
     const zero = posits.filter(p => p.value === 0.0);
 
     var dtheta = calculateDTheta(n);
-    var radius = calculateRadius(n); 
+    var radius = calculateRadius(n);
     var x_center = width/2;
     var y_center = radius;
 
     drawPositivePath(container, x_center, y_center, radius, zero, arrowheadMarkerId)
     drawNegativePath(container, x_center, y_center, radius, zero, arrowheadMarkerId)
 
-    drawPositiveDots(container, x_center, y_center, positivePosits, n, es) 
-    drawNegativeDots(container, x_center, y_center, negativePosits, n, es) 
+    drawPositiveDots(container, x_center, y_center, positivePosits, n, es)
+    drawNegativeDots(container, x_center, y_center, negativePosits, n, es)
 
     if (displayFormat === label_format.FRACTION) {
         drawFractionLabels(container, width, height, n, es);
