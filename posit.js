@@ -71,6 +71,13 @@ function decodePosit(bitstring, n, es) {
     out.rawBitfields = rawBitfields;
     out.actualValueBitfields = actualValueBitfields;
     out.value = value;
+    out.calc = {
+        sign:String(sign),
+        useed:String(useed),
+        k:String(k),
+        exp:String(exponent),
+        frac:String(fraction)
+    };
 
     return out;
 };

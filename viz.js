@@ -1,4 +1,4 @@
-COLORS = ["#FF2100", "#C98700", "#2867FF", "#000000"]
+COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"]
 
 
 /**
@@ -21,7 +21,7 @@ function update(contianer, width, height, n, es, format) {
     console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
     drawProjectiveRealsLine(container, width, height, n, es, format);
     createLegend(container);
-    createTooltip(container);
+    createTooltip(container, n, es);
 }
 
 
@@ -257,21 +257,25 @@ function createLegend(container) {
         .style("text-anchor", "end")
         .text(function(d) { return d;});
 }
-function createTooltip(contianer) {
+function createTooltip(contianer, n, es) {
     const tip = d3.tip()
         .attr('class', "d3-tip")
-        .style("color", "white")
-        .style("background-color", "black")
+        .style("color", "black")
+        .style("background-color", "lightgrey")
         .style("padding", "6px")
         .style("border-radius", "4px")
-        .style("font-size", "12px")
+        .style("font-size", "14px")
         .offset([-10, 0])
         .html(function(d) {
-            if (displayFormat == label_format.FRACTION) {
-                return `<strong>${(d.value)}</strong>`;
-            } else {
-                return `<strong>${(d.bitstring.join(""))}</strong>`;
-            }
+            decode = decodePosit(d.bitstring, n, es)
+            var value = String(decode.value) + " = ";
+            var sign = `<span style="color:${(COLORS[0])}">${(decode.calc.sign)}</span>`
+            var useed = `<span style="color:${(COLORS[1])}">${(decode.calc.useed)}</span>`
+            var k = `<span style="color:${(COLORS[1])}">${(decode.calc.k)}</span>`
+            var exp = `<span style="color:${(COLORS[2])}">${(decode.calc.exp)}</span>`
+            var frac = `<span style="color:${(COLORS[3])}">${(decode.calc.frac)}</span>`
+            return value + sign + " * " + useed + "^" + k + " * " +
+                String(2) + "^" + exp + " * " + frac;
         });
     container.call(tip);
 
