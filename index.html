@@ -103,12 +103,11 @@
                 <tr>
                     <td><div id=n-text></div></td>
                     <td> <div style="text-align:center;" id="slider-n"></div> </td>
-                    <td><div id=bitstring-button></div></td>
+                    <td><div id=bitstring-fraction-button></div></td>
                 </tr>
                 <tr>
                     <td><div id=es-text></div></td>
                     <td><div style="text-align:center;" id="slider-es"></div> </td>
-                    <td><div id=fraction-button></div></td>
                 </tr>
             </table>
             <div id="circle-viz" style="text-align:center;"></div>
@@ -150,20 +149,20 @@
 
     update(container, width, height, n, es, displayFormat)
 
-    var selectFractionButton = d3.select("#fraction-button")
+    var selectFractionButton = d3.select("#bitstring-fraction-button")
                                .append('button')
-                               .text('Fraction Values')
+                               .text('See Fraction Values')
                                .on('click', function (d) {
-                                   displayFormat = label_format.FRACTION;
+                                   if (d3.select(this).text() == 'See Fraction Values') {
+                                     d3.select(this).text('See Bitstring Values');
+                                     displayFormat = label_format.FRACTION;
+                                   } else { 
+                                     d3.select(this).text('See Fraction Values');
+                                     displayFormat = label_format.BITSTRING;
+                                   }
+
                                     update(container, width, height, n, es, displayFormat)
                                 });
-    var selectBitstringButton = d3.select("#bitstring-button")
-                               .append('button')
-                               .text('Bitstring Values')
-                               .on('click', function(d) {
-                                    displayFormat = label_format.BITSTRING;
-                                    update(container, width, height, n, es, displayFormat)
-                               })
 
     // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
     var sliderES = d3
