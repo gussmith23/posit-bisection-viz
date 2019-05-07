@@ -28,7 +28,9 @@ function decodePosit(bitstring, n, es) {
         'bitstring' : bitstring,
         'rawBitfields' : undefined,
         'actualValueBitfields' : undefined,
-        'value' : undefined
+        'value' : undefined,
+        'zero' : false,
+        'infinity' : false
     };
 
 
@@ -38,10 +40,12 @@ function decodePosit(bitstring, n, es) {
 
     if (unsignedIntegerFromBitstring(bitstring) === 0) {
         out.value = 0.0;
+        out.zero = true
         return out;
     }
     if (unsignedIntegerFromBitstring(bitstring) === 2**(bitstring.length-1)) {
         out.value = Infinity;
+        out.infinity = true
         return out;
     }
 

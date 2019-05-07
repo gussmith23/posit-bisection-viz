@@ -271,24 +271,36 @@ function createTooltip(contianer, n, es) {
         .style("font-size", "14px")
         .offset([-10, 0])
         .html(function(d) {
-            decode = decodePosit(d.bitstring, n, es)
-            var value = String(decode.value) + " = ";
-            var sign = `<span style="color:${(COLORS[0])}">${(decode.calc.sign)}</span>`
-            var useed = `<span style="color:${(COLORS[1])}">${(decode.calc.useed)}</span>`
-            var k = `<span style="color:${(COLORS[1])}">${(decode.calc.k)}</span>`
-            var exp = `<span style="color:${(COLORS[2])}">${(decode.calc.exp)}</span>`
-            var frac = `<span style="color:${(COLORS[3])}">${(decode.calc.frac)}</span>`
-            return value + sign + " * " + useed + "^" + k + " * " +
-                String(2) + "^" + exp + " * " + frac;
+            var decode = decodePosit(d.bitstring, n, es)
+            if (decode.infinity) {
+                return "Infinity";
+            } else if (decode.zero) {
+                return "Zero";
+            } else {
+                var value = String(decode.value) + " = ";
+                var sign = `<span style="color:${(COLORS[0])}">${(decode.calc.sign)}</span>`
+                var useed = `<span style="color:${(COLORS[1])}">${(decode.calc.useed)}</span>`
+                var k = `<span style="color:${(COLORS[1])}">${(decode.calc.k)}</span>`
+                var exp = `<span style="color:${(COLORS[2])}">${(decode.calc.exp)}</span>`
+                var frac = `<span style="color:${(COLORS[3])}">${(decode.calc.frac)}</span>`
+                return value + sign + " * " + useed + "^" + k + " * " +
+                    String(2) + "^" + exp + " * " + frac;
+            }
         });
     container.call(tip);
 
-    var classNames = ['.positiveDot', '.negativeDot', '.zeroDot', '.infDot'];
-    for (var i = 0; i < classNames.length; i++) {
-        container.selectAll(classNames[i])
-            .on('mouseover', function(d) { tip.show(d, this);})
-            .on('mouseout', function(d) { tip.hide();});
-    }
+    container.selectAll(".positiveDot")
+        .on('mouseover', function(d) { tip.show(d, this);})
+        .on('mouseout', function(d) { tip.hide();});
+    container.selectAll(".negativeDot")
+        .on('mouseover', function(d) { tip.show(d, this);})
+        .on('mouseout', function(d) { tip.hide();});
+    container.selectAll(".zeroDot")
+        .on('mouseover', function(d) { tip.show(d, this);})
+        .on('mouseout', function(d) { tip.hide();});
+    container.selectAll(".infDot")
+        .on('mouseover', function(d) { tip.show(d, this);})
+        .on('mouseout', function(d) { tip.hide();});
 }
 
 function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
