@@ -391,13 +391,23 @@ function drawPositiveDots(container, x_center, y_center, posits, n, es) {
     var dots = container.selectAll('.positiveDot').data(posits)
     dots.enter().append('circle')
         .attr('class', 'positiveDot')
-        .attr('cx', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d).x)
-        .attr('cy', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d).y)
+        .attr('transform', function(d) { 
+            var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d); 
+            return "translate(" + coords.x + "," + coords.y + ")"})
         .attr('r', 5)
-        .attr('fill', 'black');
+        .style('opacity', 1E-6)
+        .attr('fill', 'black')
+        .transition()
+        .duration(750)
+        .style('opacity', 1.0)
+        .each(function(d) {this._current_point = 
+                getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d)});
     dots
-        .attr('cx', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d).x)
-        .attr('cy', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d).y)
+        .transition()
+        .duration(750)
+        .attr('transform', function(d) { 
+            var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d); 
+            return "translate(" + coords.x + "," + coords.y + ")"})
     dots.exit().remove()
 }
 
@@ -408,13 +418,23 @@ function drawNegativeDots(container, x_center, y_center, posits, n, es) {
     var dots = container.selectAll('.negativeDot').data(posits)
     dots.enter().append('circle')
         .attr('class', 'negativeDot')
-        .attr('cx', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d).x)
-        .attr('cy', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d).y)
+        .attr('transform', function(d) { 
+            var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d); 
+            return "translate(" + coords.x + "," + coords.y + ")"})
+        .style('opacity', 1E-6)
         .attr('r', 5)
-        .attr('fill', 'black');
+        .attr('fill', 'black')
+        .transition()
+        .duration(750)
+        .style('opacity', 1.0)
+        .each(function(d) {this._current_point = 
+                getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d)});
     dots
-        .attr('cx', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d).x)
-        .attr('cy', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d).y)
+        .transition()
+        .duration(750)
+        .attr('transform', function(d) { 
+            var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d); 
+            return "translate(" + coords.x + "," + coords.y + ")"})
     dots.exit().remove()
 }
 
