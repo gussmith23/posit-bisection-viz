@@ -28,19 +28,24 @@ function update(contianer, width, height, n, es, format) {
 function drawInfinityDot(container, x_center, y_center, radius, infinity, format) {
     var infinityDot = container.selectAll('.infDot').data(infinity);
     var text_radius = radius + 15 + 5 * (infinity[0].bitstring.length - 2)
+    var circle_top = y_center - radius;
 
 
     var dotText = (format == label_format.FRACTION) ? "Infinity" : ((d) => d.bitstring.join(""));
     infinityDot.enter().append('circle')
         .attr('class', 'infDot')
-        .attr('cx', x_center)
-        .attr('cy', y_center - radius)
+        .attr('transform', "translate(" + x_center + "," + circle_top + ")")
         .attr('r', 5)
-        .attr('fill', 'black');
+        .attr('fill', 'black')
+        .style('opacity', 1E-6)
+        .transition()
+        .duration(750)
+        .style('opacity', 1.0)
 
     infinityDot
-        .attr('cx', x_center)
-        .attr('cy', y_center - radius)
+        .transition()
+        .duration(750)
+        .attr('transform', "translate(" + x_center + "," + circle_top + ")");
 
     infinityDot.exit().remove();
 
@@ -64,19 +69,24 @@ function drawInfinityDot(container, x_center, y_center, radius, infinity, format
 function drawZero(container, x_center, y_center, radius, zero, format) {
     var zeroDot = container.selectAll('.zeroDot').data(zero);
     var text_radius = radius + 15 + 5 * (zero[0].bitstring.length - 2)
+    var circle_bottom = y_center + radius;
 
     zeroDot.enter().append('circle')
         .attr('class', 'zeroDot')
-        .attr('cx', x_center)
-        .attr('cy', y_center + radius)
+        .attr('transform', "translate(" + x_center + "," + circle_bottom + ")")
         .attr('r', 5)
-        .attr('fill', 'black');
+        .attr('fill', 'black')
+        .style('opacity', 1E-6)
+        .transition()
+        .duration(750)
+        .style('opacity', 1.0)
 
     zeroDot
-        .attr('cx', x_center)
-        .attr('cy', y_center + radius)
-
+        .transition()
+        .duration(750)
+        .attr('transform', "translate(" + x_center + "," + circle_bottom + ")")
     zeroDot.exit().remove();
+
     zero_text = (format == label_format.FRACTION) ? "0" : ((d) => d.bitstring.join(""));
 
     text = container.selectAll('.zeroText').data(zero);
@@ -400,8 +410,6 @@ function drawPositiveDots(container, x_center, y_center, posits, n, es) {
         .transition()
         .duration(750)
         .style('opacity', 1.0)
-        .each(function(d) {this._current_point = 
-                getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d)});
     dots
         .transition()
         .duration(750)
@@ -427,8 +435,6 @@ function drawNegativeDots(container, x_center, y_center, posits, n, es) {
         .transition()
         .duration(750)
         .style('opacity', 1.0)
-        .each(function(d) {this._current_point = 
-                getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d)});
     dots
         .transition()
         .duration(750)
