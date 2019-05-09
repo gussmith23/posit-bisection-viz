@@ -21,7 +21,8 @@ function update(contianer, width, height, n, es, format) {
     console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
     drawProjectiveRealsLine(container, width, height, n, es, format);
     createLegend(container);
-    createTooltip(container, n, es);
+    var tip = createTooltip(container, n, es);
+    setMouseInteraction(tip)
 }
 
 
@@ -40,7 +41,7 @@ function drawInfinityDot(container, x_center, y_center, radius, infinity, format
         .style('opacity', 1E-6)
         .transition()
         .duration(750)
-        .style('opacity', 1.0)
+        .style('opacity', dot_opacity.UNFOCUSED)
 
     infinityDot
         .transition()
@@ -79,7 +80,7 @@ function drawZero(container, x_center, y_center, radius, zero, format) {
         .style('opacity', 1E-6)
         .transition()
         .duration(750)
-        .style('opacity', 1.0)
+        .style('opacity', dot_opacity.UNFOCUSED)
 
     zeroDot
         .transition()
@@ -308,18 +309,30 @@ function createTooltip(contianer, n, es) {
         });
     container.call(tip);
 
-    container.selectAll(".positiveDot")
-        .on('mouseover', function(d) { tip.show(d, this);})
-        .on('mouseout', function(d) { tip.hide();});
-    container.selectAll(".negativeDot")
-        .on('mouseover', function(d) { tip.show(d, this);})
-        .on('mouseout', function(d) { tip.hide();});
-    container.selectAll(".zeroDot")
-        .on('mouseover', function(d) { tip.show(d, this);})
-        .on('mouseout', function(d) { tip.hide();});
-    container.selectAll(".infDot")
-        .on('mouseover', function(d) { tip.show(d, this);})
-        .on('mouseout', function(d) { tip.hide();});
+    return tip
+}
+
+function setMouseInteraction(tip) {
+    mouseInteractionHelper(container.selectAll('.positiveDot'), tip)
+    mouseInteractionHelper(container.selectAll('.negativeDot'), tip)
+    mouseInteractionHelper(container.selectAll('.zeroDot'), tip)
+    mouseInteractionHelper(container.selectAll('.infDot'), tip)
+}
+
+function mouseInteractionHelper(nodes, tip) {
+    nodes
+        .on('mouseover', function(d) { 
+            d3.select(this)
+              .attr('r', dot_radius.FOCUSED)
+              .style('opacity', dot_opacity.FOCUSED);
+            tip.show(d, this);}
+        )
+        .on('mouseout', function(d) { 
+            d3.select(this)
+              .attr('r', dot_radius.UNFOCUSED)
+              .style('opacity', dot_opacity.UNFOCUSED);
+            tip.hide();
+        });
 }
 
 function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
@@ -409,7 +422,7 @@ function drawPositiveDots(container, x_center, y_center, posits, n, es) {
         .attr('fill', 'black')
         .transition()
         .duration(750)
-        .style('opacity', 1.0)
+        .style('opacity', dot_opacity.UNFOCUSED)
     dots
         .transition()
         .duration(750)
@@ -417,6 +430,7 @@ function drawPositiveDots(container, x_center, y_center, posits, n, es) {
             var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d); 
             return "translate(" + coords.x + "," + coords.y + ")"})
     dots.exit().remove()
+
 }
 
 function drawNegativeDots(container, x_center, y_center, posits, n, es) {
@@ -434,7 +448,7 @@ function drawNegativeDots(container, x_center, y_center, posits, n, es) {
         .attr('fill', 'black')
         .transition()
         .duration(750)
-        .style('opacity', 1.0)
+        .style('opacity', dot_opacity.UNFOCUSED)
     dots
         .transition()
         .duration(750)
