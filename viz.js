@@ -39,11 +39,8 @@ function drawInfinityDot(container, x_center, y_center, radius, infinity, format
         .attr('fill', 'black');
 
     infinityDot
-        .attr('class', 'infDot')
         .attr('cx', x_center)
         .attr('cy', y_center - radius)
-        .attr('r', 5)
-        .attr('fill', 'black');
 
     infinityDot.exit().remove();
 
@@ -57,11 +54,8 @@ function drawInfinityDot(container, x_center, y_center, radius, infinity, format
         .text(dotText);
 
     text
-        .attr('class', 'infText')
         .attr('x', x_center)
         .attr('y', y_center - text_radius)
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
         .text(dotText);
 
     text.exit().remove()
@@ -78,11 +72,9 @@ function drawZero(container, x_center, y_center, radius, zero, format) {
         .attr('r', 5)
         .attr('fill', 'black');
 
-    zeroDot.attr('class', 'zeroDot')
+    zeroDot
         .attr('cx', x_center)
         .attr('cy', y_center + radius)
-        .attr('r', 5)
-        .attr('fill', 'black');
 
     zeroDot.exit().remove();
     zero_text = (format == label_format.FRACTION) ? "0" : ((d) => d.bitstring.join(""));
@@ -96,11 +88,9 @@ function drawZero(container, x_center, y_center, radius, zero, format) {
         .attr('text-anchor', 'middle')
         .text(zero_text);
 
-    text.attr('class', 'zeroText')
+    text
         .attr('x', x_center)
         .attr('y', y_center + text_radius)
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
         .text(zero_text);
     text.exit().remove();
 }
@@ -387,11 +377,8 @@ function drawPositiveDots(container, x_center, y_center, posits, n, es) {
         .attr('r', 5)
         .attr('fill', 'black');
     dots
-        .attr('class', 'positiveDot')
         .attr('cx', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d).x)
         .attr('cy', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 0, d).y)
-        .attr('r', 5)
-        .attr('fill', 'black');
     dots.exit().remove()
 }
 
@@ -407,11 +394,8 @@ function drawNegativeDots(container, x_center, y_center, posits, n, es) {
         .attr('r', 5)
         .attr('fill', 'black');
     dots
-        .attr('class', 'negativeDot')
         .attr('cx', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d).x)
         .attr('cy', (d) => getDotCoordsFromPosit(x_center, y_center, radius, dtheta, 1, d).y)
-        .attr('r', 5)
-        .attr('fill', 'black');
     dots.exit().remove()
 }
 
@@ -425,12 +409,7 @@ function drawPositivePath(container, x_center, y_center, radius, zero, arrowhead
         .attr('fill', 'none')
         .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
     positivePath
-        .attr('class', 'positivePositPath')
         .attr('d', describeArc(x_center, y_center, radius, 0, 180, 3))
-        .attr('stroke-width', '3')
-        .attr('stroke', 'orange')
-        .attr('fill', 'none')
-        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
     positivePath.exit().remove()
 
 }
@@ -446,12 +425,7 @@ function drawNegativePath(container, x_center, y_center, radius, zero, arrowhead
         .attr('fill', 'none')
         .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
     negativePath
-        .attr('class', 'negativePositPath')
         .attr('d', describeArc(x_center, y_center, radius, 1, 180, 357))
-        .attr('stroke-width', '3')
-        .attr('stroke', 'blue')
-        .attr('fill', 'none')
-        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')');
     negativePath.exit().remove()
 
 }
