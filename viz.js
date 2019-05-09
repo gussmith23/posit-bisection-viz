@@ -101,6 +101,10 @@ function calculateRadius(n) {
     return ((n/2) * 100) + (2**(n/2) * 3);
 }
 
+function calculateTextRadius(radius) {
+    return radius + 20;
+}
+
 function calculateYCenter(n) {
     return calculateRadius(n) + (n * 5);
 }
@@ -113,6 +117,13 @@ function calculateDTheta(n) {
 // TODO(gus) do we need so much separation between drawing labels as fractions
 // or as bitstrings?
 function setFracTextAttrs(text_var, params, sign, classString) {
+    var anchor_pos;
+    if (sign === 1) {
+        anchor_pos = 'end'
+    }
+    else {
+        anchor_pos = 'start'
+    }
     text_var
         .attr('transform', function(d, i) {
             var coord = getDotCoordsFromPosit(params.x_center,
@@ -126,7 +137,7 @@ function setFracTextAttrs(text_var, params, sign, classString) {
                 + " rotate(" + rotate + ")";
         })
         .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
+        .attr('text-anchor', anchor_pos)
         .attr('class', classString)
         .style("fill", "black")
         .text((d) => decodePosit(d.bitstring, params.n, params.es).value);
@@ -144,7 +155,7 @@ function drawFractionLabels(container, width, height, n, es) {
     var params = {
         x_center: width/2,
         y_center: calculateYCenter(n),
-        text_radius: radius + 15 + 5 * (posits[0].bitstring.length - 2),
+        text_radius: calculateTextRadius(radius), 
         dtheta: calculateDTheta(n),
         n: n,
         es: es
@@ -161,6 +172,14 @@ function drawFractionLabels(container, width, height, n, es) {
 }
 
 function setBitstringTextAttrs(text_var, params, sign, classString) {
+    var anchor_pos;
+    if (sign === 1) {
+        anchor_pos = 'end'
+    }
+    else {
+        anchor_pos = 'start'
+    }
+
     text_var
     // For whatever reason, 'transform' rotate doesn't play well with x and y
     // attrs. So we just use translate instead of x and y.
@@ -176,7 +195,7 @@ function setBitstringTextAttrs(text_var, params, sign, classString) {
                 + " rotate(" + rotate + ")";
         })
         .attr('font-family', 'sans-serif')
-        .attr('text-anchor', 'middle')
+        .attr('text-anchor', anchor_pos)
         .attr('class', classString)
         .style("fill", COLORS[0])
         .text((d) => d.rawBitfields.sign.join(""))
@@ -202,7 +221,7 @@ function drawBitstringLabels(container, width, height, n, es) {
     var params = {
         x_center: width/2,
         y_center: calculateYCenter(n),
-        text_radius: radius + 15 + 5 * (posits[0].bitstring.length - 2),
+        text_radius: calculateTextRadius(radius), 
         n:n,
         es:es,
         dtheta:calculateDTheta(n),
