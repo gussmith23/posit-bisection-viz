@@ -148,6 +148,9 @@ function setFracTextAttrs(text_var, params, sign, classString) {
                 + " rotate(" + rotate + ")";
         })
         .attr('font-family', 'sans-serif')
+    // TODO(gus) no need to define anchor_pos above. Instead, use a function
+    // like you do in the 'transform' case above, and then decide anchor based
+    // on d.sign
         .attr('text-anchor', anchor_pos)
         .attr('class', classString)
         .style("fill", "black")
