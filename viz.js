@@ -302,7 +302,7 @@ function drawPositivePath(container, x_center, y_center, radius, zero, arrowhead
         .attr('class', 'positivePositPath')
         .attr('d', describeArc(x_center, y_center, radius, 0, 180, 3))
         .attr('stroke-width', '3')
-        .attr('stroke', 'orange')
+        .attr('stroke', '#2464FF')
         .attr('fill', 'none')
         .attr('marker-end', 'url(#' + arrowheadMarkerId + ')')
         .each(function(d) { this._current_n = d.bitstring.length; }) ;
@@ -365,7 +365,7 @@ function drawNegativePath(container, x_center, y_center, radius, zero, arrowhead
         .attr('class', 'negativePositPath')
         .attr('d', describeArc(x_center, y_center, radius, 1, 180, 357))
         .attr('stroke-width', '3')
-        .attr('stroke', 'blue')
+        .attr('stroke', '#FF0000')
         .attr('fill', 'none')
         .attr('marker-end', 'url(#' + arrowheadMarkerId + ')')
         .each(function(d) { this._current_n = d.bitstring.length; }) ;
