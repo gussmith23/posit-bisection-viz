@@ -1,3 +1,6 @@
+/** File taken from link below:
+ * https://github.com/haldenl/d3-tutorial-webpage-version/blob/master/docs/d3tip.js
+ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('d3-collection'), require('d3-selection')) :
   typeof define === 'function' && define.amd ? define(['d3-collection', 'd3-selection'], factory) :
