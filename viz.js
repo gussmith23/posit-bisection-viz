@@ -11,8 +11,7 @@ COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"]
 function update(width, height, n, es, format) {
     drawProjectiveRealsLine(width, height, n, es, format);
     createLegend();
-    var tip = createTooltip(n, es);
-    setMouseInteraction(tip)
+    createTooltip(n, es);
 }
 
 /**
@@ -90,7 +89,30 @@ function createTooltip(n, es) {
         });
     svg_viz_container.call(tip);
 
-    return tip
+    // Set how mouse movements interact with the tooltip
+    mouseInteractionHelper(svg_viz_container.selectAll('.positiveDot'), tip)
+    mouseInteractionHelper(svg_viz_container.selectAll('.negativeDot'), tip)
+    mouseInteractionHelper(svg_viz_container.selectAll('.zeroDot'), tip)
+    mouseInteractionHelper(svg_viz_container.selectAll('.infDot'), tip)
+}
+
+/** @brief Sets how mouse movements interact with the tooltip for
+ *  the given set of nodes
+ */
+function mouseInteractionHelper(nodes, tip) {
+    nodes
+        .on('mouseover', function(d) {
+            d3.select(this)
+              .attr('r', dot_radius.FOCUSED)
+              .style('opacity', dot_opacity.FOCUSED);
+            tip.show(d, this);}
+        )
+        .on('mouseout', function(d) {
+            d3.select(this)
+              .attr('r', dot_radius.UNFOCUSED)
+              .style('opacity', dot_opacity.UNFOCUSED);
+            tip.hide();
+        });
 }
 
 
@@ -109,8 +131,7 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
     // Create a defs block; define arrowhead and dot markers.
     var arrowheadMarker = createArrowheadMarker();
     var arrowheadMarkerId = d3.select(arrowheadMarker).attr('id');
-    // var reverseArrowheadMarker = createReverseArrowheadMarker();
-    // var reverseArrowheadMarkerId = d3.select(reverseArrowheadMarker).attr('id');
+
     var dotMarker = createDotMarker();
     var dotMarkerId = d3.select(dotMarker).attr('id');
 
@@ -218,35 +239,6 @@ function setTextAttrs(text_var, params, sign, classString, format) {
     }
 }
 
-/** @brief Set how mouse movements interact with the tooltip
- *  @param tip D3 tooltip object from createTooltip
- */
-function setMouseInteraction(tip) {
-    mouseInteractionHelper(svg_viz_container.selectAll('.positiveDot'), tip)
-    mouseInteractionHelper(svg_viz_container.selectAll('.negativeDot'), tip)
-    mouseInteractionHelper(svg_viz_container.selectAll('.zeroDot'), tip)
-    mouseInteractionHelper(svg_viz_container.selectAll('.infDot'), tip)
-}
-
-/** @brief Sets how mouse movements interact with the tooltip for
- *  the given set of nodes
- */
-function mouseInteractionHelper(nodes, tip) {
-    nodes
-        .on('mouseover', function(d) {
-            d3.select(this)
-              .attr('r', dot_radius.FOCUSED)
-              .style('opacity', dot_opacity.FOCUSED);
-            tip.show(d, this);}
-        )
-        .on('mouseout', function(d) {
-            d3.select(this)
-              .attr('r', dot_radius.UNFOCUSED)
-              .style('opacity', dot_opacity.UNFOCUSED);
-            tip.hide();
-        });
-}
-
 
 /** @brief Draw an arc for the posits
  *  @param x_center The x coordinate of the center of the circle
@@ -313,11 +305,8 @@ function positivePathTween(a) {
 function drawDots(x_center, y_center, posits, n, es, sign) {
     var radius = calculateRadius(n)
     var dtheta = calculateDTheta(n)
-    if (sign == psign.POSITIVE) { // positive dots
-        className = 'positiveDot'
-    } else {
-        className = 'negativeDot'
-    }
+    className = (sign == psign.POSITIVE) ? 'positiveDot' : 'negativeDot';
+
     var dots = svg_viz_container.selectAll('.'.concat(className)).data(posits)
     dots.enter().append('circle')
         .attr('class', className)
