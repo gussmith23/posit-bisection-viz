@@ -93,6 +93,7 @@ function createTooltip(n, es) {
     return tip
 }
 
+
 /**
  * Draw the projective reals line on an SVG.
  * @param width The width of the SVG container
@@ -126,26 +127,19 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
     var x_center = width/2;
     var y_center = calculateYCenter(n);
 
-    drawPath(x_center, y_center, radius, posits.zero, arrowheadMarkerId, 0)
-    drawPath(x_center, y_center, radius, posits.zero, arrowheadMarkerId, 1)
+    drawPath(x_center, y_center, radius, posits.zero, arrowheadMarkerId, psign.POSITIVE)
+    drawPath(x_center, y_center, radius, posits.zero, arrowheadMarkerId, psign.NEGATIVE)
 
-    drawDots(x_center, y_center, posits.pos, n, es, 0)
-    drawDots(x_center, y_center, posits.neg, n, es, 1)
+    drawDots(x_center, y_center, posits.pos, n, es, psign.POSITIVE)
+    drawDots(x_center, y_center, posits.neg, n, es, psign.NEGATIVE)
 
-    if (displayFormat === label_format.FRACTION) {
-        drawFractionLabels(posits, width, height, n, es);
-    }
-    else {
-        drawBitstringLabels(posits, width, height, n, es);
-    }
+    drawLabels(posits, width, height, n, es, displayFormat)
 
     drawZero(x_center, y_center, radius, posits.zero, format)
     drawInfinityDot(x_center, y_center, radius, posits.inf, format)
 }
 
 
-// TODO(gus) do we need so much separation between drawing labels as fractions
-// or as bitstrings?
 /** @brief Draw labels corresponding to the fractional posit values on the visualization
  * @param posits Posits that we're visualizing
  * @param width The width of the SVG container
@@ -153,7 +147,7 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
  * @param n Current N value of the visualization
  * @param es Current ES value of the visualization
  */
-function drawFractionLabels(posits, width, height, n, es) {
+function drawLabels(posits, width, height, n, es, format) {
     var radius = calculateRadius(n)
 
     var params = {
@@ -166,12 +160,12 @@ function drawFractionLabels(posits, width, height, n, es) {
     };
 
     var texts = svg_viz_container.selectAll('.negativeText').data(posits.neg);
-    setFracTextAttrs(texts.enter().append('text'), params, 1, 'negativeText');
-    setFracTextAttrs(texts, params, 1, 'negativeText');
+    setTextAttrs(texts.enter().append('text'), params, psign.NEGATIVE, 'negativeText', format);
+    setTextAttrs(texts, params, psign.NEGATIVE, 'negativeText', format);
     texts.exit().remove();
     texts = svg_viz_container.selectAll('.positiveText').data(posits.pos);
-    setFracTextAttrs(texts.enter().append('text'), params, 0, 'positiveText');
-    setFracTextAttrs(texts, params, 0, 'positiveText');
+    setTextAttrs(texts.enter().append('text'), params, psign.POSITIVE, 'positiveText', format);
+    setTextAttrs(texts, params, psign.POSITIVE, 'positiveText', format);
     texts.exit().remove();
 }
 
@@ -179,22 +173,19 @@ function drawFractionLabels(posits, width, height, n, es) {
  *  @param text_var D3 set that we're setting attributes for
  *  @param sign 1 for negative posits, 0 for positive posits
  *  @param classString String that describes the D3 class of the text_var
+ *  @param format Whether we're displaying fractions or bitstrings
  */
-function setFracTextAttrs(text_var, params, sign, classString) {
-    var anchor_pos;
-    if (sign === 1) {
-        anchor_pos = 'end'
-    }
-    else {
-        anchor_pos = 'start'
-    }
+function setTextAttrs(text_var, params, sign, classString, format) {
+    var anchor_pos = (sign === psign.NEGATIVE) ? 'end' : 'start';
     text_var
+    // For whatever reason, 'transform' rotate doesn't play well with x and y
+    // attrs. So we just use translate instead of x and y.
         .attr('transform', function(d, i) {
             var coord = getDotCoordsFromPosit(params.x_center,
                                               params.y_center,
                                               params.text_radius,
                                               params.dtheta, d);
-            var rotate = d.actualValueBitfields.sign[0] === 1 ?
+            var rotate = d.actualValueBitfields.sign[0] === psign.NEGATIVE ?
                 coord.endAngle + 90 : coord.endAngle - 90;
             // Note: order of transforms matters!
             return "translate(" + coord.x +"," + coord.y + ")"
@@ -206,86 +197,26 @@ function setFracTextAttrs(text_var, params, sign, classString) {
     // on d.sign
         .attr('text-anchor', anchor_pos)
         .attr('class', classString)
-        .style("fill", "black")
-        .text((d) => decodePosit(d.bitstring, params.n, params.es).value);
-}
 
-
-/** @brief Draw labels corresponding to the posit bitstrings on the visualization
- * @param svgSelection - the d3 selection of the SVG element.
- * @param posits Posits that we're visualizing
- * @param width The width of the SVG container
- * @param height The height of the SVG container
- * @param n Current N value of the visualization
- * @param es Current ES value of the visualization
- */
-function drawBitstringLabels(posits, width, height, n, es) {
-    var radius = calculateRadius(n)
-
-    var params = {
-        x_center: width/2,
-        y_center: calculateYCenter(n),
-        text_radius: calculateTextRadius(radius),
-        n:n,
-        es:es,
-        dtheta:calculateDTheta(n),
+    if (format == label_format.FRACTION) {
+        text_var
+            .style("fill", "black")
+            .text((d) => decodePosit(d.bitstring, params.n, params.es).value);
+    } else {
+        text_var
+            .style("fill", COLORS[0])
+            .text((d) => d.rawBitfields.sign.join(""))
+            .append("tspan")
+            .style("fill", COLORS[1])
+            .text((d) => d.rawBitfields.regime.join(""))
+            .append("tspan")
+            .style("fill", COLORS[2])
+            .text((d) => d.rawBitfields.exponent.join(""))
+            .append("tspan")
+            .style("fill", COLORS[3])
+            .text((d) => d.rawBitfields.fraction.join(""))
     }
-
-    var texts = svg_viz_container.selectAll('.negativeText').data(posits.neg)
-    setBitstringTextAttrs(texts.enter().append('text'), params, 1, 'negativeText')
-    setBitstringTextAttrs(texts, params, 1, 'negativeText')
-    texts.exit().remove()
-
-    texts = svg_viz_container.selectAll('.positiveText').data(posits.pos)
-    setBitstringTextAttrs(texts.enter().append('text'), params, 0, 'positiveText')
-    setBitstringTextAttrs(texts, params, 0, 'positiveText')
-    texts.exit().remove()
 }
-
-/** @brief Set the D3 attributes of bitstring text elements
- *  @param text_var D3 set that we're setting attributes for
- *  @param sign 1 for negative posits, 0 for positive posits
- *  @param classString String that describes the D3 class of the text_var
- */
-function setBitstringTextAttrs(text_var, params, sign, classString) {
-    var anchor_pos;
-    if (sign === 1) {
-        anchor_pos = 'end'
-    }
-    else {
-        anchor_pos = 'start'
-    }
-
-    text_var
-    // For whatever reason, 'transform' rotate doesn't play well with x and y
-    // attrs. So we just use translate instead of x and y.
-        .attr('transform', function(d, i) {
-            var coord = getDotCoordsFromPosit(params.x_center,
-                                              params.y_center,
-                                              params.text_radius,
-                                              params.dtheta, d);
-            var rotate = d.actualValueBitfields.sign[0] === 1 ?
-                coord.endAngle + 90 : coord.endAngle - 90;
-            // Note: order of transforms matters!
-            return "translate(" + coord.x +"," + coord.y + ")"
-                + " rotate(" + rotate + ")";
-        })
-        .attr('font-family', 'sans-serif')
-        .attr('text-anchor', anchor_pos)
-        .attr('class', classString)
-        .style("fill", COLORS[0])
-        .text((d) => d.rawBitfields.sign.join(""))
-        .append("tspan")
-        .style("fill", COLORS[1])
-        .text((d) => d.rawBitfields.regime.join(""))
-        .append("tspan")
-        .style("fill", COLORS[2])
-        .text((d) => d.rawBitfields.exponent.join(""))
-        .append("tspan")
-        .style("fill", COLORS[3])
-        .text((d) => d.rawBitfields.fraction.join(""))
-}
-
 
 /** @brief Set how mouse movements interact with the tooltip
  *  @param tip D3 tooltip object from createTooltip
@@ -327,13 +258,13 @@ function mouseInteractionHelper(nodes, tip) {
 */
 function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
     var animation_len = 750
-    if (sign == 0) { // positive path
-        arc = describeArc(x_center, y_center, radius, 0, 180, 3)
+    if (sign == psign.POSITIVE) { // positive path
+        arc = describeArc(x_center, y_center, radius, psign.POSITIVE, 180, 3)
         color = '#2464FF'
         className = "positivePositPath"
         transitionFunc = positivePathTween
     } else {
-        arc = describeArc(x_center, y_center, radius, 1, 180, 357)
+        arc = describeArc(x_center, y_center, radius, psign.NEGATIVE, 180, 357)
         color = '#FF0000'
         className = "negativePositPath"
         transitionFunc = negativePathTween
@@ -367,7 +298,7 @@ function positivePathTween(a) {
     this._current_n = next_n;
     return function(t) {
         return describeArc(inter(t).x_center, inter(t).y_center,
-            inter(t).radius, 0, 180, 3);
+            inter(t).radius, psign.POSITIVE, 180, 3);
     };
 }
 
@@ -382,7 +313,7 @@ function positivePathTween(a) {
 function drawDots(x_center, y_center, posits, n, es, sign) {
     var radius = calculateRadius(n)
     var dtheta = calculateDTheta(n)
-    if (sign == 0) { // positive dots
+    if (sign == psign.POSITIVE) { // positive dots
         className = 'positiveDot'
     } else {
         className = 'negativeDot'
@@ -424,7 +355,7 @@ function negativePathTween(a) {
     this._current_n = next_n;
     return function(t) {
         return describeArc(inter(t).x_center, inter(t).y_center,
-            inter(t).radius, 1, 180, 357);
+            inter(t).radius, psign.NEGATIVE, 180, 357);
     };
 }
 
@@ -609,7 +540,7 @@ function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, posit) {
     var posit_as_int = unsignedIntegerFromBitstring(posit.bitstring);
     var infVal = 2**(posit.bitstring.length - 1);
     var end_angle;
-    if (posit.rawBitfields.sign[0] === 0) {
+    if (posit.rawBitfields.sign[0] === psign.POSITIVE) {
         end_angle = 180 - (dtheta * posit_as_int)
     } else {
         // Semi-hacky correction so that negative posits go
