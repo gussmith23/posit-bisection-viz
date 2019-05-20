@@ -77,6 +77,7 @@ function createTooltip(n, es) {
             } else if (decode.zero) {
                 return "Zero";
             } else {
+                // We want to color the text in the tooltip, HTML Span elements are a useful hack
                 var value = String(decode.value) + " = ";
                 var sign = `<span style="color:${(COLORS[0])}">${(decode.calc.sign)}</span>`
                 var useed = `<span style="color:${(COLORS[1])}">${(decode.calc.useed)}</span>`
@@ -125,11 +126,11 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
     var x_center = width/2;
     var y_center = calculateYCenter(n);
 
-    drawPositivePath(x_center, y_center, radius, posits.zero, arrowheadMarkerId)
-    drawNegativePath(x_center, y_center, radius, posits.zero, arrowheadMarkerId)
+    drawPath(x_center, y_center, radius, posits.zero, arrowheadMarkerId, 0)
+    drawPath(x_center, y_center, radius, posits.zero, arrowheadMarkerId, 1)
 
-    drawPositiveDots(x_center, y_center, posits.pos, n, es)
-    drawNegativeDots(x_center, y_center, posits.neg, n, es)
+    drawDots(x_center, y_center, posits.pos, n, es, 0)
+    drawDots(x_center, y_center, posits.neg, n, es, 1)
 
     if (displayFormat === label_format.FRACTION) {
         drawFractionLabels(posits, width, height, n, es);
@@ -155,7 +156,6 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
 function drawFractionLabels(posits, width, height, n, es) {
     var radius = calculateRadius(n)
 
-    // TODO(gus) we should try to generate the posits in just one place---where should that be?
     var params = {
         x_center: width/2,
         y_center: calculateYCenter(n),
@@ -317,27 +317,39 @@ function mouseInteractionHelper(nodes, tip) {
 }
 
 
-/** @brief Draw the arc for the positive posits
+/** @brief Draw an arc for the posits
  *  @param x_center The x coordinate of the center of the circle
  *  @param y_center The y coordinate of the center of the circle
  *  @param radius The radius of the circle
  *  @param zero The posit corresponding to zero
  *  @param arrowheadMarkerId ID for the arrowhead marker that appears at the end of the arc
+ *  @param sign 0 to draw the positive arc, 1 to draw the negative arc
 */
-function drawPositivePath(x_center, y_center, radius, zero, arrowheadMarkerId) {
-    var positivePath = svg_viz_container.selectAll('.positivePositPath').data(zero);
-    positivePath.enter().append('path')
-        .attr('class', 'positivePositPath')
-        .attr('d', describeArc(x_center, y_center, radius, 0, 180, 3))
+function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
+    var animation_len = 750
+    if (sign == 0) { // positive path
+        arc = describeArc(x_center, y_center, radius, 0, 180, 3)
+        color = '#2464FF'
+        className = "positivePositPath"
+        transitionFunc = positivePathTween
+    } else {
+        arc = describeArc(x_center, y_center, radius, 1, 180, 357)
+        color = '#FF0000'
+        className = "negativePositPath"
+        transitionFunc = negativePathTween
+    }
+
+    var path = svg_viz_container.selectAll('.'.concat(className)).data(zero);
+    path.enter().append('path')
+        .attr('class', className)
+        .attr('d', arc)
         .attr('stroke-width', '3')
-        .attr('stroke', '#2464FF')
+        .attr('stroke', color)
         .attr('fill', 'none')
         .attr('marker-end', 'url(#' + arrowheadMarkerId + ')')
         .each(function(d) { this._current_n = d.bitstring.length; }) ;
-    positivePath
-        .transition().duration(750).attrTween('d', positivePathTween)
-    positivePath.exit().remove()
-
+    path.transition().duration(animation_len).attrTween('d', transitionFunc)
+    path.exit().remove()
 }
 
 function positivePathTween(a) {
@@ -365,19 +377,24 @@ function positivePathTween(a) {
  *  @param posits The positive valued posits that correspond to the points we're drawing
  *  @param n Current N value of the visualization
  *  @param es Current ES value of the visualization
+ *  @param sign 0 for positive posits, 1 for negative posits
  */
-function drawPositiveDots(x_center, y_center, posits, n, es) {
+function drawDots(x_center, y_center, posits, n, es, sign) {
     var radius = calculateRadius(n)
     var dtheta = calculateDTheta(n)
-
-    var dots = svg_viz_container.selectAll('.positiveDot').data(posits)
+    if (sign == 0) { // positive dots
+        className = 'positiveDot'
+    } else {
+        className = 'negativeDot'
+    }
+    var dots = svg_viz_container.selectAll('.'.concat(className)).data(posits)
     dots.enter().append('circle')
-        .attr('class', 'positiveDot')
+        .attr('class', className)
         .attr('transform', function(d) {
             var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, d);
             return "translate(" + coords.x + "," + coords.y + ")"})
-        .attr('r', 5)
         .style('opacity', 1E-6)
+        .attr('r', 5)
         .attr('fill', 'black')
         .transition()
         .duration(750)
@@ -389,33 +406,8 @@ function drawPositiveDots(x_center, y_center, posits, n, es) {
             var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, d);
             return "translate(" + coords.x + "," + coords.y + ")"})
     dots.exit().remove()
-
 }
 
-
-/** @brief Draw the arc for the negative posits
- *  @param x_center The x coordinate of the center of the circle
- *  @param y_center The y coordinate of the center of the circle
- *  @param radius The radius of the circle
- *  @param zero The posit corresponding to zero
- *  @param arrowheadMarkerId ID for the arrowhead marker that appears at the end of the arc
-*/
-function drawNegativePath(x_center, y_center, radius, zero, arrowheadMarkerId) {
-    // negative arc
-    var negativePath = svg_viz_container.selectAll('.negativePositPath').data(zero);
-    negativePath.enter().append('path')
-        .attr('class', 'negativePositPath')
-        .attr('d', describeArc(x_center, y_center, radius, 1, 180, 357))
-        .attr('stroke-width', '3')
-        .attr('stroke', '#FF0000')
-        .attr('fill', 'none')
-        .attr('marker-end', 'url(#' + arrowheadMarkerId + ')')
-        .each(function(d) { this._current_n = d.bitstring.length; }) ;
-    negativePath
-        .transition().duration(750).attrTween('d', negativePathTween)
-    negativePath.exit().remove()
-
-}
 
 function negativePathTween(a) {
     var current_n = this._current_n;
@@ -435,39 +427,6 @@ function negativePathTween(a) {
             inter(t).radius, 1, 180, 357);
     };
 }
-
-/** @brief Draw the dots that correspond to negative posits on the arc
- *  @param x_center The x coordinate of the center of the circle
- *  @param y_center The y coordinate of the center of the circle
- *  @param posits The negative valued posits that correspond to the points we're drawing
- *  @param n Current N value of the visualization
- *  @param es Current ES value of the visualization
- */
-function drawNegativeDots(x_center, y_center, posits, n, es) {
-    var radius = calculateRadius(n)
-    var dtheta = calculateDTheta(n)
-
-    var dots = svg_viz_container.selectAll('.negativeDot').data(posits)
-    dots.enter().append('circle')
-        .attr('class', 'negativeDot')
-        .attr('transform', function(d) {
-            var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, d);
-            return "translate(" + coords.x + "," + coords.y + ")"})
-        .style('opacity', 1E-6)
-        .attr('r', 5)
-        .attr('fill', 'black')
-        .transition()
-        .duration(750)
-        .style('opacity', dot_opacity.UNFOCUSED)
-    dots
-        .transition()
-        .duration(750)
-        .attr('transform', function(d) {
-            var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, d);
-            return "translate(" + coords.x + "," + coords.y + ")"})
-    dots.exit().remove()
-}
-
 
 /** @brief Draw the single point at the top of the visualization that corresponds to
  *         a fractional value of infinity
