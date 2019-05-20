@@ -102,7 +102,22 @@ function generatePositsOfLength(n, es) {
         arr[i] = decodePosit(bitarray, n, es);
     }
 
-    return arr;
+    const positivePosits = arr.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
+        .sort(positCompare);
+    const negativePosits = arr.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
+        .sort(positCompare);
+    const zeroPosit = arr.filter(p => p.value === 0.0);
+    const infinity = arr.filter(p => p.value === Infinity);
+    console.assert(zeroPosit && infinity);
+    console.assert(positivePosits.length === negativePosits.length);
+    console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
+
+    return {
+        pos: positivePosits,
+        neg: negativePosits,
+        zero: zeroPosit,
+        inf: infinity
+    }
 }
 
 //console.log(generatePositsOfLength(4, 1));

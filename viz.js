@@ -9,17 +9,6 @@ COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"]
  * infinity; binds new set of data to the viz.
  */
 function update(width, height, n, es, format) {
-    const posits = generatePositsOfLength(n, es);
-
-    const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
-        .sort(positCompare);
-    const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
-        .sort(positCompare);
-    const zero = posits.filter(p => p.value === 0.0);
-    const infinity = posits.filter(p => p.value === Infinity);
-    console.assert(zero && infinity);
-    console.assert(positivePosits.length === negativePosits.length);
-    console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
     drawProjectiveRealsLine(width, height, n, es, format);
     createLegend();
     var tip = createTooltip(n, es);
@@ -131,53 +120,42 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
 
     const posits = generatePositsOfLength(n, es);
 
-    const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
-        .sort(positCompare);
-    const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
-        .sort(positCompare);
-    const infinity = posits.filter(p => p.value === Infinity);
-    const zero = posits.filter(p => p.value === 0.0);
-
     var dtheta = calculateDTheta(n);
     var radius = calculateRadius(n);
     var x_center = width/2;
     var y_center = calculateYCenter(n);
 
-    drawPositivePath(x_center, y_center, radius, zero, arrowheadMarkerId)
-    drawNegativePath(x_center, y_center, radius, zero, arrowheadMarkerId)
+    drawPositivePath(x_center, y_center, radius, posits.zero, arrowheadMarkerId)
+    drawNegativePath(x_center, y_center, radius, posits.zero, arrowheadMarkerId)
 
-    drawPositiveDots(x_center, y_center, positivePosits, n, es)
-    drawNegativeDots(x_center, y_center, negativePosits, n, es)
+    drawPositiveDots(x_center, y_center, posits.pos, n, es)
+    drawNegativeDots(x_center, y_center, posits.neg, n, es)
 
     if (displayFormat === label_format.FRACTION) {
-        drawFractionLabels(width, height, n, es);
+        drawFractionLabels(posits, width, height, n, es);
     }
     else {
-        drawBitstringLabels(width, height, n, es);
+        drawBitstringLabels(posits, width, height, n, es);
     }
 
-    drawZero(x_center, y_center, radius, zero, format)
-    drawInfinityDot(x_center, y_center, radius, infinity, format)
+    drawZero(x_center, y_center, radius, posits.zero, format)
+    drawInfinityDot(x_center, y_center, radius, posits.inf, format)
 }
 
 
 // TODO(gus) do we need so much separation between drawing labels as fractions
 // or as bitstrings?
 /** @brief Draw labels corresponding to the fractional posit values on the visualization
+ * @param posits Posits that we're visualizing
  * @param width The width of the SVG container
  * @param height The height of the SVG container
  * @param n Current N value of the visualization
  * @param es Current ES value of the visualization
  */
-function drawFractionLabels(width, height, n, es) {
+function drawFractionLabels(posits, width, height, n, es) {
     var radius = calculateRadius(n)
 
     // TODO(gus) we should try to generate the posits in just one place---where should that be?
-    const posits = generatePositsOfLength(n, es);
-    const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
-        .sort(positCompare);
-    const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
-        .sort(positCompare);
     var params = {
         x_center: width/2,
         y_center: calculateYCenter(n),
@@ -187,11 +165,11 @@ function drawFractionLabels(width, height, n, es) {
         es: es
     };
 
-    var texts = svg_viz_container.selectAll('.negativeText').data(negativePosits);
+    var texts = svg_viz_container.selectAll('.negativeText').data(posits.neg);
     setFracTextAttrs(texts.enter().append('text'), params, 1, 'negativeText');
     setFracTextAttrs(texts, params, 1, 'negativeText');
     texts.exit().remove();
-    texts = svg_viz_container.selectAll('.positiveText').data(positivePosits);
+    texts = svg_viz_container.selectAll('.positiveText').data(posits.pos);
     setFracTextAttrs(texts.enter().append('text'), params, 0, 'positiveText');
     setFracTextAttrs(texts, params, 0, 'positiveText');
     texts.exit().remove();
@@ -235,19 +213,15 @@ function setFracTextAttrs(text_var, params, sign, classString) {
 
 /** @brief Draw labels corresponding to the posit bitstrings on the visualization
  * @param svgSelection - the d3 selection of the SVG element.
+ * @param posits Posits that we're visualizing
  * @param width The width of the SVG container
  * @param height The height of the SVG container
  * @param n Current N value of the visualization
  * @param es Current ES value of the visualization
  */
-function drawBitstringLabels(width, height, n, es) {
+function drawBitstringLabels(posits, width, height, n, es) {
     var radius = calculateRadius(n)
 
-    const posits = generatePositsOfLength(n, es);
-    const positivePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 0)
-        .sort(positCompare);
-    const negativePosits = posits.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
-        .sort(positCompare);
     var params = {
         x_center: width/2,
         y_center: calculateYCenter(n),
@@ -257,12 +231,12 @@ function drawBitstringLabels(width, height, n, es) {
         dtheta:calculateDTheta(n),
     }
 
-    var texts = svg_viz_container.selectAll('.negativeText').data(negativePosits)
+    var texts = svg_viz_container.selectAll('.negativeText').data(posits.neg)
     setBitstringTextAttrs(texts.enter().append('text'), params, 1, 'negativeText')
     setBitstringTextAttrs(texts, params, 1, 'negativeText')
     texts.exit().remove()
 
-    texts = svg_viz_container.selectAll('.positiveText').data(positivePosits)
+    texts = svg_viz_container.selectAll('.positiveText').data(posits.pos)
     setBitstringTextAttrs(texts.enter().append('text'), params, 0, 'positiveText')
     setBitstringTextAttrs(texts, params, 0, 'positiveText')
     texts.exit().remove()
