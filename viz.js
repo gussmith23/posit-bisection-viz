@@ -5,7 +5,7 @@ COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"]
  * Update data with new posit parameters.
  *
  * Regenerates set of posits, splits them into positive, negative, zero, and
- * infinity; attaches new set of data to the viz.
+ * infinity; binds new set of data to the viz.
  */
 function update(contianer, width, height, n, es, format) {
     const posits = generatePositsOfLength(n, es);
@@ -25,6 +25,10 @@ function update(contianer, width, height, n, es, format) {
     setMouseInteraction(tip)
 }
 
+/**
+ * @brief Creates a legend for colors used in the bitstrings
+ * @param container The SVG container
+ */
 function createLegend(container) {
     const color = d3.scaleOrdinal()
         .range([COLORS[0], COLORS[1], COLORS[2], COLORS[3]])
@@ -40,6 +44,7 @@ function createLegend(container) {
             return `translate(0, ${i * 20})`;
         });
 
+    // The legend is <box> <text>, this creates the colored box portion
     legend.append('rect')
         .attr('class', 'legend-rect')
         .attr('x', width + margin.right-12)
@@ -48,6 +53,7 @@ function createLegend(container) {
         .attr('height', 12)
         .style('fill', color)
 
+    // This creates the text portion
     legend.append("text")
         .attr('class', 'legend-text')
         .attr("x", width + margin.right-22)
@@ -58,6 +64,15 @@ function createLegend(container) {
         .text(function(d) { return d;});
 }
 
+/**
+ * @brief Create a tooltip that appears when hovering over points in the visualization
+ *   The tooltip shows the calculation from the posit bitstring that given the corrseponding
+ *   fractional value
+ * @param container SVG container for the visualization
+ * @param n Current N value of the visualization
+ * @param es Current ES value of the visualization
+ * @return D3 tooltip object
+ */
 function createTooltip(contianer, n, es) {
     const tip = d3.tip()
         .attr('class', "d3-tip")
@@ -92,6 +107,11 @@ function createTooltip(contianer, n, es) {
 /**
  * Draw the projective reals line on an SVG.
  * @param svgSelection - the d3 selection of the SVG element.
+ * @param width The width of the SVG container
+ * @param height The height of the SVG container
+ * @param n Current N value of the visualization
+ * @param es Current ES value of the visualization
+ * @param format Current format setting, fractions or bitstrings
  */
 function drawProjectiveRealsLine(container, width, height, n, es, format) {
     // An assumption I'm making right now.
@@ -145,6 +165,13 @@ function drawProjectiveRealsLine(container, width, height, n, es, format) {
 
 // TODO(gus) do we need so much separation between drawing labels as fractions
 // or as bitstrings?
+/** @brief Draw labels corresponding to the fractional posit values on the visualization
+ * @param svgSelection - the d3 selection of the SVG element.
+ * @param width The width of the SVG container
+ * @param height The height of the SVG container
+ * @param n Current N value of the visualization
+ * @param es Current ES value of the visualization
+ */
 function drawFractionLabels(container, width, height, n, es) {
     var radius = calculateRadius(n)
 
@@ -173,6 +200,11 @@ function drawFractionLabels(container, width, height, n, es) {
     texts.exit().remove();
 }
 
+/** @brief Set the D3 attributes of fractional text elements
+ *  @param text_var D3 set that we're setting attributes for
+ *  @param sign 1 for negative posits, 0 for positive posits
+ *  @param classString String that describes the D3 class of the text_var
+ */
 function setFracTextAttrs(text_var, params, sign, classString) {
     var anchor_pos;
     if (sign === 1) {
@@ -204,6 +236,13 @@ function setFracTextAttrs(text_var, params, sign, classString) {
 }
 
 
+/** @brief Draw labels corresponding to the posit bitstrings on the visualization
+ * @param svgSelection - the d3 selection of the SVG element.
+ * @param width The width of the SVG container
+ * @param height The height of the SVG container
+ * @param n Current N value of the visualization
+ * @param es Current ES value of the visualization
+ */
 function drawBitstringLabels(container, width, height, n, es) {
     var radius = calculateRadius(n)
 
@@ -232,6 +271,11 @@ function drawBitstringLabels(container, width, height, n, es) {
     texts.exit().remove()
 }
 
+/** @brief Set the D3 attributes of bitstring text elements
+ *  @param text_var D3 set that we're setting attributes for
+ *  @param sign 1 for negative posits, 0 for positive posits
+ *  @param classString String that describes the D3 class of the text_var
+ */
 function setBitstringTextAttrs(text_var, params, sign, classString) {
     var anchor_pos;
     if (sign === 1) {
@@ -272,6 +316,9 @@ function setBitstringTextAttrs(text_var, params, sign, classString) {
 }
 
 
+/** @brief Set how mouse movements interact with the tooltip
+ *  @param tip D3 tooltip object from createTooltip
+ */
 function setMouseInteraction(tip) {
     mouseInteractionHelper(container.selectAll('.positiveDot'), tip)
     mouseInteractionHelper(container.selectAll('.negativeDot'), tip)
@@ -279,6 +326,9 @@ function setMouseInteraction(tip) {
     mouseInteractionHelper(container.selectAll('.infDot'), tip)
 }
 
+/** @brief Sets how mouse movements interact with the tooltip for
+ *  the given set of nodes
+ */
 function mouseInteractionHelper(nodes, tip) {
     nodes
         .on('mouseover', function(d) {
@@ -296,6 +346,14 @@ function mouseInteractionHelper(nodes, tip) {
 }
 
 
+/** @brief Draw the arc for the positive posits
+ *  @param container The SVG container
+ *  @param x_center The x coordinate of the center of the circle
+ *  @param y_center The y coordinate of the center of the circle
+ *  @param radius The radius of the circle
+ *  @param zero The posit corresponding to zero
+ *  @param arrowheadMarkerId ID for the arrowhead marker that appears at the end of the arc
+*/
 function drawPositivePath(container, x_center, y_center, radius, zero, arrowheadMarkerId) {
     var positivePath = container.selectAll('.positivePositPath').data(zero);
     positivePath.enter().append('path')
@@ -331,6 +389,14 @@ function positivePathTween(a) {
     };
 }
 
+/** @brief Draw the dots that correspond to positive posits on the arc
+ *  @param container The SVG container
+ *  @param x_center The x coordinate of the center of the circle
+ *  @param y_center The y coordinate of the center of the circle
+ *  @param posits The positive valued posits that correspond to the points we're drawing
+ *  @param n Current N value of the visualization
+ *  @param es Current ES value of the visualization
+ */
 function drawPositiveDots(container, x_center, y_center, posits, n, es) {
     var radius = calculateRadius(n)
     var dtheta = calculateDTheta(n)
@@ -358,6 +424,14 @@ function drawPositiveDots(container, x_center, y_center, posits, n, es) {
 }
 
 
+/** @brief Draw the arc for the negative posits
+ *  @param container The SVG container
+ *  @param x_center The x coordinate of the center of the circle
+ *  @param y_center The y coordinate of the center of the circle
+ *  @param radius The radius of the circle
+ *  @param zero The posit corresponding to zero
+ *  @param arrowheadMarkerId ID for the arrowhead marker that appears at the end of the arc
+*/
 function drawNegativePath(container, x_center, y_center, radius, zero, arrowheadMarkerId) {
     // negative arc
     var negativePath = container.selectAll('.negativePositPath').data(zero);
@@ -394,6 +468,14 @@ function negativePathTween(a) {
     };
 }
 
+/** @brief Draw the dots that correspond to negative posits on the arc
+ *  @param container The SVG container
+ *  @param x_center The x coordinate of the center of the circle
+ *  @param y_center The y coordinate of the center of the circle
+ *  @param posits The negative valued posits that correspond to the points we're drawing
+ *  @param n Current N value of the visualization
+ *  @param es Current ES value of the visualization
+ */
 function drawNegativeDots(container, x_center, y_center, posits, n, es) {
     var radius = calculateRadius(n)
     var dtheta = calculateDTheta(n)
@@ -420,6 +502,16 @@ function drawNegativeDots(container, x_center, y_center, posits, n, es) {
 }
 
 
+/** @brief Draw the single point at the top of the visualization that corresponds to
+ *         a fractional value of infinity
+ *  @param container The SVG container
+ *  @param x_center The x coordinate of the center of the circle
+ *  @param y_center The y coordinate of the center of the circle
+ *  @param radius The radius of the posit circle
+ *  @param infinity The Posit for infinity
+ *  @param format Current format setting for the visualization, either
+ *                fraction or bitstring
+ */
 function drawInfinityDot(container, x_center, y_center, radius, infinity, format) {
     var infinityDot = container.selectAll('.infDot').data(infinity);
     var text_radius = radius + 15 + 5 * (infinity[0].bitstring.length - 2)
@@ -461,6 +553,16 @@ function drawInfinityDot(container, x_center, y_center, radius, infinity, format
     text.exit().remove()
 }
 
+/** @brief Draw the single point at the bottom of the visualization that corresponds to
+ *         a fractional value of zero
+ *  @param container The SVG container
+ *  @param x_center The x coordinate of the center of the circle
+ *  @param y_center The y coordinate of the center of the circle
+ *  @param radius The radius of the posit circle
+ *  @param zero The Posit for zero
+ *  @param format Current format setting for the visualization, either
+ *                fraction or bitstring
+ */
 function drawZero(container, x_center, y_center, radius, zero, format) {
     var zeroDot = container.selectAll('.zeroDot').data(zero);
     var text_radius = radius + 15 + 5 * (zero[0].bitstring.length - 2)
@@ -504,9 +606,11 @@ function drawZero(container, x_center, y_center, radius, zero, format) {
 
 // TODO Everything below here could probably be moved into a separate "viz-lib" file
 /**
- * Create an arrowhead <marker> element to be appended to an <svg> (within a
- * <defs>).
+ * @brief Create an arrowhead <marker> element to be appended to an <svg> (within a
+ *        <defs>).
+ *
  * See https://vanseodesign.com/web-design/svg-markers/.
+ * @return The arrowhead <marker> element
  */
 function createArrowheadMarker() {
     var id = 'arrowhead';
@@ -538,7 +642,8 @@ function createArrowheadMarker() {
 }
 
 /**
- * Create a dot <marker> element to be appended to an <svg> (within a <defs>).
+ * @brief Create a dot <marker> element to be appended to an <svg> (within a <defs>).
+ * @return The arrowhead <marker> element
  */
 function createDotMarker() {
     var id = 'dot';
@@ -568,7 +673,16 @@ function createDotMarker() {
     return marker;
 }
 
+/** @brief Given a Posit value and the circle's center and radius, get the X
+ *         and Y coordinates that the given Posit's dot should be drawn at
+ *  @param x_center The x coordinate of the center of the circle
+ *  @param y_center The y coordinate of the center of the circle
+ *  @param radius The radius of the posit circle
+ *  @param dtheta The angle change between posits on the circle
+ *  @param posit The Posit value
+ */
 function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, sign, posit) {
+//TODO (neil) This doesn't need to take a sign, it's in the Posit
     var posit_as_int = unsignedIntegerFromBitstring(posit.bitstring);
     var infVal = 2**(posit.bitstring.length - 1);
     var end_angle;
