@@ -148,7 +148,7 @@
 
      var margin = {left : 50, top : 50, right : 50, bottom : 50};
 
-     var container = d3.select("#circle-viz").append('svg')
+     var svg_viz_container = d3.select("#circle-viz").append('svg')
                        .attr('width', margin.left + width + margin.right)
                        .attr('height', margin.top + height + margin.bottom)
      // A trick to make a margin without needing the drawing logic to reason about it.
@@ -157,7 +157,7 @@
                        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 
-    update(container, width, height, n, es, displayFormat)
+    update(width, height, n, es, displayFormat)
 
     var selectFractionButton = d3.select("#bitstring-fraction-button")
                                .append('button')
@@ -171,7 +171,7 @@
                                      displayFormat = label_format.BITSTRING;
                                    }
 
-                                    update(container, width, height, n, es, displayFormat)
+                                    update(width, height, n, es, displayFormat)
                                 });
 
     // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
@@ -186,7 +186,7 @@
         .tickFormat(d3.format('d'))
         .on('onchange', val => {
             es = val;
-            update(container, width, height, n, es, displayFormat);
+            update(width, height, n, es, displayFormat);
         });
 
     var sliderN = d3
@@ -204,7 +204,7 @@
             } else {
                 n = val;
             }
-            update(container, width, height, n, es, displayFormat);
+            update(width, height, n, es, displayFormat);
         });
 
     d3.select('#slider-n')
