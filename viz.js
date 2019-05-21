@@ -275,6 +275,17 @@ function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
     path.exit().remove()
 }
 
+/**
+ * @brief This function defines the transition function that should be used for transitioning
+ *        between arcs of different sizes when N changes. This gets passed as the
+ *        transitioning function to .attrTween
+ *        Note: This is almost identical to negativePathTween. However, for some reason, when 
+ *        trying to pass other parameters, it's impossible to use the this keyword, which we 
+ *        need to get the initial state of the arc
+ * @param a the current datapoint bound to the object
+ * @return A function that can be passed a parameter to generate an arc object. A paramter
+ *         of 0 is the original arc and a parameter of 1 is the final arc
+ */
 function positivePathTween(a) {
     var current_n = this._current_n;
     var next_n = a.bitstring.length;
@@ -329,6 +340,17 @@ function drawDots(x_center, y_center, posits, n, es, sign) {
 }
 
 
+/**
+ * @brief This function defines the transition function that should be used for transitioning
+ *        between arcs of different sizes when N changes. This gets passed as the
+ *        transitioning function to .attrTween
+ *        Note: This is almost identical to positivePathTween. However, for some reason, when 
+ *        trying to pass other parameters, it's impossible to use the this keyword, which we 
+ *        need to get the initial state of the arc
+ * @param a the current datapoint bound to the object
+ * @return A function that can be passed a parameter to generate an arc object. A paramter
+ *         of 0 is the original arc and a parameter of 1 is the final arc
+ */
 function negativePathTween(a) {
     var current_n = this._current_n;
     var next_n = a.bitstring.length;
