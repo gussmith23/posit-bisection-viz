@@ -222,7 +222,7 @@ function setTextAttrs(text_var, params, sign, classString, format) {
     if (format == label_format.FRACTION) {
         text_var
             .style("fill", "black")
-            .text((d) => decodePosit(d.bitstring, params.n, params.es).value);
+            .text((d) => formatFractionalString(d.bitstring, params.n, params.es));
     } else {
         text_var
             .style("fill", COLORS[0])
@@ -239,6 +239,24 @@ function setTextAttrs(text_var, params, sign, classString, format) {
     }
 }
 
+/** @brief Helper function for formatting the text displayed for the fractional posit representations 
+ *  @param bitstring the bitstring representation of the posit
+ *  @param n the current N value to be used for decoding the posit
+ *  @param es the current es value to be used for decoding the posit
+ *  @return A formatted string to be set as label text on the circle
+ */
+function formatFractionalString(bitstring, n, es) {
+    var fractional_posit_value = decodePosit(bitstring, n, es).value
+    var string;
+    if (Math.abs(fractional_posit_value) < 0.00001
+        || Math.abs(fractional_posit_value) > 99999) {
+        string = fractional_posit_value.toExponential(5).toString() 
+    }
+    else {
+        string = parseFloat(fractional_posit_value.toFixed(5)).toString()
+    }
+    return string;
+}
 
 /** @brief Draw an arc for the posits
  *  @param x_center The x coordinate of the center of the circle
