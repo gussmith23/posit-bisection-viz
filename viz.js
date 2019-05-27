@@ -602,33 +602,3 @@ function describeArc(x, y, radius, sign, startAngle, endAngle){
     return d;
 }
 
-/**
- * Following two functions based on this:
- * https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
- */
-function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-    var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
-
-    return {
-        x: centerX + (radius * Math.cos(angleInRadians)),
-        y: centerY + (radius * Math.sin(angleInRadians))
-    };
-}
-
-function calculateRadius(n) {
-    // TODO(gus) magic numbers
-    return ((n/2) * 100) + (2**(n/2) * 3);
-}
-
-function calculateTextRadius(radius) {
-    return radius + 20;
-}
-
-function calculateYCenter(n) {
-    return calculateRadius(n) + (n * 5);
-}
-
-function calculateDTheta(n) {
-    // TODO(gus) magic numbers
-    return 178/(1 << (n-1));
-}

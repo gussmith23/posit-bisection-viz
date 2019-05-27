@@ -7,6 +7,7 @@
         <script src="d3tip.js"></script>
         <script src="posit.js"></script>
         <script src="viz.js"></script>
+        <script src="viz_utils.js"></script>
         <title>CSE512 | A3 Posit Bisection</title>
         <!-- Stylesheet from CSE512 faculty -->
         <style media="all">
@@ -119,25 +120,6 @@
     </body>
     <script type="text/javascript">
 
-    const label_format = {
-        FRACTION: 'fraction',
-        BITSTRING: 'bitstring'
-    };
-
-    const psign= {
-        POSITIVE: 0,
-        NEGATIVE: 1
-    };
-
-    const dot_opacity = {
-        FOCUSED: 1.0,
-        UNFOCUSED: 0.6
-    }
-
-    const dot_radius = {
-        FOCUSED: 7,
-        UNFOCUSED: 5
-    }
 
      // Posit parameters
      var n = 4; var es = 1;
