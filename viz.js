@@ -158,8 +158,10 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
 
     drawLabels(posits, width, height, n, es, displayFormat);
 
-    drawZero(x_center, y_center, radius, posits.zero, format);
-    drawInfinityDot(x_center, y_center, radius, posits.inf, format);
+    drawZero(x_center, y_center, radius, posits.zero, format)
+    drawInfinityDot(x_center, y_center, radius, posits.inf, format)
+
+    drawBrush(x_center, y_center, radius)
 }
 
 
