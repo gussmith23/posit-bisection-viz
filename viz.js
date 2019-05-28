@@ -11,7 +11,6 @@ function update(width, height, n, es, format) {
     drawProjectiveRealsLine(width, height, n, es, format);
     createLegend();
     createTooltip(n, es);
-    drawSliders(width);
 }
 
 function drawSliders(width) {
@@ -51,6 +50,7 @@ function drawSliders(width) {
         .style('font-weight', 700)
         .text("ES:");
 }
+
 /**
  * @brief Creates a legend for colors used in the bitstrings
  */

@@ -122,6 +122,7 @@
              update(width, height, n, es, displayFormat);
          });
 
+
     var selectFractionButton = d3.select("#bitstring-fraction-button")
                                .append('button')
                                .text('See Fraction Values')
@@ -138,6 +139,7 @@
                                 });
 
      update(width, height, n, es, displayFormat);
+     drawSliders(width);
     // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
     </script>
 </html>
