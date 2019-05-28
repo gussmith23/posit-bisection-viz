@@ -1,7 +1,6 @@
 // @note svg_viz_container is a global variable defined in index.html
 COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
 
-
 /**
  * Update data with new posit parameters.
  *
@@ -12,8 +11,46 @@ function update(width, height, n, es, format) {
     drawProjectiveRealsLine(width, height, n, es, format);
     createLegend();
     createTooltip(n, es);
+    drawSliders(width);
 }
 
+function drawSliders(width) {
+    var y_center = calculateYCenter(4);
+    var es_slider_start = (width / 2) - (es_slider_width / 2);
+    var n_slider_start = (width / 2) - (n_slider_width / 2);
+    var n_slider_y = y_center - 100;
+    var es_slider_y = y_center - 40;
+    svg_viz_container.append('g')
+        .attr('class', 'n_slider')
+        .attr('width', n_slider_width + 100)
+        .attr('height', 100)
+        .attr('align', 'center')
+        .attr('transform', `translate(${n_slider_start},${n_slider_y})`)
+        .attr('id', 'n_slider')
+        .call(sliderN);
+
+    svg_viz_container.append('g')
+        .attr('class', 'es_slider')
+        .attr('width', es_slider_width + 100)
+        .attr('height', 100)
+        .attr('align', 'center')
+        .attr('transform', `translate(${es_slider_start},${es_slider_y})`)
+        .attr('id', 'es_slider')
+        .call(sliderES);
+
+
+     svg_viz_container.append('text')
+        .attr("transform", `translate(${n_slider_start-25},${n_slider_y+5})`)
+        .style('text-anchor', 'middle')
+        .style('font-weight', 700)
+        .text("N:");
+
+     svg_viz_container.append('text')
+        .attr("transform", `translate(${es_slider_start-25},${es_slider_y+5})`)
+        .style('text-anchor', 'middle')
+        .style('font-weight', 700)
+        .text("ES:");
+}
 /**
  * @brief Creates a legend for colors used in the bitstrings
  */
