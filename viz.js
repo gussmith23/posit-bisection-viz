@@ -1,5 +1,5 @@
 // @note svg_viz_container is a global variable defined in index.html
-COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"]
+COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
 
 
 /**
@@ -39,7 +39,7 @@ function createLegend() {
         .attr('y', 65)
         .attr('width', 12)
         .attr('height', 12)
-        .style('fill', color)
+        .style('fill', color);
 
     // This creates the text portion
     legend.append("text")
@@ -70,7 +70,7 @@ function createTooltip(n, es) {
         .style("font-size", "14px")
         .offset([-10, 0])
         .html(function(d) {
-            var decode = decodePosit(d.bitstring, n, es)
+            var decode = decodePosit(d.bitstring, n, es);
             if (decode.infinity) {
                 return "Infinity";
             } else if (decode.zero) {
@@ -78,11 +78,11 @@ function createTooltip(n, es) {
             } else {
                 // We want to color the text in the tooltip, HTML Span elements are a useful hack
                 var value = String(decode.value) + " = ";
-                var sign = `<span style="color:${(COLORS[0])}">${(decode.calc.sign)}</span>`
-                var useed = `<span style="color:${(COLORS[1])}">${(decode.calc.useed)}</span>`
-                var k = `<span style="color:${(COLORS[1])}">${(decode.calc.k)}</span>`
-                var exp = `<span style="color:${(COLORS[2])}">${(decode.calc.exp)}</span>`
-                var frac = `<span style="color:${(COLORS[3])}">${(decode.calc.frac)}</span>`
+                var sign = `<span style="color:${(COLORS[0])}">${(decode.calc.sign)}</span>`;
+                var useed = `<span style="color:${(COLORS[1])}">${(decode.calc.useed)}</span>`;
+                var k = `<span style="color:${(COLORS[1])}">${(decode.calc.k)}</span>`;
+                var exp = `<span style="color:${(COLORS[2])}">${(decode.calc.exp)}</span>`;
+                var frac = `<span style="color:${(COLORS[3])}">${(decode.calc.frac)}</span>`;
                 return value + sign + " * " + useed + "^" + k + " * " +
                     String(2) + "^" + exp + " * " + frac;
             }
@@ -90,10 +90,10 @@ function createTooltip(n, es) {
     svg_viz_container.call(tip);
 
     // Set how mouse movements interact with the tooltip
-    mouseInteractionHelper(svg_viz_container.selectAll('.positiveDot'), tip)
-    mouseInteractionHelper(svg_viz_container.selectAll('.negativeDot'), tip)
-    mouseInteractionHelper(svg_viz_container.selectAll('.zeroDot'), tip)
-    mouseInteractionHelper(svg_viz_container.selectAll('.infDot'), tip)
+    mouseInteractionHelper(svg_viz_container.selectAll('.positiveDot'), tip);
+    mouseInteractionHelper(svg_viz_container.selectAll('.negativeDot'), tip);
+    mouseInteractionHelper(svg_viz_container.selectAll('.zeroDot'), tip);
+    mouseInteractionHelper(svg_viz_container.selectAll('.infDot'), tip);
 }
 
 /** @brief Sets how mouse movements interact with the tooltip for
@@ -148,16 +148,18 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
     var x_center = width/2;
     var y_center = calculateYCenter(n);
 
-    drawPath(x_center, y_center, radius, posits.zero, arrowheadMarkerId, psign.POSITIVE)
-    drawPath(x_center, y_center, radius, posits.zero, arrowheadMarkerId, psign.NEGATIVE)
+    drawPath(x_center, y_center, radius, posits.zero,
+             arrowheadMarkerId, psign.POSITIVE);
+    drawPath(x_center, y_center, radius, posits.zero,
+             arrowheadMarkerId, psign.NEGATIVE);
 
-    drawDots(x_center, y_center, posits.pos, n, es, psign.POSITIVE)
-    drawDots(x_center, y_center, posits.neg, n, es, psign.NEGATIVE)
+    drawDots(x_center, y_center, posits.pos, n, es, psign.POSITIVE);
+    drawDots(x_center, y_center, posits.neg, n, es, psign.NEGATIVE);
 
-    drawLabels(posits, width, height, n, es, displayFormat)
+    drawLabels(posits, width, height, n, es, displayFormat);
 
-    drawZero(x_center, y_center, radius, posits.zero, format)
-    drawInfinityDot(x_center, y_center, radius, posits.inf, format)
+    drawZero(x_center, y_center, radius, posits.zero, format);
+    drawInfinityDot(x_center, y_center, radius, posits.inf, format);
 }
 
 
@@ -169,7 +171,7 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
  * @param es Current ES value of the visualization
  */
 function drawLabels(posits, width, height, n, es, format) {
-    var radius = calculateRadius(n)
+    var radius = calculateRadius(n);
 
     var params = {
         x_center: width/2,
@@ -217,7 +219,7 @@ function setTextAttrs(text_var, params, sign, classString, format) {
     // like you do in the 'transform' case above, and then decide anchor based
     // on d.sign
         .attr('text-anchor', anchor_pos)
-        .attr('class', classString)
+        .attr('class', classString);
 
     if (format == label_format.FRACTION) {
         text_var
@@ -235,7 +237,7 @@ function setTextAttrs(text_var, params, sign, classString, format) {
             .text((d) => d.rawBitfields.exponent.join(""))
             .append("tspan")
             .style("fill", COLORS[3])
-            .text((d) => d.rawBitfields.fraction.join(""))
+            .text((d) => d.rawBitfields.fraction.join(""));
     }
 }
 
@@ -246,14 +248,14 @@ function setTextAttrs(text_var, params, sign, classString, format) {
  *  @return A formatted string to be set as label text on the circle
  */
 function formatFractionalString(bitstring, n, es) {
-    var fractional_posit_value = decodePosit(bitstring, n, es).value
+    var fractional_posit_value = decodePosit(bitstring, n, es).value;
     var string;
     if (Math.abs(fractional_posit_value) < 0.00001
         || Math.abs(fractional_posit_value) > 99999) {
-        string = fractional_posit_value.toExponential(5).toString() 
+        string = fractional_posit_value.toExponential(5).toString();
     }
     else {
-        string = parseFloat(fractional_posit_value.toFixed(5)).toString()
+        string = parseFloat(fractional_posit_value.toFixed(5)).toString();
     }
     return string;
 }
@@ -267,17 +269,17 @@ function formatFractionalString(bitstring, n, es) {
  *  @param sign 0 to draw the positive arc, 1 to draw the negative arc
 */
 function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
-    var animation_len = 750
+    var animation_len = 750;
     if (sign == psign.POSITIVE) { // positive path
-        arc = describeArc(x_center, y_center, radius, psign.POSITIVE, 180, 3)
-        color = '#2464FF'
-        className = "positivePositPath"
-        transitionFunc = positivePathTween
+        arc = describeArc(x_center, y_center, radius, psign.POSITIVE, 180, 3);
+        color = '#2464FF';
+        className = "positivePositPath";
+        transitionFunc = positivePathTween;
     } else {
-        arc = describeArc(x_center, y_center, radius, psign.NEGATIVE, 180, 357)
-        color = '#FF0000'
-        className = "negativePositPath"
-        transitionFunc = negativePathTween
+        arc = describeArc(x_center, y_center, radius, psign.NEGATIVE, 180, 357);
+        color = '#FF0000';
+        className = "negativePositPath";
+        transitionFunc = negativePathTween;
     }
 
     var path = svg_viz_container.selectAll('.'.concat(className)).data(zero);
@@ -289,8 +291,8 @@ function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
         .attr('fill', 'none')
         .attr('marker-end', 'url(#' + arrowheadMarkerId + ')')
         .each(function(d) { this._current_n = d.bitstring.length; }) ;
-    path.transition().duration(animation_len).attrTween('d', transitionFunc)
-    path.exit().remove()
+    path.transition().duration(animation_len).attrTween('d', transitionFunc);
+    path.exit().remove();
 }
 
 /**
@@ -332,29 +334,29 @@ function positivePathTween(a) {
  *  @param sign 0 for positive posits, 1 for negative posits
  */
 function drawDots(x_center, y_center, posits, n, es, sign) {
-    var radius = calculateRadius(n)
-    var dtheta = calculateDTheta(n)
+    var radius = calculateRadius(n);
+    var dtheta = calculateDTheta(n);
     className = (sign == psign.POSITIVE) ? 'positiveDot' : 'negativeDot';
 
-    var dots = svg_viz_container.selectAll('.'.concat(className)).data(posits)
+    var dots = svg_viz_container.selectAll('.'.concat(className)).data(posits);
     dots.enter().append('circle')
         .attr('class', className)
         .attr('transform', function(d) {
             var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, d);
-            return "translate(" + coords.x + "," + coords.y + ")"})
+            return "translate(" + coords.x + "," + coords.y + ")";})
         .style('opacity', 1E-6)
         .attr('r', 5)
         .attr('fill', 'black')
         .transition()
         .duration(750)
-        .style('opacity', dot_opacity.UNFOCUSED)
+        .style('opacity', dot_opacity.UNFOCUSED);
     dots
         .transition()
         .duration(750)
         .attr('transform', function(d) {
             var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, d);
-            return "translate(" + coords.x + "," + coords.y + ")"})
-    dots.exit().remove()
+            return "translate(" + coords.x + "," + coords.y + ")";});
+    dots.exit().remove();
 }
 
 
@@ -399,7 +401,7 @@ function negativePathTween(a) {
  */
 function drawInfinityDot(x_center, y_center, radius, infinity, format) {
     var infinityDot = svg_viz_container.selectAll('.infDot').data(infinity);
-    var text_radius = radius + 15 + 5 * (infinity[0].bitstring.length - 2)
+    var text_radius = radius + 15 + 5 * (infinity[0].bitstring.length - 2);
     var circle_top = y_center - radius;
 
 
@@ -412,7 +414,7 @@ function drawInfinityDot(x_center, y_center, radius, infinity, format) {
         .style('opacity', 1E-6)
         .transition()
         .duration(750)
-        .style('opacity', dot_opacity.UNFOCUSED)
+        .style('opacity', dot_opacity.UNFOCUSED);
 
     infinityDot
         .transition()
@@ -421,7 +423,7 @@ function drawInfinityDot(x_center, y_center, radius, infinity, format) {
 
     infinityDot.exit().remove();
 
-    text = svg_viz_container.selectAll('.infText').data(infinity)
+    text = svg_viz_container.selectAll('.infText').data(infinity);
     text.enter().append('text')
         .attr('class', 'infText')
         .attr('x', x_center)
@@ -435,7 +437,7 @@ function drawInfinityDot(x_center, y_center, radius, infinity, format) {
         .attr('y', y_center - text_radius)
         .text(dotText);
 
-    text.exit().remove()
+    text.exit().remove();
 }
 
 /** @brief Draw the single point at the bottom of the visualization that corresponds to
@@ -449,7 +451,7 @@ function drawInfinityDot(x_center, y_center, radius, infinity, format) {
  */
 function drawZero(x_center, y_center, radius, zero, format) {
     var zeroDot = svg_viz_container.selectAll('.zeroDot').data(zero);
-    var text_radius = radius + 15 + 5 * (zero[0].bitstring.length - 2)
+    var text_radius = radius + 15 + 5 * (zero[0].bitstring.length - 2);
     var circle_bottom = y_center + radius;
 
     zeroDot.enter().append('circle')
@@ -460,12 +462,12 @@ function drawZero(x_center, y_center, radius, zero, format) {
         .style('opacity', 1E-6)
         .transition()
         .duration(750)
-        .style('opacity', dot_opacity.UNFOCUSED)
+        .style('opacity', dot_opacity.UNFOCUSED);
 
     zeroDot
         .transition()
         .duration(750)
-        .attr('transform', "translate(" + x_center + "," + circle_bottom + ")")
+        .attr('transform', "translate(" + x_center + "," + circle_bottom + ")");
     zeroDot.exit().remove();
 
     zero_text = (format == label_format.FRACTION) ? "0" : ((d) => d.bitstring.join(""));
@@ -570,12 +572,12 @@ function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, posit) {
     var infVal = 2**(posit.bitstring.length - 1);
     var end_angle;
     if (posit.rawBitfields.sign[0] === psign.POSITIVE) {
-        end_angle = 180 - (dtheta * posit_as_int)
+        end_angle = 180 - (dtheta * posit_as_int);
     } else {
         // Semi-hacky correction so that negative posits go
         // from most negative to least negative
         if (posit.value != Infinity) { posit_as_int = Math.abs(infVal - (posit_as_int - infVal));}
-        end_angle = 180 + (dtheta * (posit_as_int))
+        end_angle = 180 + (dtheta * (posit_as_int));
     }
     return {
         endAngle:end_angle,
@@ -601,4 +603,3 @@ function describeArc(x, y, radius, sign, startAngle, endAngle){
     ].join(" ");
     return d;
 }
-

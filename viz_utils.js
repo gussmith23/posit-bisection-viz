@@ -16,12 +16,12 @@ const psign= {
 const dot_opacity = {
     FOCUSED: 1.0,
     UNFOCUSED: 0.6
-}
+};
 
 const dot_radius = {
     FOCUSED: 7,
     UNFOCUSED: 5
-}
+};
 
 /**
  * @brief Calculate the radius of the posit circle
