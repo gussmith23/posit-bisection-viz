@@ -13,12 +13,15 @@ function update(width, height, n, es, format) {
     createTooltip(n, es);
 }
 
-function drawSliders(width) {
+function drawControls(width) {
     var y_center = calculateYCenter(4);
     var es_slider_start = (width / 2) - (es_slider_width / 2);
     var n_slider_start = (width / 2) - (n_slider_width / 2);
     var n_slider_y = y_center - 100;
     var es_slider_y = y_center - 40;
+    var button_y = y_center + 25;
+    var button_width = 150;
+
     svg_viz_container.append('g')
         .attr('class', 'n_slider')
         .attr('width', n_slider_width + 100)
@@ -49,6 +52,34 @@ function drawSliders(width) {
         .style('text-anchor', 'middle')
         .style('font-weight', 700)
         .text("ES:");
+
+    svg_viz_container.append('text')
+        .attr("transform", `translate(${width / 2},${button_y})`)
+        .style('text-anchor', 'middle')
+        .style('font-weight', 400)
+        .attr('id', 'button-text')
+        .text('See Fraction Values')
+        .on('click', function (d) {
+            if (d3.select(this).text() == 'See Fraction Values') {
+                d3.select(this).text('See Bitstring Values');
+                displayFormat = label_format.FRACTION;
+            } else {
+                d3.select(this).text('See Fraction Values');
+                displayFormat = label_format.BITSTRING;
+            }
+            update(width, height, n, es, displayFormat);
+        });
+
+    svg_viz_container.append('g')
+        .append('rect')
+        .attr('class', 'button')
+        .attr('width', button_width)
+        .attr('height', 30)
+        .style('fill', 'none')
+        .style('stroke', 'black')
+        .attr('rx', 10)
+        .attr('id', 'button')
+        .attr('transform', `translate(${width / 2 - button_width/2}, ${button_y-20})`);
 }
 
 /**
@@ -336,7 +367,7 @@ function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
  * @brief This function defines the transition function that should be used for transitioning
  *        between arcs of different sizes when N changes. This gets passed as the
  *        transitioning function to .attrTween
- *        Note: This is almost identical to negativePathTween. However, for some reason, when 
+ *        Note: This is almost identical to negativePathTween. However, for some reason, when
  *        trying to pass other parameters, it's impossible to use the this keyword, which we 
  *        need to get the initial state of the arc
  * @param a the current datapoint bound to the object

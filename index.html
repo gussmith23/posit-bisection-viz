@@ -50,11 +50,6 @@
                 </p>
             </section>
 
-            <table style="margin-left:auto; margin-right:auto;">
-                <tr>
-                    <div id=bitstring-fraction-button></div>
-                </tr>
-            </table>
             <div id="circle-viz" style="text-align:center;"></div>
             <div class="footer">
                 <a href="https://courses.cs.washington.edu/courses/cse512/19sp/">CSE 512 Data Visualization</a>
@@ -122,24 +117,8 @@
              update(width, height, n, es, displayFormat);
          });
 
-
-    var selectFractionButton = d3.select("#bitstring-fraction-button")
-                               .append('button')
-                               .text('See Fraction Values')
-                               .on('click', function (d) {
-                                   if (d3.select(this).text() == 'See Fraction Values') {
-                                     d3.select(this).text('See Bitstring Values');
-                                     displayFormat = label_format.FRACTION;
-                                   } else {
-                                     d3.select(this).text('See Fraction Values');
-                                     displayFormat = label_format.BITSTRING;
-                                   }
-
-                                    update(width, height, n, es, displayFormat)
-                                });
-
      update(width, height, n, es, displayFormat);
-     drawSliders(width);
+     drawControls(width);
     // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
     </script>
 </html>
