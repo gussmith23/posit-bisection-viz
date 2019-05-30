@@ -24,11 +24,11 @@ d3.svg.circularbrush = function() {
 
 	function _circularbrush(_container) {
 
-		updateBrushData();
+        updateBrushData();
 
 		_brushG = _container
 		.append("g")
-		.attr("class", "circularbrush");
+        .attr("class", "circularbrush")
 
 		_brushG
 		.selectAll("path.circularbrush")
@@ -51,7 +51,7 @@ d3.svg.circularbrush = function() {
 		var _d = _scale.domain();
 		var _r = _scale.range();
 
-		var _actualScale = d3.scale.linear()
+		var _actualScale = d3.scaleLinear()
 		.domain([-_d[1],_d[0],_d[0],_d[1]])
 		.range([_r[0],_r[1],_r[0],_r[1]])
 
@@ -145,9 +145,11 @@ d3.svg.circularbrush = function() {
 
 	}
 
+        
     rebind(_circularbrush, _circularbrushDispatch, "on");
 
-	return _circularbrush;
+    return _circularbrush;
+    
 
 	function resizeDown(d) {
 		var _mouse = d3.mouse(_brushG.node());
@@ -175,7 +177,7 @@ d3.svg.circularbrush = function() {
 			.on("mouseup.brush", extentUp);
 		}
 
-        //	_circularbrushDispatch.start();
+        onBrushStart()
 
 	}
 
@@ -240,8 +242,7 @@ d3.svg.circularbrush = function() {
 
 		_extent = ([_newStartAngle,_newEndAngle]);
 
-        //_circularbrushDispatch.brush();
-
+        whileBrushing()
 	}
 
 	function brushRefresh() {
@@ -257,7 +258,7 @@ d3.svg.circularbrush = function() {
 		_brushData = _newBrushData;
 		d3_window.on("mousemove.brush", null).on("mouseup.brush", null);
 
-        //_circularbrushDispatch.end();
+        onBrushEnd()
 	}
 
 	function updateBrushData() {
@@ -287,6 +288,6 @@ d3.svg.circularbrush = function() {
         var value = method.apply(source, arguments);
         return value === source ? target : value;
       };
-}
+    }
 
 }

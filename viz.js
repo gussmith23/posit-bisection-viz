@@ -9,6 +9,7 @@ COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
  * infinity; binds new set of data to the viz.
  */
 function update(width, height, n, es, format) {
+    posits = generatePositsOfLength(n, es)
     drawProjectiveRealsLine(width, height, n, es, format);
     createLegend();
     createTooltip(n, es);
@@ -140,8 +141,6 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
     var defs = svg_viz_container.append('defs');
     defs.append(function () {return arrowheadMarker;});
     defs.append(function(){return dotMarker;});
-
-    const posits = generatePositsOfLength(n, es);
 
     var dtheta = calculateDTheta(n);
     var radius = calculateRadius(n);
