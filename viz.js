@@ -1,7 +1,6 @@
 // @note svg_viz_container is a global variable defined in index.html
 COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
 
-
 /**
  * Update data with new posit parameters.
  *
@@ -12,6 +11,75 @@ function update(width, height, n, es, format) {
     drawProjectiveRealsLine(width, height, n, es, format);
     createLegend();
     createTooltip(n, es);
+}
+
+function drawControls(width) {
+    var y_center = calculateYCenter(4);
+    var es_slider_start = (width / 2) - (es_slider_width / 2);
+    var n_slider_start = (width / 2) - (n_slider_width / 2);
+    var n_slider_y = y_center - 100;
+    var es_slider_y = y_center - 40;
+    var button_y = y_center + 25;
+    var button_width = 150;
+
+    svg_viz_container.append('g')
+        .attr('class', 'n_slider')
+        .attr('width', n_slider_width + 100)
+        .attr('height', 100)
+        .attr('align', 'center')
+        .attr('transform', `translate(${n_slider_start},${n_slider_y})`)
+        .attr('id', 'n_slider')
+        .call(sliderN);
+
+    svg_viz_container.append('g')
+        .attr('class', 'es_slider')
+        .attr('width', es_slider_width + 100)
+        .attr('height', 100)
+        .attr('align', 'center')
+        .attr('transform', `translate(${es_slider_start},${es_slider_y})`)
+        .attr('id', 'es_slider')
+        .call(sliderES);
+
+
+     svg_viz_container.append('text')
+        .attr("transform", `translate(${n_slider_start-25},${n_slider_y+5})`)
+        .style('text-anchor', 'middle')
+        .style('font-weight', 700)
+        .text("N:");
+
+     svg_viz_container.append('text')
+        .attr("transform", `translate(${es_slider_start-25},${es_slider_y+5})`)
+        .style('text-anchor', 'middle')
+        .style('font-weight', 700)
+        .text("ES:");
+
+    svg_viz_container.append('text')
+        .attr("transform", `translate(${width / 2},${button_y})`)
+        .style('text-anchor', 'middle')
+        .style('font-weight', 400)
+        .attr('id', 'button-text')
+        .text('See Fraction Values')
+        .on('click', function (d) {
+            if (d3.select(this).text() == 'See Fraction Values') {
+                d3.select(this).text('See Bitstring Values');
+                displayFormat = label_format.FRACTION;
+            } else {
+                d3.select(this).text('See Fraction Values');
+                displayFormat = label_format.BITSTRING;
+            }
+            update(width, height, n, es, displayFormat);
+        });
+
+    svg_viz_container.append('g')
+        .append('rect')
+        .attr('class', 'button')
+        .attr('width', button_width)
+        .attr('height', 30)
+        .style('fill', 'none')
+        .style('stroke', 'black')
+        .attr('rx', 10)
+        .attr('id', 'button')
+        .attr('transform', `translate(${width / 2 - button_width/2}, ${button_y-20})`);
 }
 
 /**
