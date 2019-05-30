@@ -14,7 +14,8 @@ d3.svg.circularbrush = function() {
 		{startAngle: _extent[0] - .2, endAngle:  _extent[0], class: "resize e"},
 		{startAngle: _extent[1], endAngle: _extent[1] + .2, class: "resize w"}
 		];
-	var _newBrushData = [];
+    var _newBrushData = [];
+    var data = [];
 	var d3_window = d3.select(window);
 	var _origin;
 	var _brushG;
@@ -46,6 +47,12 @@ d3.svg.circularbrush = function() {
 
 		return _circularbrush;
 	}
+
+    _circularbrush.data = function(_value) {
+        if (!arguments.length) return data;
+        data = _value;
+        return this;
+    }
 
 	_circularbrush.extent = function(_value) {
 		var _d = _scale.domain();

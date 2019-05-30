@@ -4,9 +4,10 @@ var selectionBrush = d3.svg.circularbrush()
                            .range([0,360])
                            .extent([90, 270]);
 
-function drawBrush(x_center, y_center, radius) {
+function drawBrush(x_center, y_center, radius, data) {
     selectionBrush.innerRadius(radius - 10)
                   .outerRadius(radius + 10)
+                  .data(data)
 
     svg_viz_container.select('.selection_brush').remove()
     svg_viz_container.append('g')
@@ -41,6 +42,7 @@ function updateBrushedData() {
     var radius = calculateRadius(n);
     var x_center = width/2;
     var y_center = calculateYCenter(n);
+    var posits = selectionBrush.data();
     var posits_as_array = posits.inf.concat(posits.neg).concat(posits.pos).concat(posits.zero)
     var filtered_data = selectionBrush.filter(posits_as_array, function(d) {
         if (d.zero) { 
