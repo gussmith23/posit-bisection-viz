@@ -367,7 +367,7 @@ function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
  * @brief This function defines the transition function that should be used for transitioning
  *        between arcs of different sizes when N changes. This gets passed as the
  *        transitioning function to .attrTween
- *        Note: This is almost identical to negativePathTween. However, for some reason, when
+ *        Note: This is almost identical to negativePathTween. However, for some reason, when 
  *        trying to pass other parameters, it's impossible to use the this keyword, which we 
  *        need to get the initial state of the arc
  * @param a the current datapoint bound to the object
