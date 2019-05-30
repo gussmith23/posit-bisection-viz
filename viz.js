@@ -209,25 +209,28 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
     defs.append(function () {return arrowheadMarker;});
     defs.append(function(){return dotMarker;});
 
-    const posits = generatePositsOfLength(n, es);
-
     var dtheta = calculateDTheta(n);
     var radius = calculateRadius(n);
     var x_center = width/2;
     var y_center = calculateYCenter(n);
+    const posits = generatePositsOfLength(n, es)
 
     drawPath(x_center, y_center, radius, posits.zero,
              arrowheadMarkerId, psign.POSITIVE);
     drawPath(x_center, y_center, radius, posits.zero,
              arrowheadMarkerId, psign.NEGATIVE);
 
-    drawDots(x_center, y_center, posits.pos, n, es, psign.POSITIVE);
-    drawDots(x_center, y_center, posits.neg, n, es, psign.NEGATIVE);
+    // drawing the brush has to come before drawing the dots or the hovering doesn't work
+    drawBrush(x_center, y_center, radius, posits)
+
+    drawDots(x_center, y_center, posits.pos, n, es, psign.POSITIVE)
+    drawDots(x_center, y_center, posits.neg, n, es, psign.NEGATIVE)
 
     drawLabels(posits, width, height, n, es, displayFormat);
 
-    drawZero(x_center, y_center, radius, posits.zero, format);
-    drawInfinityDot(x_center, y_center, radius, posits.inf, format);
+    drawZero(x_center, y_center, radius, posits.zero, format)
+    drawInfinityDot(x_center, y_center, radius, posits.inf, format)
+
 }
 
 

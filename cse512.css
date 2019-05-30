@@ -46,3 +46,51 @@ p { margin: 0 0 10px 0; }
 .footer a:hover {
     color: #ce3333;
 }
+.e {
+    fill: rgb(255, 0, 0);
+    cursor: move;
+}
+.w {
+    fill: rgb(0, 255, 0);
+    cursor: move;
+}
+.extent {
+    opacity: .60;
+    cursor: hand;
+}
+.positiveText {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+.negativeText {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+.zeroText {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+.infText {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
