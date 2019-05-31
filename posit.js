@@ -13,6 +13,47 @@
  */
 
 /**
+ * For a given posit, calculate the rounding tie point between the numbers.
+ * We assume that the two posits are adjacent. This assumption is not checked.
+ * @param posit1 -
+ * @param posit2 -
+ */
+function calculateRoundingTiePoint(posit1, posit2, n, es) {
+    console.assert(posit1.value != posit2.value);
+    var lowerPosit = (Math.abs(posit1.value) < Math.abs(posit2.value)) ? posit1 : posit2;
+    var upperPosit = (Math.abs(posit1.value) > Math.abs(posit2.value)) ? posit1 : posit2;
+    console.assert(!lowerPosit.infinity && ! upperPosit.zero);
+
+    // Clamping.
+    if (lowerPosit.zero) return upperPosit.value;
+    if (upperPosit.infinity) return lowerPosit.value;
+
+    // Figure out what kind of bit is being rounded.
+    var exponentRounded = lowerPosit.actualValueBitfields.exponent.length !== es;
+
+    // If exponent is being rounded, the tie point is the geometric mean;
+    // otherwise, it's the arithmetic mean.
+    if (exponentRounded) {
+        return Math.sqrt(lowerPosit.value * upperPosit.value)
+            * (lowerPosit.value < 0 ? -1 : 1);
+    } else {
+        return (lowerPosit.value + upperPosit.value)/2;
+    }
+}
+
+{
+    var testPosits = generatePositsOfLength(6, 1);
+    var out = calculateRoundingTiePoint(testPosits.pos[29], testPosits.pos[30], 6, 1);
+    expect(out).to.be(128);
+    var out = calculateRoundingTiePoint(testPosits.pos[28], testPosits.pos[29], 6, 1);
+    expect(out).to.be(48);
+    var out = calculateRoundingTiePoint(testPosits.neg[0], testPosits.neg[1], 6, 1);
+    expect(out).to.be(-128);
+    var out = calculateRoundingTiePoint(testPosits.neg[1], testPosits.neg[2], 6, 1);
+    expect(out).to.be(-48);
+}
+
+/**
  * Compare two posits for sorting.
  */
 function positCompare(posit1, posit2) {
