@@ -106,8 +106,8 @@ function generatePositsOfLength(n, es) {
         .sort(positCompare);
     const negativePosits = arr.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
         .sort(positCompare);
-    const zeroPosit = arr.filter(p => p.value === 0.0);
-    const infinity = arr.filter(p => p.value === Infinity);
+    const zeroPosit = arr.filter(p => p.zero);
+    const infinity = arr.filter(p => p.infinity);
     console.assert(zeroPosit && infinity);
     console.assert(positivePosits.length === negativePosits.length);
     console.assert(positivePosits.length + negativePosits.length + 2 === 2**n);
