@@ -65,6 +65,7 @@
      // Posit parameters
      var n = 4; var es = 1;
      var displayFormat = label_format.BITSTRING;
+     var scaleFormat = scale_format.LINEAR;
      const nLowerBound = 4; const nUpperBound = 8;
      const esLowerBound = 0;
      const sliderLowerBound = esLowerBound;
@@ -98,7 +99,7 @@
          .tickFormat(d3.format('d'))
          .on('onchange', val => {
              es = val;
-             update(width, height, n, es, displayFormat);
+             update(width, height, n, es);
          });
 
      var sliderN = d3
@@ -116,10 +117,10 @@
              } else {
                  n = val;
              }
-             update(width, height, n, es, displayFormat);
+             update(width, height, n, es);
          });
 
-     update(width, height, n, es, displayFormat);
+     update(width, height, n, es);
      drawControls(width);
     // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
     </script>
