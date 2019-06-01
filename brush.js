@@ -38,24 +38,46 @@ function whileBrushing() {
 }
 
 function updateBrushedData() {
-    var dtheta = calculateDTheta(n);
+    var posits = selectionBrush.data();
+    var positive_posits = posits.pos;
+    var negative_posits = posits.neg;
+
+    var posits_as_array = posits.zero
+                                .concat(negative_posits)
+                                .concat(positive_posits)
+                                .concat(posits.inf);
+
+    var positive_dthetas = calculateDTheta(n, positive_posits);
+    var negative_dthetas = calculateDTheta(n, negative_posits);
+
+    var dthetas_as_array = [0].concat(negative_dthetas)
+                              .concat(positive_dthetas)
+                              .concat([180]);
+
+    var combined_array = posits_as_array.map(function(d, i) {
+        return {
+            posit: d,
+            angle: dthetas_as_array[i]
+        }
+
+    })
     var radius = calculateRadius(n);
     var x_center = width/2;
     var y_center = calculateYCenter(n);
-    var posits = selectionBrush.data();
-    var posits_as_array = posits.inf.concat(posits.neg).concat(posits.pos).concat(posits.zero)
-    var filtered_data = selectionBrush.filter(posits_as_array, function(d) {
-        if (d.zero) { 
+
+    var filtered_data = selectionBrush.filter(combined_array, function(d) {
+        if (d.posit.zero) { 
             return 180
         }
-        else if (d.infinity) {
+        else if (d.posit.infinity) {
             return 0
         }
         else {
-            var coord = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, d)
+            var coord = getDotCoordsFromPosit(x_center, y_center, radius, d.angle, d.posit)
             return coord.endAngle;
         }
     })
+
     console.log(filtered_data)
 }
 /* 
