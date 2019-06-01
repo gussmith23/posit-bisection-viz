@@ -7,8 +7,9 @@ COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
  * Regenerates set of posits, splits them into positive, negative, zero, and
  * infinity; binds new set of data to the viz.
  */
-function update(width, height, n, es, format) {
-    drawProjectiveRealsLine(width, height, n, es, format);
+function update(width, height, n, es) {
+    console.log(scaleFormat);
+    drawProjectiveRealsLine(width, height, n, es);
     createLegend();
     createTooltip(n, es);
 }
@@ -19,7 +20,8 @@ function drawControls(width) {
     var n_slider_start = (width / 2) - (n_slider_width / 2);
     var n_slider_y = y_center - 100;
     var es_slider_y = y_center - 40;
-    var button_y = y_center + 25;
+    var format_button_y = y_center + 25;
+    var scale_button_y = format_button_y + 35;
     var button_width = 150;
 
     svg_viz_container.append('g')
@@ -54,10 +56,9 @@ function drawControls(width) {
         .text("ES:");
 
     svg_viz_container.append('text')
-        .attr("transform", `translate(${width / 2},${button_y})`)
+        .attr("transform", `translate(${width / 2},${format_button_y})`)
         .style('text-anchor', 'middle')
         .style('font-weight', 400)
-        .attr('id', 'button-text')
         .text('See Fraction Values')
         .on('click', function (d) {
             if (d3.select(this).text() == 'See Fraction Values') {
@@ -67,19 +68,40 @@ function drawControls(width) {
                 d3.select(this).text('See Fraction Values');
                 displayFormat = label_format.BITSTRING;
             }
-            update(width, height, n, es, displayFormat);
+            update(width, height, n, es);
         });
 
-    svg_viz_container.append('g')
-        .append('rect')
-        .attr('class', 'button')
+    svg_viz_container.append('rect')
         .attr('width', button_width)
         .attr('height', 30)
         .style('fill', 'none')
         .style('stroke', 'black')
         .attr('rx', 10)
-        .attr('id', 'button')
-        .attr('transform', `translate(${width / 2 - button_width/2}, ${button_y-20})`);
+        .attr('transform', `translate(${width / 2 - button_width/2}, ${format_button_y-20})`);
+
+    svg_viz_container.append('text')
+        .attr("transform", `translate(${width / 2},${scale_button_y})`)
+        .style('text-anchor', 'middle')
+        .style('font-weight', 400)
+        .text('Show Log Scale')
+        .on('click', function (d) {
+            if (d3.select(this).text() == 'Show Log Scale') {
+                d3.select(this).text('Show Linear Scale');
+                scaleFormat = scale_format.LOG;
+            } else {
+                d3.select(this).text('Show Log Scale');
+                scaleFormat = scale_format.LINEAR;
+            }
+            update(width, height, n, es);
+        });
+
+    svg_viz_container.append('rect')
+        .attr('width', button_width)
+        .attr('height', 30)
+        .style('fill', 'none')
+        .style('stroke', 'black')
+        .attr('rx', 10)
+        .attr('transform', `translate(${width / 2 - button_width/2}, ${scale_button_y-20})`);
 }
 
 /**
@@ -192,7 +214,7 @@ function mouseInteractionHelper(nodes, tip) {
  * @param es Current ES value of the visualization
  * @param format Current format setting, fractions or bitstrings
  */
-function drawProjectiveRealsLine(width, height, n, es, format) {
+function drawProjectiveRealsLine(width, height, n, es) {
     // An assumption I'm making right now.
     console.assert(width === height);
 
@@ -209,7 +231,6 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
     defs.append(function () {return arrowheadMarker;});
     defs.append(function(){return dotMarker;});
 
-    var dtheta = calculateDTheta(n);
     var radius = calculateRadius(n);
     var x_center = width/2;
     var y_center = calculateYCenter(n);
@@ -226,10 +247,11 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
     drawDots(x_center, y_center, posits.pos, n, es, psign.POSITIVE)
     drawDots(x_center, y_center, posits.neg, n, es, psign.NEGATIVE)
 
-    drawLabels(posits, width, height, n, es, displayFormat);
+    drawLabels(posits.pos, width, height, n, es, displayFormat, psign.POSITIVE);
+    drawLabels(posits.neg, width, height, n, es, displayFormat, psign.NEGATIVE);
 
-    drawZero(x_center, y_center, radius, posits.zero, format)
-    drawInfinityDot(x_center, y_center, radius, posits.inf, format)
+    drawZero(x_center, y_center, radius, posits.zero, displayFormat)
+    drawInfinityDot(x_center, y_center, radius, posits.inf, displayFormat)
 
 }
 
@@ -241,25 +263,27 @@ function drawProjectiveRealsLine(width, height, n, es, format) {
  * @param n Current N value of the visualization
  * @param es Current ES value of the visualization
  */
-function drawLabels(posits, width, height, n, es, format) {
+function drawLabels(posits, width, height, n, es, format, sign) {
+    var class_str;
+    if (sign == psign.POSITIVE) {
+        class_str = "negativeText";
+    } else {
+        class_str = "positiveText";
+    }
     var radius = calculateRadius(n);
 
     var params = {
         x_center: width/2,
         y_center: calculateYCenter(n),
         text_radius: calculateTextRadius(radius),
-        dtheta: calculateDTheta(n),
+        dtheta: calculateDTheta(n, posits),
         n: n,
         es: es
     };
 
-    var texts = svg_viz_container.selectAll('.negativeText').data(posits.neg);
-    setTextAttrs(texts.enter().append('text'), params, psign.NEGATIVE, 'negativeText', format);
-    setTextAttrs(texts, params, psign.NEGATIVE, 'negativeText', format);
-    texts.exit().remove();
-    texts = svg_viz_container.selectAll('.positiveText').data(posits.pos);
-    setTextAttrs(texts.enter().append('text'), params, psign.POSITIVE, 'positiveText', format);
-    setTextAttrs(texts, params, psign.POSITIVE, 'positiveText', format);
+    var texts = svg_viz_container.selectAll('.'.concat(class_str)).data(posits);
+    setTextAttrs(texts.enter().append('text'), params, sign, class_str, format);
+    setTextAttrs(texts, params, sign, class_str, format);
     texts.exit().remove();
 }
 
@@ -278,7 +302,7 @@ function setTextAttrs(text_var, params, sign, classString, format) {
             var coord = getDotCoordsFromPosit(params.x_center,
                                               params.y_center,
                                               params.text_radius,
-                                              params.dtheta, d);
+                                              params.dtheta[i], d);
             var rotate = d.actualValueBitfields.sign[0] === psign.NEGATIVE ?
                 coord.endAngle + 90 : coord.endAngle - 90;
             // Note: order of transforms matters!
@@ -319,14 +343,14 @@ function setTextAttrs(text_var, params, sign, classString, format) {
  *  @return A formatted string to be set as label text on the circle
  */
 function formatFractionalString(bitstring, n, es) {
-    var fractional_posit_value = decodePosit(bitstring, n, es).value;
+    var frac_posit_value = decodePosit(bitstring, n, es).value;
     var string;
-    if (Math.abs(fractional_posit_value) < 0.00001
-        || Math.abs(fractional_posit_value) > 99999) {
-        string = fractional_posit_value.toExponential(5).toString();
+    if (Math.abs(frac_posit_value) < 0.00001
+        || Math.abs(frac_posit_value) > 99999) {
+        string = frac_posit_value.toExponential(5).toString();
     }
     else {
-        string = parseFloat(fractional_posit_value.toFixed(5)).toString();
+        string = parseFloat(frac_posit_value.toFixed(5)).toString();
     }
     return string;
 }
@@ -406,14 +430,14 @@ function positivePathTween(a) {
  */
 function drawDots(x_center, y_center, posits, n, es, sign) {
     var radius = calculateRadius(n);
-    var dtheta = calculateDTheta(n);
+    var dtheta = calculateDTheta(n, posits);
     className = (sign == psign.POSITIVE) ? 'positiveDot' : 'negativeDot';
 
     var dots = svg_viz_container.selectAll('.'.concat(className)).data(posits);
     dots.enter().append('circle')
         .attr('class', className)
-        .attr('transform', function(d) {
-            var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, d);
+        .attr('transform', function(d, i) {
+            var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta[i], d);
             return "translate(" + coords.x + "," + coords.y + ")";})
         .style('opacity', 1E-6)
         .attr('r', 5)
@@ -424,8 +448,8 @@ function drawDots(x_center, y_center, posits, n, es, sign) {
     dots
         .transition()
         .duration(750)
-        .attr('transform', function(d) {
-            var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta, d);
+        .attr('transform', function(d, i) {
+            var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta[i], d);
             return "translate(" + coords.x + "," + coords.y + ")";});
     dots.exit().remove();
 }
@@ -643,12 +667,12 @@ function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, posit) {
     var infVal = 2**(posit.bitstring.length - 1);
     var end_angle;
     if (posit.rawBitfields.sign[0] === psign.POSITIVE) {
-        end_angle = 180 - (dtheta * posit_as_int);
+        end_angle = 180 - dtheta;
     } else {
         // Semi-hacky correction so that negative posits go
         // from most negative to least negative
         if (posit.value != Infinity) { posit_as_int = Math.abs(infVal - (posit_as_int - infVal));}
-        end_angle = 180 + (dtheta * (posit_as_int));
+        end_angle = 180 + dtheta;
     }
     return {
         endAngle:end_angle,
