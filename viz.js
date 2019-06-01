@@ -82,14 +82,17 @@ function drawControls(width) {
         .attr("transform", `translate(${width / 2},${scale_button_y})`)
         .style('text-anchor', 'middle')
         .style('font-weight', 400)
-        .text('Show Log Scale')
+        .text('Ordinal Scale')
         .on('click', function (d) {
-            if (d3.select(this).text() == 'Show Log Scale') {
-                d3.select(this).text('Show Linear Scale');
+            if (scaleFormat == scale_format.ORDINAL) {
+                d3.select(this).text('Linear Scale');
+                scaleFormat = scale_format.LINEAR;
+            } else if (scaleFormat == scale_format.LINEAR) {
+                d3.select(this).text('Log Scale');
                 scaleFormat = scale_format.LOG;
             } else {
-                d3.select(this).text('Show Log Scale');
-                scaleFormat = scale_format.LINEAR;
+                d3.select(this).text('Ordinal Scale');
+                scaleFormat = scale_format.ORDINAL;
             }
             update(width, height, n, es);
         });
