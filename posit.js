@@ -106,6 +106,9 @@ function generatePositsOfLength(n, es) {
         .sort(positCompare);
     const negativePosits = arr.filter(posit => posit.actualValueBitfields && posit.actualValueBitfields.sign[0] === 1)
         .sort(positCompare);
+    // Order the negative posits by closeness to zero, since that matches
+    // the order that we draw them
+    negativePosits.reverse();
     const zeroPosit = arr.filter(p => p.zero);
     const infinity = arr.filter(p => p.infinity);
     console.assert(zeroPosit && infinity);

@@ -64,32 +64,26 @@ function calculateYCenter(n) {
  * TODO return a list of angles instead, intervals based scaleFormat
  */
 function calculateDTheta(n, posits) {
-    var total_angle = 178; // How many degrees we have to play with
+    var total_angle = 170; // How many degrees we have to play with
     var dthetas = [];
-    var last_angle = 0;
     var angle;
+    var num_posits = 1 << n;
     if (scaleFormat == scale_format.LINEAR) {
+        var last_angle = 0;
         for (i = 0; i < posits.length; i++) {
-            // TODO(gus) magic numbers
-            angle = total_angle/(1 << (n-1)) + last_angle;
+            angle = total_angle/(num_posits/2) + last_angle;
             dthetas.push(angle);
             last_angle = angle;
         }
     } else {
-        // var max_log_val = Math.max.apply(Math, posits.map(
-        //     function(p) { return Math.log2(Math.abs(p.value));}));
-        var max_log_val = Math.log2(Math.abs(posits[posits.length - 1].value));
-        // var min_log_val = Math.min.apply(Math, posits.map(
-        //     function(p) { return Math.log2(Math.abs(p.value));}));
-        var min_log_val = Math.log2(Math.abs(posits[0].value));
-        var log_val_range = max_log_val - min_log_val;
+        var max_val = Math.abs(posits[posits.length - 1].value);
+        var min_val = Math.abs(posits[0].value);
+        var val_range = max_val - min_val;
         for (i = 0; i < posits.length; i++) {
-            var log_val = Math.log2(Math.abs(posits[i].value));
-            var percent_of_range = (log_val - min_log_val) / log_val_range;
+            var val = Math.abs(posits[i].value);
+            var percent_of_range = (val - min_val) / val_range;
             angle = total_angle * percent_of_range;
-            // dthethas.push(angle - last_angle);
-            dthetas.push(0);
-            last_angle = angle;
+            dthetas.push(angle);
         }
     }
     return dthetas;

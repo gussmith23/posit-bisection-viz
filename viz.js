@@ -8,7 +8,6 @@ COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
  * infinity; binds new set of data to the viz.
  */
 function update(width, height, n, es) {
-    console.log(scaleFormat);
     drawProjectiveRealsLine(width, height, n, es);
     createLegend();
     createTooltip(n, es);
@@ -234,7 +233,7 @@ function drawProjectiveRealsLine(width, height, n, es) {
     var radius = calculateRadius(n);
     var x_center = width/2;
     var y_center = calculateYCenter(n);
-    const posits = generatePositsOfLength(n, es)
+    const posits = generatePositsOfLength(n, es);
 
     drawPath(x_center, y_center, radius, posits.zero,
              arrowheadMarkerId, psign.POSITIVE);
@@ -242,16 +241,16 @@ function drawProjectiveRealsLine(width, height, n, es) {
              arrowheadMarkerId, psign.NEGATIVE);
 
     // drawing the brush has to come before drawing the dots or the hovering doesn't work
-    drawBrush(x_center, y_center, radius, posits)
+    drawBrush(x_center, y_center, radius, posits);
 
-    drawDots(x_center, y_center, posits.pos, n, es, psign.POSITIVE)
-    drawDots(x_center, y_center, posits.neg, n, es, psign.NEGATIVE)
+    drawDots(x_center, y_center, posits.pos, n, es, psign.POSITIVE);
+    drawDots(x_center, y_center, posits.neg, n, es, psign.NEGATIVE);
 
     drawLabels(posits.pos, width, height, n, es, displayFormat, psign.POSITIVE);
     drawLabels(posits.neg, width, height, n, es, displayFormat, psign.NEGATIVE);
 
-    drawZero(x_center, y_center, radius, posits.zero, displayFormat)
-    drawInfinityDot(x_center, y_center, radius, posits.inf, displayFormat)
+    drawZero(x_center, y_center, radius, posits.zero, displayFormat);
+    drawInfinityDot(x_center, y_center, radius, posits.inf, displayFormat);
 
 }
 
@@ -309,6 +308,7 @@ function setTextAttrs(text_var, params, sign, classString, format) {
             return "translate(" + coord.x +"," + coord.y + ")"
                 + " rotate(" + rotate + ")";
         })
+
         .attr('font-family', 'sans-serif')
     // TODO(gus) no need to define anchor_pos above. Instead, use a function
     // like you do in the 'transform' case above, and then decide anchor based
@@ -382,6 +382,7 @@ function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
         .attr('class', className)
         .attr('d', arc)
         .attr('stroke-width', '3')
+
         .attr('stroke', color)
         .attr('fill', 'none')
         .attr('marker-end', 'url(#' + arrowheadMarkerId + ')')
@@ -482,6 +483,7 @@ function negativePathTween(a) {
     return function(t) {
         return describeArc(inter(t).x_center, inter(t).y_center,
             inter(t).radius, psign.NEGATIVE, 180, 357);
+
     };
 }
 
@@ -515,6 +517,7 @@ function drawInfinityDot(x_center, y_center, radius, infinity, format) {
         .transition()
         .duration(750)
         .attr('transform', "translate(" + x_center + "," + circle_top + ")");
+
 
     infinityDot.exit().remove();
 
@@ -671,7 +674,6 @@ function getDotCoordsFromPosit(x_center, y_center, radius, dtheta, posit) {
     } else {
         // Semi-hacky correction so that negative posits go
         // from most negative to least negative
-        if (posit.value != Infinity) { posit_as_int = Math.abs(infVal - (posit_as_int - infVal));}
         end_angle = 180 + dtheta;
     }
     return {
