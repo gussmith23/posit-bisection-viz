@@ -36,7 +36,7 @@ const dot_radius = {
  */
 function calculateRadius(n) {
     // TODO(gus) magic numbers
-    return ((n/2) * 100) + (2**(n/2) * 3);
+    return ((6/2) * 100) + (2**(6/2) * 3);
 }
 
 /**
@@ -55,7 +55,7 @@ function calculateTextRadius(radius) {
  * @returns the Y coordinate
  */
 function calculateYCenter(n) {
-    return calculateRadius(n) + (n * 5);
+    return calculateRadius(6) + (6 * 5);
 }
 
 /**
