@@ -736,6 +736,9 @@ function drawNumberLine(svg, width, height, ...data) {
             .attr('cy', height/2)
             .attr('r', 5)
             .attr('fill', colorScale(i));
+        select
+            .attr('cx', (d) => xScale(d.value))
+            .attr('cy', height/2);
         select.exit().remove();
     }
 
