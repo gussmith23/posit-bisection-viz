@@ -703,3 +703,40 @@ function describeArc(x, y, radius, sign, startAngle, endAngle){
     ].join(" ");
     return d;
 }
+
+/**
+ * Draw a number line on the specified element.
+ *
+ * Note from implementer: I suggest using this by doing the following:
+ * 1. Create an element (probably a `g`?) within the SVG to hold the number line
+ * 2. Create margins using this one weird old trick:
+ *    https://bl.ocks.org/mbostock/3019563
+ * 3. Pass the element and its width/height
+ *
+ * @param {list} data the data to be drawn on the number line. Data from multiple
+ * number systems can be passed. Currently, the only requirement for each list
+ * member is to have a `value` field.
+ */
+function drawNumberLine(svg, width, height, ...data) {
+    var xScale = d3.scaleLinear()
+        .domain(d3.extent(data.reduce(
+            (accum, current) => accum.concat(current)),
+                          (point) => point.value))
+        .range([0,width]);
+
+    var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+    for (i in data) {
+        var currentData = data[i];
+        const CLASS = "numberLineDot" + i;
+        var select = svg.selectAll('.' + CLASS).data(currentData);
+        select.enter().append('circle')
+            .attr('class', CLASS)
+            .attr('cx', (d) => xScale(d.value))
+            .attr('cy', height/2)
+            .attr('r', 5)
+            .attr('fill', colorScale(i));
+        select.exit().remove();
+    }
+
+}
