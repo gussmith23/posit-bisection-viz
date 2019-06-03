@@ -713,17 +713,25 @@ function describeArc(x, y, radius, sign, startAngle, endAngle){
  *    https://bl.ocks.org/mbostock/3019563
  * 3. Pass the element and its width/height
  *
- * @param {list} data the data to be drawn on the number line. Data from multiple
- * number systems can be passed. Currently, the only requirement for each list
- * member is to have a `value` field.
+ * @param data the data to be drawn on the number line. These are structs which
+ * look like:
+ * {
+ *   name: <name to appear in legend>
+ *   data: [{value: <value>},...],
+ *   mark: <'circle' or 'tick'>
+ * }
+ * Data from multiple number systems can be passed. Currently, the only
+ * requirement for each list member is to have a `value` field.
  */
 function drawNumberLine(svg, width, height, ...data) {
     const STROKE_WIDTH = 2;
     const LINE_COLOR = 'black';
+    const TICK_WIDTH = 2;
+    const TICK_HEIGHT = 30;
 
     var xScale = d3.scaleLinear()
         .domain(d3.extent(data.reduce(
-            (accum, current) => accum.concat(current)),
+            (accum, current) => current.data.concat(accum), []),
                           (point) => point.value))
         .range([0,width]);
 
@@ -739,19 +747,65 @@ function drawNumberLine(svg, width, height, ...data) {
         .attr('stroke', LINE_COLOR);
 
     for (i in data) {
-        var currentData = data[i];
+        var currentData = data[i].data;
         const CLASS = "numberLineDot" + i;
         var select = svg.selectAll('.' + CLASS).data(currentData);
-        select.enter().append('circle')
-            .attr('class', CLASS)
-            .attr('cx', (d) => xScale(d.value))
-            .attr('cy', height/2)
-            .attr('r', 5)
-            .attr('fill', colorScale(i));
-        select
-            .attr('cx', (d) => xScale(d.value))
-            .attr('cy', height/2);
-        select.exit().remove();
+
+        if (data[i].mark === 'circle') {
+            select.enter().append('circle')
+                .attr('class', CLASS)
+                .attr('cx', (d) => xScale(d.value))
+                .attr('cy', height/2)
+                .attr('r', 5)
+                .attr('fill', colorScale(i));
+            select
+                .attr('cx', (d) => xScale(d.value))
+                .attr('cy', height/2);
+            select.exit().remove();
+        } else {
+            console.assert(data[i].mark === 'tick');
+            select.enter().append('rect')
+                .attr('class', CLASS)
+                .attr('x', (d) => xScale(d.value) - TICK_WIDTH/2)
+                .attr('y', height/2 - TICK_HEIGHT/2)
+                .attr('width', TICK_WIDTH)
+                .attr('height', TICK_HEIGHT)
+                .attr('fill', colorScale(i));
+            select
+                .attr('x', (d) => xScale(d.value) - TICK_WIDTH/2)
+                .attr('y', height/2 - TICK_HEIGHT/2);
+            select.exit().remove();
+        }
     }
+
+    // Legend
+    const legend = svg
+          .selectAll(".legend")
+          .data(colorScale.domain())
+          .enter()
+          .append('g')
+          .attr("class", "legend")
+          .attr("transform", function(d,i) {
+              return `translate(0, ${i * 20})`;
+          });
+
+    // The legend is <box> <text>, this creates the colored box portion
+    legend.append('rect')
+        .attr('class', 'legend-rect')
+        .attr('x', width)
+        .attr('y', 65)
+        .attr('width', 12)
+        .attr('height', 12)
+        .style('fill', colorScale);
+
+    // This creates the text portion
+    legend.append("text")
+        .attr('class', 'legend-text')
+        .attr("x", width)
+        .attr("y", 70)
+        .style('font-size', "12px")
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text(function(d) { return data[d].name;});
 
 }
