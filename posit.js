@@ -15,8 +15,6 @@
 /**
  * For a given posit, calculate the rounding tie point between the numbers.
  * We assume that the two posits are adjacent. This assumption is not checked.
- * @param posit1 -
- * @param posit2 -
  */
 function calculateRoundingTiePoint(posit1, posit2, n, es) {
     console.assert(posit1.value != posit2.value);
@@ -59,6 +57,14 @@ function calculateRoundingTiePoint(posit1, posit2, n, es) {
  */
 function positCompare(posit1, posit2) {
     return unsignedIntegerFromBitstring(posit1.bitstring) - unsignedIntegerFromBitstring(posit2.bitstring);
+};
+
+/**
+ * Compare two posits for sorting by the `value` field. Unsure why
+ * `positCompare` is written the way it is.
+ */
+function positCompareByValue(posit1, posit2) {
+    return posit1.value-posit2.value;
 };
 
 /**
