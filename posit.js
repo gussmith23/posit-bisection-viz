@@ -47,9 +47,9 @@ function calculateRoundingTiePoint(posit1, posit2, n, es) {
     expect(out).to.be(128);
     var out = calculateRoundingTiePoint(testPosits.pos[28], testPosits.pos[29], 6, 1);
     expect(out).to.be(48);
-    var out = calculateRoundingTiePoint(testPosits.neg[0], testPosits.neg[1], 6, 1);
+    var out = calculateRoundingTiePoint(testPosits.neg[29], testPosits.neg[30], 6, 1);
     expect(out).to.be(-128);
-    var out = calculateRoundingTiePoint(testPosits.neg[1], testPosits.neg[2], 6, 1);
+    var out = calculateRoundingTiePoint(testPosits.neg[28], testPosits.neg[29], 6, 1);
     expect(out).to.be(-48);
 }
 
