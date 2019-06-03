@@ -718,6 +718,9 @@ function describeArc(x, y, radius, sign, startAngle, endAngle){
  * member is to have a `value` field.
  */
 function drawNumberLine(svg, width, height, ...data) {
+    const STROKE_WIDTH = 2;
+    const LINE_COLOR = 'black';
+
     var xScale = d3.scaleLinear()
         .domain(d3.extent(data.reduce(
             (accum, current) => accum.concat(current)),
@@ -725,6 +728,15 @@ function drawNumberLine(svg, width, height, ...data) {
         .range([0,width]);
 
     var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+    // Draw the line itself.
+    svg.append('line')
+        .attr('x1', 0)
+        .attr('y1', height/2)
+        .attr('x2', width)
+        .attr('y2', height/2)
+        .attr('stroke-width', STROKE_WIDTH)
+        .attr('stroke', LINE_COLOR);
 
     for (i in data) {
         var currentData = data[i];
