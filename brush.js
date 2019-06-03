@@ -80,7 +80,7 @@ function updateBrushedData() {
 
     console.log(filtered_data)
 }
-/* 
+/**
  * @brief This gets called when you stop brushing (when you stop clicking on the brush area)
  */
 function onBrushEnd() {
