@@ -55,6 +55,7 @@ function calculateRoundingTiePoint(posit1, posit2, n, es) {
 
 /**
  * Compare two posits for sorting.
+ * TODO(gus): unsure why I didn't use `posit.value` here.
  */
 function positCompare(posit1, posit2) {
     return unsignedIntegerFromBitstring(posit1.bitstring) - unsignedIntegerFromBitstring(posit2.bitstring);
