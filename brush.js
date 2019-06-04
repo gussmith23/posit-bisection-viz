@@ -1,24 +1,22 @@
 var selectedPosits = [];
 
 var selectionBrush = d3.svg.circularbrush()
+                     .range([0,360])
+                     .extent([90, 270]);
 
 function drawBrush(x_center, y_center, radius, data) {
     selectionBrush.innerRadius(radius - 10)
                   .outerRadius(radius + 10)
                   .handleSize(.05)
                   .data(data)
-                  .range([0,360])
-                  .extent([90, 270]);
+    updateBrushedData()
 
     svg_viz_container.select('.selection_brush').remove()
     svg_viz_container.append('g')
         .attr('class', 'selection_brush')
         .attr('transform', 'translate(' + x_center + ',' + y_center + ')')
-        .style('opacity', 1E-6)
-        .call(selectionBrush)
-        .transition()
-        .duration(750)
         .style('opacity', dot_opacity.UNFOCUSED)
+        .call(selectionBrush)
     
 }
 
@@ -79,7 +77,6 @@ function updateBrushedData() {
         }
     })
 
-    console.log(filtered_data)
     selectedPosits = filtered_data;
 }
 /**
