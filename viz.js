@@ -19,9 +19,9 @@ function drawControls(width) {
     var y_center = calculateYCenter(4);
     var es_slider_start = (width / 2) - (es_slider_width / 2);
     var n_slider_start = (width / 2) - (n_slider_width / 2);
-    var n_slider_y = y_center - 100;
-    var es_slider_y = y_center - 40;
-    var format_button_y = y_center + 25;
+    var n_slider_y = y_center - 220;
+    var es_slider_y = y_center - 160;
+    var format_button_y = y_center - 80;
     var scale_button_y = format_button_y + 35;
     var button_width = 150;
 
