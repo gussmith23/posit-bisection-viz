@@ -1,13 +1,14 @@
 var selectedPosits = [];
 
 var selectionBrush = d3.svg.circularbrush()
-                           .range([0,360])
-                           .extent([90, 270]);
 
 function drawBrush(x_center, y_center, radius, data) {
     selectionBrush.innerRadius(radius - 10)
                   .outerRadius(radius + 10)
+                  .handleSize(.05)
                   .data(data)
+                  .range([0,360])
+                  .extent([90, 270]);
 
     svg_viz_container.select('.selection_brush').remove()
     svg_viz_container.append('g')

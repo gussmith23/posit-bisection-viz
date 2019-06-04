@@ -159,7 +159,7 @@ d3.svg.circularbrush = function() {
     
 
 	function resizeDown(d) {
-		var _mouse = d3.mouse(_brushG.node());
+        var _mouse = d3.mouse(_brushG.node());
 
 		if (_brushData[0] === undefined) {
 			_brushData[0] = d;
@@ -225,11 +225,17 @@ d3.svg.circularbrush = function() {
 		}
 
 
-		_newBrushData = [
+        _newBrushData = [
 		{startAngle: _newStartAngle, endAngle: _newEndAngle, class: "extent"},
 		{startAngle: _newStartAngle - _handleSize, endAngle: _newStartAngle, class: "resize e"},
 		{startAngle: _newEndAngle, endAngle: _newEndAngle + _handleSize, class: "resize w"}
-		]
+        ]
+
+        if (_newStartAngle - _handleSize < 0 
+            || _newEndAngle + _handleSize > Math.PI * 2
+            || _newEndAngle + _handleSize < _newStartAngle - _handleSize) {
+            _newBrushData = _brushData
+        }
 
 		brushRefresh();
 
@@ -253,6 +259,7 @@ d3.svg.circularbrush = function() {
 	}
 
 	function brushRefresh() {
+		_brushData = _newBrushData;
 		_brushG
 			.selectAll("path.circularbrush")
 			.data(_newBrushData)
@@ -262,13 +269,12 @@ d3.svg.circularbrush = function() {
 
 	function extentUp() {
 
-		_brushData = _newBrushData;
 		d3_window.on("mousemove.brush", null).on("mouseup.brush", null);
 
         onBrushEnd()
 	}
 
-	function updateBrushData() {
+    function updateBrushData() {
 		_brushData = [
 		{startAngle: _extent[0], endAngle: _extent[1], class: "extent"},
 		{startAngle: _extent[0] - _handleSize, endAngle:  _extent[0], class: "resize e"},
