@@ -585,17 +585,19 @@ function drawZero(x_center, y_center, radius, zero, format) {
     zero_text = (format == label_format.FRACTION) ? "0" : ((d) => d.bitstring.join(""));
 
     text = svg_viz_container.selectAll('.zeroText').data(zero);
+    y_coord = y_center + text_radius + 10
+    x_coord = x_center - 4
     text.enter().append('text')
         .attr('class', 'zeroText')
-        .attr('x', x_center)
-        .attr('y', y_center + text_radius)
+        .attr('transform', "translate(" + x_coord + "," + y_coord + ")"
+            + " rotate(" + 90 + ")")
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .text(zero_text);
 
     text
-        .attr('x', x_center)
-        .attr('y', y_center + text_radius)
+        .attr('transform', "translate(" + x_coord + "," + y_coord + ")"
+            + " rotate(" + 90 + ")")
         .text(zero_text);
     text.exit().remove();
 }
