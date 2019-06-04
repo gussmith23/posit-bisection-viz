@@ -1,4 +1,4 @@
-
+var selectedPosits = [];
 
 var selectionBrush = d3.svg.circularbrush()
                            .range([0,360])
@@ -79,10 +79,13 @@ function updateBrushedData() {
     })
 
     console.log(filtered_data)
+    selectedPosits = filtered_data;
 }
 /**
  * @brief This gets called when you stop brushing (when you stop clicking on the brush area)
  */
 function onBrushEnd() {
     console.log("Brushing ending")
+
+    update(width, height, n, es);
 }
