@@ -1,6 +1,6 @@
 // @note svg_viz_container is a global variable defined in index.html
 COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
-ANGLE_MIN = 2
+ANGLE_MIN = 1.4
 
 /**
  * Update data with new posit parameters.
@@ -320,29 +320,32 @@ function setTextAttrs(text_var, params, sign, classString, format) {
         .attr('text-anchor', anchor_pos)
         .attr('class', classString);
 
+    function is_spaced(d, i) {
+        var diff = (i > 0) ? params.dtheta[i] - params.dtheta[i-1] :
+            params.dtheta[i];
+        return diff > ANGLE_MIN;
+    }
+
     if (format == label_format.FRACTION) {
         text_var
             .style("fill", "black")
             .text(function(d, i) {
-                var diff = (i > 0) ? params.dtheta[i] - params.dtheta[i-1] :
-                    params.dtheta[i];
-                if (diff < ANGLE_MIN) {
-                    return "";
-                }
-                return formatFractionalString(d.bitstring, params.n, params.es);})
+                var frac_str = formatFractionalString(d.bitstring, params.n, params.es);
+                return (is_spaced(d,i) ? frac_str : "");
+            })
     } else {
         text_var
             .style("fill", COLORS[0])
-            .text((d) => d.rawBitfields.sign.join(""))
+            .text((d,i) => (is_spaced(d,i) ? d.rawBitfields.sign.join("") : ""))
             .append("tspan")
             .style("fill", COLORS[1])
-            .text((d) => d.rawBitfields.regime.join(""))
+            .text((d,i) => (is_spaced(d,i) ? d.rawBitfields.regime.join("") : ""))
             .append("tspan")
             .style("fill", COLORS[2])
-            .text((d) => d.rawBitfields.exponent.join(""))
+            .text((d,i) => (is_spaced(d,i) ? d.rawBitfields.exponent.join("") : ""))
             .append("tspan")
             .style("fill", COLORS[3])
-            .text((d) => d.rawBitfields.fraction.join(""));
+            .text((d,i) => (is_spaced(d,i) ? d.rawBitfields.fraction.join("") : ""));
     }
 }
 
