@@ -1,5 +1,6 @@
 // @note svg_viz_container is a global variable defined in index.html
 COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
+ANGLE_MIN = 2
 
 /**
  * Update data with new posit parameters.
@@ -322,7 +323,13 @@ function setTextAttrs(text_var, params, sign, classString, format) {
     if (format == label_format.FRACTION) {
         text_var
             .style("fill", "black")
-            .text((d) => formatFractionalString(d.bitstring, params.n, params.es));
+            .text(function(d, i) {
+                var diff = (i > 0) ? params.dtheta[i] - params.dtheta[i-1] :
+                    params.dtheta[i];
+                if (diff < ANGLE_MIN) {
+                    return "";
+                }
+                return formatFractionalString(d.bitstring, params.n, params.es);})
     } else {
         text_var
             .style("fill", COLORS[0])
