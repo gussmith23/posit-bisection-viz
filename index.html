@@ -88,6 +88,9 @@
                        .append('g')
                        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+     var numberLine = svg_viz_container.append('g')
+                                       .attr('transform', 'translate(210, 250)');
+
 
      var sliderES = d3
          .sliderBottom()

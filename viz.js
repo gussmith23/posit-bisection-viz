@@ -12,6 +12,7 @@ function update(width, height, n, es) {
     drawProjectiveRealsLine(width, height, n, es);
     createLegend();
     createTooltip(n, es);
+    createNumberLine(svg_viz_container, width, height, n, es)
 }
 
 function drawControls(width) {
@@ -818,4 +819,31 @@ function drawNumberLine(svg, width, height, ...data) {
         .style("text-anchor", "end")
         .text(function(d) { return data[d].name;});
 
+}
+
+function createNumberLine(svg, width, height, n, es) {
+
+    var posits = selectedPosits.map((d) => d.posit);
+    posits.sort(positCompareByValue);
+
+    var roundingTiePoints = posits.reduce(function(acc, posit) {
+        if (acc === null) return [posit, []];
+        var lastPosit = acc[0];
+        var currentList = acc[1];
+        return [posit, currentList.concat([
+            {value: calculateRoundingTiePoint(posit, lastPosit, n, es)}])];
+    }, null);
+    roundingTiePoints = (roundingTiePoints === null) ? [] : roundingTiePoints[1];
+    drawNumberLine(numberLine, 620-40, 300-40,
+                   {
+                       name: 'Posits',
+                       data: posits,
+                       mark: 'circle'
+                   },
+                   {
+                       name: 'Posit Rounding Tie Points',
+                       data: roundingTiePoints,
+                       mark: 'tick'
+                   }
+                  );
 }
