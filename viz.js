@@ -197,12 +197,24 @@ function createTooltip(n, es) {
 function mouseInteractionHelper(nodes, tip) {
     nodes
         .on('mouseover', function(d) {
+            // Change the corresponding dot on the number line
+            var dots = svg_viz_container.selectAll('.numberLineDot0').filter(
+                function(dot) { return dot.bitstring.join("") == d.bitstring.join("");}
+            )
+            dots.attr('r', dot_radius.FOCUSED)
+            dots.attr('opacity', dot_opacity.FOCUSED)
             d3.select(this)
               .attr('r', dot_radius.FOCUSED)
               .style('opacity', dot_opacity.FOCUSED);
             tip.show(d, this);}
         )
         .on('mouseout', function(d) {
+            // Change the corresponding dot on the number line
+            var dots = svg_viz_container.selectAll('.numberLineDot0').filter(
+                function(dot) { return dot.bitstring.join("") == d.bitstring.join("");}
+            )
+            dots.attr('r', dot_radius.UNFOCUSED)
+            dots.attr('opacity', dot_opacity.UNFOCUSED)
             d3.select(this)
               .attr('r', dot_radius.UNFOCUSED)
               .style('opacity', dot_opacity.UNFOCUSED);
