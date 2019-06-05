@@ -599,7 +599,10 @@ function drawZero(x_center, y_center, radius, zero, format) {
     zeroDot
         .transition()
         .duration(750)
-        .attr('transform', "translate(" + x_center + "," + circle_bottom + ")");
+        .attr('transform', "translate(" + x_center + "," + circle_bottom + ")")
+        .each(function(d) {
+            this.parentNode.appendChild(this);
+        });
     zeroDot.exit().remove();
 
     zero_text = (format == label_format.FRACTION) ? "0" : ((d) => d.bitstring.join(""));
