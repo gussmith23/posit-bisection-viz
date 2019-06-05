@@ -48,10 +48,13 @@ function updateBrushedData() {
 
     var positive_dthetas = calculateDTheta(n, positive_posits);
     var negative_dthetas = calculateDTheta(n, negative_posits);
+    negative_dthetas = negative_dthetas.map(function(d) {
+        return d + 180;
+    })
 
-    var dthetas_as_array = [0].concat(negative_dthetas)
+    var dthetas_as_array = [180].concat(negative_dthetas)
                               .concat(positive_dthetas)
-                              .concat([180]);
+                              .concat([0]);
 
     var combined_array = posits_as_array.map(function(d, i) {
         return {
@@ -72,12 +75,12 @@ function updateBrushedData() {
             return 0
         }
         else {
-            var coord = getDotCoordsFromPosit(x_center, y_center, radius, d.angle, d.posit)
-            return coord.endAngle;
+            return d.angle;
         }
     })
 
     selectedPosits = filtered_data;
+    console.log(selectedPosits)
 }
 /**
  * @brief This gets called when you stop brushing (when you stop clicking on the brush area)
@@ -85,5 +88,5 @@ function updateBrushedData() {
 function onBrushEnd() {
     console.log("Brushing ending")
 
-    update(width, height, n, es);
+    createNumberLine(svg_viz_container, width, height, n, es);
 }
