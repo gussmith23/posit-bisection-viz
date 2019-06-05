@@ -12,19 +12,27 @@ function decodebfloat16(bitstring) {
         'ninfinity' : false
     };
 
-    var sgn = parseInt(bitstring[0]);
-    var exp = parseInt(bitstring.slice(1,8).join(""), 2) - 127
-    var sub = (parseInt(bitstring.slice(1,8).join(""), 2) == 0)
-    var fra = (1.0-sub) + parseInt(bitstring.slice(9, 15).join(""), 2) / 2**7
+    var sgnbits = bitstring[0]
+    var expbits = bitstring.slice(1,9).join("")
+    var subbits = bitstring.slice(1,9).join("")
+    var frabits = bitstring.slice(9, 16).join("")
 
-    var value = (0-sgn) * 2**exp * fra; 
+    var sgn = parseInt(sgnbits);
+    var exp = parseInt(expbits, 2) - 127
+    var sub = (parseInt(subbits, 2) == 0)
+    var fra = (1.0-sub) + parseInt(frabits, 2) / 2**7
+
+    var value = 2**exp * fra; 
+    if (sgn == 1) {
+        value = -value;
+    }
 
     var pzero = bitstring.join("") == "0_00000000_0000000";
     var nzero = bitstring.join("") == "1_00000000_0000000";
     var pinf = bitstring.join("") == "0_11111111_0000000";
     var ninf = bitstring.join("") == "1_11111111_0000000";
-    var pnan = (bitstring.slice(0, 8).join("") == "0_11111111") & !pinf;
-    var nnan = (bitstring.slice(0, 8).join("") == "1_11111111") & !ninf;
+    var pnan = (bitstring.slice(0, 9).join("") == "0_11111111") & !pinf;
+    var nnan = (bitstring.slice(0, 9).join("") == "1_11111111") & !ninf;
 
     out.bitstring = bitstring;
     out.value = value;
@@ -35,10 +43,18 @@ function decodebfloat16(bitstring) {
     out.pnan = pnan;
     out.nnan = nnan;
 
-    console.log(value)
+    //console.log(
+    //    "sign: " + sgn + ": " + sgnbits
+    //    + " exp: " + exp + ": " + expbits
+    //    + " sub: " + sub + ": " + subbits
+    //    + " fra: " + fra + ": " + frabits
+    //    + " val: " + value.toFixed(2) + ": " + bitstring
+    //    );
 
     return out
 }
+
+//console.log(decodefloat16([0, 1,0,0,1,0,1,0,0, 1,1,0,0,0,1,1]))
 
 function decodefloat16(bitstring) {
     var out = {
@@ -52,19 +68,27 @@ function decodefloat16(bitstring) {
         'ninfinity' : false
     };
 
-    var sgn = parseInt(bitstring[0], 2);
-    var exp = parseInt(bitstring.slice(1,5).join(""), 2) - 15
-    var sub = (parseInt(bitstring.slice(1,5).join(""), 2) == 0) 
-    var fra = (1.0-sub) + parseInt(bitstring.slice(6, 15).join(""), 2) / 2**10
+    var sgnbits = bitstring[0]
+    var expbits = bitstring.slice(1,6).join("")
+    var subbits = bitstring.slice(1,6).join("")
+    var frabits = bitstring.slice(6, 16).join("")
 
-    var value = (0-sgn) * 2**exp * fra; 
+    var sgn = parseInt(sgnbits, 2);
+    var exp = parseInt(expbits, 2) - 15
+    var sub = (parseInt(subbits, 2) == 0) 
+    var fra = (1.0-sub) + parseInt(frabits, 2) / 2**10
+
+    var value = 2**exp * fra; 
+    if (sgn == 1) {
+        value = -value;
+    }
 
     var pzero = bitstring.join("") == "0_00000_0000000000";
     var nzero = bitstring.join("") == "1_00000_0000000000";
     var pinf = bitstring.join("") == "0_11111_1111111111";
     var ninf = bitstring.join("") == "1_11111_1111111111";
-    var pnan = (bitstring.slice(0, 5).join("") == "0_11111") & !pinf;
-    var nnan = (bitstring.slice(0, 5).join("") == "1_11111") & !ninf;
+    var pnan = (bitstring.slice(0, 6).join("") == "0_11111") & !pinf;
+    var nnan = (bitstring.slice(0, 6).join("") == "1_11111") & !ninf;
 
     out.bitstring = bitstring;
     out.value = value;
@@ -75,12 +99,18 @@ function decodefloat16(bitstring) {
     out.pnan = pnan;
     out.nnan = nnan;
 
-    //console.log(value);
+    //console.log(
+    //    "sign: " + sgn + ": " + sgnbits
+    //    + " exp: " + exp + ": " + expbits
+    //    + " sub: " + sub + ": " + subbits
+    //    + " fra: " + fra + ": " + frabits
+    //    + " val: " + value.toFixed(2) + ": " + bitstring
+    //    );
 
     return out
 }
 
-console.log(decodefloat16([0,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1]))
+//console.log(decodefloat16([0, 1,0,0,1,0, 1,0,0,1,1,0,0,0,1,1]))
 
 function bFloatCompare(bfloat1, bfloat2) {
     return bfloat1.value - bfloat2.value;
@@ -146,4 +176,5 @@ function generateFloats() {
     }
 }
 
-
+generateFloats()
+generateBFloats()
