@@ -819,7 +819,7 @@ function drawNumberLine(svg, width, height, ...data) {
         .attr('stroke', NUMBER_LINE_BLUE);
     numberLineSelection.selectAll('.numberLineNeg')
         .attr('x1', xScale(EXTENT[0]))
-        .attr('x2', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))))
+        .attr('x2', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))));
     numberLineSelection.selectAll('.numberLinePos')
         .attr('x1', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))))
         .attr('x2', xScale(EXTENT[1]));
@@ -837,7 +837,7 @@ function drawNumberLine(svg, width, height, ...data) {
                 .attr('cy', height/2)
                 .attr('r', 5)
                 .attr('fill', colorScale(i))
-                .style('opacity', dot_opacity.UNFOCUSED)
+                .style('opacity', dot_opacity.UNFOCUSED);
             select
                 .attr('cx', (d) => xScale(d.value))
                 .attr('cy', height/2);
