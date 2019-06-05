@@ -11,8 +11,8 @@ ANGLE_MIN = 1.4
 function update(width, height, n, es) {
     drawProjectiveRealsLine(width, height, n, es);
     createLegend();
-    createTooltip(n, es);
     createNumberLine(svg_viz_container, width, height, n, es)
+    createTooltip(n, es);
 }
 
 function drawControls(width) {
@@ -188,6 +188,7 @@ function createTooltip(n, es) {
     mouseInteractionHelper(svg_viz_container.selectAll('.negativeDot'), tip);
     mouseInteractionHelper(svg_viz_container.selectAll('.zeroDot'), tip);
     mouseInteractionHelper(svg_viz_container.selectAll('.infDot'), tip);
+    mouseInteractionHelper(svg_viz_container.selectAll('.numberLineDot0'), tip);
 }
 
 /** @brief Sets how mouse movements interact with the tooltip for
@@ -447,7 +448,7 @@ function drawDots(x_center, y_center, posits, n, es, sign) {
     var radius = calculateRadius(n);
     var dtheta = calculateDTheta(n, posits);
     className = (sign == psign.POSITIVE) ? 'positiveDot' : 'negativeDot';
-
+    
     var dots = svg_viz_container.selectAll('.'.concat(className)).data(posits);
     dots.enter().append('circle')
         .attr('class', className)
@@ -465,7 +466,11 @@ function drawDots(x_center, y_center, posits, n, es, sign) {
         .duration(750)
         .attr('transform', function(d, i) {
             var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta[i], d);
-            return "translate(" + coords.x + "," + coords.y + ")";});
+            return "translate(" + coords.x + "," + coords.y + ")";})
+        // a bit of a hack to make sure the dots get redrawn in front of the brush
+        .each(function(d) {
+            this.parentNode.appendChild(this);
+        })
     dots.exit().remove();
 }
 
