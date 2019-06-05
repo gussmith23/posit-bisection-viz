@@ -776,10 +776,15 @@ function describeArc(x, y, radius, sign, startAngle, endAngle){
  * {
  *   name: <name to appear in legend>
  *   data: [{value: <value>},...],
- *   mark: <'circle' or 'tick'>
+ *   roundingTieFunc: <func>, (optional)
+ *   color: <color of marks>
  * }
  * Data from multiple number systems can be passed. Currently, the only
  * requirement for each list member is to have a `value` field.
+ * `roundingTieFunc` is a function to compute the rounding tie point given two
+ * numbers in the given format.
+ * TODO(gus) color could be passed as a scale in the future. We're going to need
+ * a scale already, so we could just pass it here.
  */
 function drawNumberLine(svg, width, height, ...data) {
     const STROKE_WIDTH = 2;
@@ -829,32 +834,34 @@ function drawNumberLine(svg, width, height, ...data) {
         var currentData = data[i].data;
         const CLASS = "numberLineDot" + i;
         var select = svg.selectAll('.' + CLASS).data(currentData);
+        select.enter().append('circle')
+            .attr('class', CLASS)
+            .attr('cx', (d) => xScale(d.value))
+            .attr('cy', height/2)
+            .attr('r', 5)
+            .attr('fill', colorScale(i))
+            .style('opacity', dot_opacity.UNFOCUSED);
+        select
+            .attr('cx', (d) => xScale(d.value))
+            .attr('cy', height/2);
+        select.exit().remove();
 
-        if (data[i].mark === 'circle') {
-            select.enter().append('circle')
-                .attr('class', CLASS)
-                .attr('cx', (d) => xScale(d.value))
-                .attr('cy', height/2)
-                .attr('r', 5)
-                .attr('fill', colorScale(i))
-                .style('opacity', dot_opacity.UNFOCUSED);
-            select
-                .attr('cx', (d) => xScale(d.value))
-                .attr('cy', height/2);
-            select.exit().remove();
-        } else {
-            console.assert(data[i].mark === 'tick');
-            select.enter().append('rect')
-                .attr('class', CLASS)
+        // If a tie point function is specified, also give tie point info
+        if (data[i].roundingTieFunc) {
+            var tiePoints = computeAllTiePoints(currentData, data[i].roundingTieFunc);
+
+            var tiePointSelect = svg.selectAll('.tiePoint' + i).data(tiePoints);
+            tiePointSelect.enter().append('rect')
+                .attr('class', 'tiePoint' + i)
                 .attr('x', (d) => xScale(d.value) - TICK_WIDTH/2)
                 .attr('y', height/2 - TICK_HEIGHT/2)
                 .attr('width', TICK_WIDTH)
                 .attr('height', TICK_HEIGHT)
                 .attr('fill', colorScale(i));
-            select
+            tiePointSelect
                 .attr('x', (d) => xScale(d.value) - TICK_WIDTH/2)
                 .attr('y', height/2 - TICK_HEIGHT/2);
-            select.exit().remove();
+            tiePointSelect.exit().remove();
         }
     }
 
@@ -893,20 +900,11 @@ function drawNumberLine(svg, width, height, ...data) {
 function createNumberLine(svg, width, height, n, es) {
     var posits = selectedPosits.map((d) => d.posit);
     posits.sort(positCompareByValue);
-
-    var roundingTiePoints =
-        computeAllTiePoints(posits, (p1, p2) =>
-                            calculatePositRoundingTiePoint(p1, p2, n, es));
     drawNumberLine(numberLine, 620-40, 300-40,
                    {
                        name: 'Posits',
                        data: posits,
-                       mark: 'circle'
-                   },
-                   {
-                       name: 'Posit Rounding Tie Points',
-                       data: roundingTiePoints,
-                       mark: 'tick'
+                       roundingTieFunc: (p1, p2) => calculatePositRoundingTiePoint(p1, p2, n, es)
                    }
                   );
 }
