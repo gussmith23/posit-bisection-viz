@@ -2,6 +2,9 @@
 COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
 ANGLE_MIN = 1.4
 
+const NUMBER_LINE_BLUE = '#2464FF';
+const NUMBER_LINE_RED = '#FF0000';
+
 /**
  * Update data with new posit parameters.
  *
@@ -382,12 +385,12 @@ function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
     var animation_len = 750;
     if (sign == psign.POSITIVE) { // positive path
         arc = describeArc(x_center, y_center, radius, psign.POSITIVE, 180, 0 + path_gap.DEGREES);
-        color = '#2464FF';
+        color = NUMBER_LINE_BLUE;
         className = "positivePositPath";
         transitionFunc = positivePathTween;
     } else {
         arc = describeArc(x_center, y_center, radius, psign.NEGATIVE, 180, 360 - path_gap.DEGREES);
-        color = '#FF0000';
+        color = NUMBER_LINE_RED;
         className = "negativePositPath";
         transitionFunc = negativePathTween;
     }
