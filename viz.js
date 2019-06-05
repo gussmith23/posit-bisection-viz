@@ -200,31 +200,51 @@ function createTooltip(n, es) {
 function mouseInteractionHelper(nodes, tip) {
     nodes
         .on('mouseover', function(d) {
-            // Change the corresponding dot on the number line
-            var dots = svg_viz_container.selectAll('.numberLineDot0').filter(
-                function(dot) { return dot.bitstring.join("") == d.bitstring.join("");}
-            )
-            dots.attr('r', dot_radius.FOCUSED)
-            dots.attr('opacity', dot_opacity.FOCUSED)
-            d3.select(this)
-              .attr('r', dot_radius.FOCUSED)
-              .style('opacity', dot_opacity.FOCUSED);
+            function focus(d) {
+                d.attr('r', dot_radius.FOCUSED)
+                 .attr('opacity', dot_opacity.FOCUSED);
+            }
+            dots = getCorrespondingDots(d)
+            focus(dots.line_dot)
+            focus(dots.circle_dot)
+            focus(d3.select(this))
             tip.show(d, this);}
         )
         .on('mouseout', function(d) {
-            // Change the corresponding dot on the number line
-            var dots = svg_viz_container.selectAll('.numberLineDot0').filter(
-                function(dot) { return dot.bitstring.join("") == d.bitstring.join("");}
-            )
-            dots.attr('r', dot_radius.UNFOCUSED)
-            dots.attr('opacity', dot_opacity.UNFOCUSED)
-            d3.select(this)
-              .attr('r', dot_radius.UNFOCUSED)
-              .style('opacity', dot_opacity.UNFOCUSED);
+            dots = getCorrespondingDots(d)
+            function unfocus(d) {
+                d.attr('r', dot_radius.UNFOCUSED)
+                 .attr('opacity', dot_opacity.UNFOCUSED);
+            }
+            unfocus(dots.line_dot)
+            unfocus(dots.circle_dot)
+            unfocus(d3.select(this))
             tip.hide();
         });
 }
 
+/** Given a point, get the corresponding point on the line and the circle viz
+*/
+function getCorrespondingDots(d) {
+    var dotbs = d.bitstring.join("");
+    var decode = decodePosit(d.bitstring, n, es);
+    filterfn = function(dot) { return dot.bitstring.join("") == dotbs;}
+    var line_dot = svg_viz_container.selectAll('.numberLineDot0').filter(filterfn)
+    var circle_dot;
+    if (decode.zero) {
+        circle_dot = svg_viz_container.selectAll('.zeroDot');
+    } else {
+        if (d.rawBitfields.sign.join("") == '1') {
+            circle_dot = svg_viz_container.selectAll('.negativeDot').filter(filterfn);
+        } else {
+            circle_dot = svg_viz_container.selectAll('.positiveDot').filter(filterfn);
+        }
+    }
+    return {
+        circle_dot : circle_dot,
+        line_dot : line_dot
+    }
+}
 
 /**
  * Draw the projective reals line on an SVG.
