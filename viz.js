@@ -750,22 +750,34 @@ function drawNumberLine(svg, width, height, ...data) {
     const TICK_WIDTH = 2;
     const TICK_HEIGHT = 30;
 
+    const EXTENT = d3.extent(data.reduce(
+        (accum, current) => current.data.concat(accum), []),
+                             (point) => point.value);
     var xScale = d3.scaleLinear()
-        .domain(d3.extent(data.reduce(
-            (accum, current) => current.data.concat(accum), []),
-                          (point) => point.value))
+        .domain(EXTENT)
         .range([0,width]);
 
     var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
     // Draw the line itself.
-    svg.append('line')
-        .attr('x1', 0)
-        .attr('y1', height/2)
-        .attr('x2', width)
-        .attr('y2', height/2)
-        .attr('stroke-width', STROKE_WIDTH)
-        .attr('stroke', LINE_COLOR);
+    if (EXTENT[0] < 0) {
+        svg.append('line')
+            .attr('x1', xScale(EXTENT[0]))
+            .attr('y1', height/2)
+            .attr('x2', xScale(0))
+            .attr('y2', height/2)
+            .attr('stroke-width', STROKE_WIDTH)
+            .attr('stroke', NUMBER_LINE_RED);
+    }
+    if (EXTENT[1] >= 0) {
+        svg.append('line')
+            .attr('x1', xScale(0))
+            .attr('y1', height/2)
+            .attr('x2', xScale(EXTENT[1]))
+            .attr('y2', height/2)
+            .attr('stroke-width', STROKE_WIDTH)
+            .attr('stroke', NUMBER_LINE_BLUE);
+    }
 
     for (i in data) {
         var currentData = data[i].data;
