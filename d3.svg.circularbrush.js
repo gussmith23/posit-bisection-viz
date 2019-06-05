@@ -122,11 +122,7 @@ d3.svg.circularbrush = function() {
 
 		var extent = _circularbrush.extent();
         var start = extent[0];
-        console.log("start")
-        console.log(start)
         var end = extent[1];
-        console.log("end")
-        console.log(end)
 		var firstPoint = _scale.range()[0];
 		var lastPoint = _scale.range()[1];
 		var filteredArray = [];
@@ -240,8 +236,6 @@ d3.svg.circularbrush = function() {
             || _newEndAngle + _handleSize < _newStartAngle - _handleSize) {
             _newBrushData = _brushData
             var extent = _circularbrush.extent()
-            console.log("Circle around")
-            console.log(extent)
             _extent = ([extent[0] * (Math.PI/180), extent[1] * (Math.PI/180)]);
         }
         else {

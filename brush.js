@@ -66,7 +66,6 @@ function updateBrushedData() {
         }
 
     })
-    console.log(combined_array)
     var radius = calculateRadius(n);
     var x_center = width/2;
     var y_center = calculateYCenter(n);
@@ -84,7 +83,6 @@ function updateBrushedData() {
     })
 
     selectedPosits = filtered_data;
-    console.log(selectedPosits)
 }
 /**
  * @brief This gets called when you stop brushing (when you stop clicking on the brush area)
