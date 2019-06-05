@@ -797,24 +797,33 @@ function drawNumberLine(svg, width, height, ...data) {
     var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
     // Draw the line itself.
-    if (EXTENT[0] < 0) {
-        svg.append('line')
-            .attr('x1', xScale(EXTENT[0]))
-            .attr('y1', height/2)
-            .attr('x2', xScale(0))
-            .attr('y2', height/2)
-            .attr('stroke-width', STROKE_WIDTH)
-            .attr('stroke', NUMBER_LINE_RED);
-    }
-    if (EXTENT[1] >= 0) {
-        svg.append('line')
-            .attr('x1', xScale(0))
-            .attr('y1', height/2)
-            .attr('x2', xScale(EXTENT[1]))
-            .attr('y2', height/2)
-            .attr('stroke-width', STROKE_WIDTH)
-            .attr('stroke', NUMBER_LINE_BLUE);
-    }
+    // The line is a dataset with one point.
+    var numberLineSelection = svg.selectAll('.numberLine').data([EXTENT]);
+    var numberLineEnterG = numberLineSelection.enter().append('g')
+        .attr('class', 'numberLine');
+    numberLineEnterG.append('line')
+        .attr('class', 'numberLineNeg')
+        .attr('x1', xScale(EXTENT[0]))
+        .attr('y1', height/2)
+        .attr('x2', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))))
+        .attr('y2', height/2)
+        .attr('stroke-width', STROKE_WIDTH)
+        .attr('stroke', NUMBER_LINE_RED);
+    numberLineEnterG.append('line')
+        .attr('class', 'numberLinePos')
+        .attr('x1', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))))
+        .attr('y1', height/2)
+        .attr('x2', xScale(EXTENT[1]))
+        .attr('y2', height/2)
+        .attr('stroke-width', STROKE_WIDTH)
+        .attr('stroke', NUMBER_LINE_BLUE);
+    numberLineSelection.selectAll('.numberLineNeg')
+        .attr('x1', xScale(EXTENT[0]))
+        .attr('x2', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))))
+    numberLineSelection.selectAll('.numberLinePos')
+        .attr('x1', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))))
+        .attr('x2', xScale(EXTENT[1]));
+    numberLineSelection.exit().remove();
 
     for (i in data) {
         var currentData = data[i].data;
