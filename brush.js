@@ -47,6 +47,9 @@ function updateBrushedData() {
                                 .concat(posits.inf);
 
     var positive_dthetas = calculateDTheta(n, positive_posits);
+    positive_dthetas = positive_dthetas.map(function(d) {
+        return 180 - d;
+    })
     var negative_dthetas = calculateDTheta(n, negative_posits);
     negative_dthetas = negative_dthetas.map(function(d) {
         return d + 180;
@@ -63,6 +66,7 @@ function updateBrushedData() {
         }
 
     })
+    console.log(combined_array)
     var radius = calculateRadius(n);
     var x_center = width/2;
     var y_center = calculateYCenter(n);
@@ -88,5 +92,5 @@ function updateBrushedData() {
 function onBrushEnd() {
     console.log("Brushing ending")
 
-    createNumberLine(svg_viz_container, width, height, n, es);
+    update(width, height, n, es);
 }
