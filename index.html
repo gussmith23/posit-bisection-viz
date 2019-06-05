@@ -18,7 +18,7 @@
     <body>
         <div class="content">
             <section class="title">
-                <a href="/">Posit Bisection</a>
+                <a href="/">Well Rounded: Visualizing Datatypes and their Rounding Systems</a>
             </section>
 
             <section>
@@ -28,6 +28,12 @@
             </section>
 
             <section>
+                <p>
+                    Numerical datatypes&mdash;how real numbers are represented in computer hardware&mdash;are absolutely foundational to the design of every computer in the world. It is surprising, then, that these datatypes have been largely unchanged for decades! For the most part, all computers rely on the IEEE 754 floating point specification, which gives us the <tt>float</tt> and <tt>double</tt> types that computer programmers may be familiar with. Today, though, these datatypes are finally coming under the microscope, as computer architects seek to squeeze every ounce of performance out of their hardware.
+                </p>
+                <p>
+                    This visualization seeks to educate the user on numerical datatypes&mdash;both old IEEE floating point, and a variety of new formats. Specifically, we present both the <tt>posit</tt> and the <tt>bfloat16</tt>, and compare them with the IEEE "half" type, <tt>float16</tt>.
+                </p>
                 <p>
                     <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf"><i>Posits</i></a> are a new numerical datatype developed to compete with the standard IEEE 754 format. Posits add a number of very interesting features over IEEE floating point, but the most interesting at a high level are (1) the addition of the <tt>es</tt> parameter, and (2) the addition of the <i>regime</i> bitfield.
                 </p>
@@ -49,7 +55,10 @@
                 </p>
 
                 <p>
-                    In this project, we present an interactive version of the visualization shown on page 2 of <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf">John Gustafson's original posit paper</a> and page 16 of <a href="https://posithub.org/conga/2019/docs/13/1000-PeterLindstrom.pdf">Peter Lindstrom's CoNGA 2019 slides</a>. This visualization shows the posits laid out on the <i>projectively-extended real number line</i>, which is the real number line we are used to, but with both infinities being represented by the same point. This makes sense for posits, as posits only have one representation for infinity. The process of filling out the values on this circle is often called <i>posit bisection</i>, hence the title of this visualization.
+                    In this project, we present an interactive version of the visualization shown on page 2 of <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf">John Gustafson's original posit paper</a> and page 16 of <a href="https://posithub.org/conga/2019/docs/13/1000-PeterLindstrom.pdf">Peter Lindstrom's CoNGA 2019 slides</a>. This visualization shows the posits laid out on the <i>projectively-extended real number line</i>, which is the real number line we are used to, but with both infinities being represented by the same point. This makes sense for posits, as posits only have one representation for infinity. The process of filling out the values on this circle is often called <i>posit bisection</i>, hence the original title of our A3 project: <i>Posit Bisection</i>.
+                </p>
+                <p>
+                    <i>To do: finish explanations.</i>
                 </p>
             </section>
 
@@ -64,12 +73,13 @@
 
 
      // Posit parameters
-     var n = 4; var es = 1;
+     var n = 5; var es = 1;
      var displayFormat = label_format.BITSTRING;
-     var scaleFormat = scale_format.LINEAR;
+     var scaleFormat = scale_format.ORDINAL;
      const nLowerBound = 4; const nUpperBound = 8;
      const esLowerBound = 0;
      const sliderLowerBound = esLowerBound;
+     const esUpperBound = 7;
      const sliderUpperBound = nUpperBound;
      const es_slider_width = 200;
      const n_slider_width = 200;
@@ -88,12 +98,15 @@
                        .append('g')
                        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+     var numberLine = svg_viz_container.append('g')
+                                       .attr('transform', 'translate(210, 250)');
+
 
      var sliderES = d3
          .sliderBottom()
-         .domain([sliderLowerBound, sliderUpperBound])
+         .domain([sliderLowerBound, esUpperBound])
          .step(1)
-         .ticks(sliderUpperBound - sliderLowerBound)
+         .ticks(esUpperBound - sliderLowerBound)
          .width(es_slider_width)
          .default(es)
          .displayFormat(d3.format('d'))

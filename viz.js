@@ -1,5 +1,9 @@
 // @note svg_viz_container is a global variable defined in index.html
 COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
+ANGLE_MIN = 1.4
+
+const NUMBER_LINE_BLUE = '#2464FF';
+const NUMBER_LINE_RED = '#FF0000';
 
 /**
  * Update data with new posit parameters.
@@ -10,6 +14,7 @@ COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
 function update(width, height, n, es) {
     drawProjectiveRealsLine(width, height, n, es);
     createLegend();
+    createNumberLine(svg_viz_container, width, height, n, es)
     createTooltip(n, es);
 }
 
@@ -17,9 +22,9 @@ function drawControls(width) {
     var y_center = calculateYCenter(4);
     var es_slider_start = (width / 2) - (es_slider_width / 2);
     var n_slider_start = (width / 2) - (n_slider_width / 2);
-    var n_slider_y = y_center - 100;
-    var es_slider_y = y_center - 40;
-    var format_button_y = y_center + 25;
+    var n_slider_y = y_center - 220;
+    var es_slider_y = y_center - 160;
+    var format_button_y = y_center - 80;
     var scale_button_y = format_button_y + 35;
     var button_width = 150;
 
@@ -55,6 +60,7 @@ function drawControls(width) {
         .text("ES:");
 
     svg_viz_container.append('text')
+        .attr("class", "modeSelectText")
         .attr("transform", `translate(${width / 2},${format_button_y})`)
         .style('text-anchor', 'middle')
         .style('font-weight', 400)
@@ -79,6 +85,7 @@ function drawControls(width) {
         .attr('transform', `translate(${width / 2 - button_width/2}, ${format_button_y-20})`);
 
     svg_viz_container.append('text')
+        .attr("class", "scaleSelectText")
         .attr("transform", `translate(${width / 2},${scale_button_y})`)
         .style('text-anchor', 'middle')
         .style('font-weight', 400)
@@ -186,6 +193,7 @@ function createTooltip(n, es) {
     mouseInteractionHelper(svg_viz_container.selectAll('.negativeDot'), tip);
     mouseInteractionHelper(svg_viz_container.selectAll('.zeroDot'), tip);
     mouseInteractionHelper(svg_viz_container.selectAll('.infDot'), tip);
+    mouseInteractionHelper(svg_viz_container.selectAll('.numberLineDot0'), tip);
 }
 
 /** @brief Sets how mouse movements interact with the tooltip for
@@ -194,19 +202,51 @@ function createTooltip(n, es) {
 function mouseInteractionHelper(nodes, tip) {
     nodes
         .on('mouseover', function(d) {
-            d3.select(this)
-              .attr('r', dot_radius.FOCUSED)
-              .style('opacity', dot_opacity.FOCUSED);
+            function focus(d) {
+                d.attr('r', dot_radius.FOCUSED)
+                 .attr('opacity', dot_opacity.FOCUSED);
+            }
+            dots = getCorrespondingDots(d)
+            focus(dots.line_dot)
+            focus(dots.circle_dot)
+            focus(d3.select(this))
             tip.show(d, this);}
         )
         .on('mouseout', function(d) {
-            d3.select(this)
-              .attr('r', dot_radius.UNFOCUSED)
-              .style('opacity', dot_opacity.UNFOCUSED);
+            dots = getCorrespondingDots(d)
+            function unfocus(d) {
+                d.attr('r', dot_radius.UNFOCUSED)
+                 .attr('opacity', dot_opacity.UNFOCUSED);
+            }
+            unfocus(dots.line_dot)
+            unfocus(dots.circle_dot)
+            unfocus(d3.select(this))
             tip.hide();
         });
 }
 
+/** Given a point, get the corresponding point on the line and the circle viz
+*/
+function getCorrespondingDots(d) {
+    var dotbs = d.bitstring.join("");
+    var decode = decodePosit(d.bitstring, n, es);
+    filterfn = function(dot) { return dot.bitstring.join("") == dotbs;}
+    var line_dot = svg_viz_container.selectAll('.numberLineDot0').filter(filterfn)
+    var circle_dot;
+    if (decode.zero) {
+        circle_dot = svg_viz_container.selectAll('.zeroDot');
+    } else {
+        if (d.rawBitfields.sign.join("") == '1') {
+            circle_dot = svg_viz_container.selectAll('.negativeDot').filter(filterfn);
+        } else {
+            circle_dot = svg_viz_container.selectAll('.positiveDot').filter(filterfn);
+        }
+    }
+    return {
+        circle_dot : circle_dot,
+        line_dot : line_dot
+    }
+}
 
 /**
  * Draw the projective reals line on an SVG.
@@ -254,7 +294,7 @@ function drawProjectiveRealsLine(width, height, n, es) {
 
     drawZero(x_center, y_center, radius, posits.zero, displayFormat);
     drawInfinityDot(x_center, y_center, radius, posits.inf, displayFormat);
-
+    
 }
 
 
@@ -319,23 +359,32 @@ function setTextAttrs(text_var, params, sign, classString, format) {
         .attr('text-anchor', anchor_pos)
         .attr('class', classString);
 
+    function is_spaced(d, i) {
+        var diff = (i > 0) ? params.dtheta[i] - params.dtheta[i-1] :
+            params.dtheta[i];
+        return diff > ANGLE_MIN;
+    }
+
     if (format == label_format.FRACTION) {
         text_var
             .style("fill", "black")
-            .text((d) => formatFractionalString(d.bitstring, params.n, params.es));
+            .text(function(d, i) {
+                var frac_str = formatFractionalString(d.bitstring, params.n, params.es);
+                return (is_spaced(d,i) ? frac_str : "");
+            })
     } else {
         text_var
             .style("fill", COLORS[0])
-            .text((d) => d.rawBitfields.sign.join(""))
+            .text((d,i) => (is_spaced(d,i) ? d.rawBitfields.sign.join("") : ""))
             .append("tspan")
             .style("fill", COLORS[1])
-            .text((d) => d.rawBitfields.regime.join(""))
+            .text((d,i) => (is_spaced(d,i) ? d.rawBitfields.regime.join("") : ""))
             .append("tspan")
             .style("fill", COLORS[2])
-            .text((d) => d.rawBitfields.exponent.join(""))
+            .text((d,i) => (is_spaced(d,i) ? d.rawBitfields.exponent.join("") : ""))
             .append("tspan")
             .style("fill", COLORS[3])
-            .text((d) => d.rawBitfields.fraction.join(""));
+            .text((d,i) => (is_spaced(d,i) ? d.rawBitfields.fraction.join("") : ""));
     }
 }
 
@@ -369,13 +418,13 @@ function formatFractionalString(bitstring, n, es) {
 function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
     var animation_len = 750;
     if (sign == psign.POSITIVE) { // positive path
-        arc = describeArc(x_center, y_center, radius, psign.POSITIVE, 180, 3);
-        color = '#2464FF';
+        arc = describeArc(x_center, y_center, radius, psign.POSITIVE, 180, 0 + path_gap.DEGREES);
+        color = NUMBER_LINE_BLUE;
         className = "positivePositPath";
         transitionFunc = positivePathTween;
     } else {
-        arc = describeArc(x_center, y_center, radius, psign.NEGATIVE, 180, 357);
-        color = '#FF0000';
+        arc = describeArc(x_center, y_center, radius, psign.NEGATIVE, 180, 360 - path_gap.DEGREES);
+        color = NUMBER_LINE_RED;
         className = "negativePositPath";
         transitionFunc = negativePathTween;
     }
@@ -436,7 +485,7 @@ function drawDots(x_center, y_center, posits, n, es, sign) {
     var radius = calculateRadius(n);
     var dtheta = calculateDTheta(n, posits);
     className = (sign == psign.POSITIVE) ? 'positiveDot' : 'negativeDot';
-
+    
     var dots = svg_viz_container.selectAll('.'.concat(className)).data(posits);
     dots.enter().append('circle')
         .attr('class', className)
@@ -454,7 +503,11 @@ function drawDots(x_center, y_center, posits, n, es, sign) {
         .duration(750)
         .attr('transform', function(d, i) {
             var coords = getDotCoordsFromPosit(x_center, y_center, radius, dtheta[i], d);
-            return "translate(" + coords.x + "," + coords.y + ")";});
+            return "translate(" + coords.x + "," + coords.y + ")";})
+        // a bit of a hack to make sure the dots get redrawn in front of the brush
+        .each(function(d) {
+            this.parentNode.appendChild(this);
+        })
     dots.exit().remove();
 }
 
@@ -568,23 +621,28 @@ function drawZero(x_center, y_center, radius, zero, format) {
     zeroDot
         .transition()
         .duration(750)
-        .attr('transform', "translate(" + x_center + "," + circle_bottom + ")");
+        .attr('transform', "translate(" + x_center + "," + circle_bottom + ")")
+        .each(function(d) {
+            this.parentNode.appendChild(this);
+        });
     zeroDot.exit().remove();
 
     zero_text = (format == label_format.FRACTION) ? "0" : ((d) => d.bitstring.join(""));
 
     text = svg_viz_container.selectAll('.zeroText').data(zero);
+    y_coord = y_center + text_radius + 10
+    x_coord = x_center - 4
     text.enter().append('text')
         .attr('class', 'zeroText')
-        .attr('x', x_center)
-        .attr('y', y_center + text_radius)
+        .attr('transform', "translate(" + x_coord + "," + y_coord + ")"
+            + " rotate(" + 90 + ")")
         .attr('font-family', 'sans-serif')
         .attr('text-anchor', 'middle')
         .text(zero_text);
 
     text
-        .attr('x', x_center)
-        .attr('y', y_center + text_radius)
+        .attr('transform', "translate(" + x_coord + "," + y_coord + ")"
+            + " rotate(" + 90 + ")")
         .text(zero_text);
     text.exit().remove();
 }
@@ -713,21 +771,65 @@ function describeArc(x, y, radius, sign, startAngle, endAngle){
  *    https://bl.ocks.org/mbostock/3019563
  * 3. Pass the element and its width/height
  *
- * @param {list} data the data to be drawn on the number line. Data from multiple
- * number systems can be passed. Currently, the only requirement for each list
- * member is to have a `value` field.
+ * @param data the data to be drawn on the number line. These are structs which
+ * look like:
+ * {
+ *   name: <name to appear in legend>
+ *   data: [{value: <value>},...],
+ *   roundingTieFunc: <func>, (optional)
+ *   color: <color of marks>
+ * }
+ * Data from multiple number systems can be passed. Currently, the only
+ * requirement for each list member is to have a `value` field.
+ * `roundingTieFunc` is a function to compute the rounding tie point given two
+ * numbers in the given format.
+ * TODO(gus) color could be passed as a scale in the future. We're going to need
+ * a scale already, so we could just pass it here.
  */
 function drawNumberLine(svg, width, height, ...data) {
+    const STROKE_WIDTH = 2;
+    const LINE_COLOR = 'black';
+    const TICK_WIDTH = 2;
+    const TICK_HEIGHT = 30;
+
+    const EXTENT = d3.extent(data.reduce(
+        (accum, current) => current.data.concat(accum), []),
+                             (point) => point.value);
     var xScale = d3.scaleLinear()
-        .domain(d3.extent(data.reduce(
-            (accum, current) => accum.concat(current)),
-                          (point) => point.value))
+        .domain(EXTENT)
         .range([0,width]);
 
-    var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+    // Draw the line itself.
+    // The line is a dataset with one point.
+    var numberLineSelection = svg.selectAll('.numberLine').data([EXTENT]);
+    var numberLineEnterG = numberLineSelection.enter().append('g')
+        .attr('class', 'numberLine');
+    numberLineEnterG.append('line')
+        .attr('class', 'numberLineNeg')
+        .attr('x1', xScale(EXTENT[0]))
+        .attr('y1', height/2)
+        .attr('x2', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))))
+        .attr('y2', height/2)
+        .attr('stroke-width', STROKE_WIDTH)
+        .attr('stroke', NUMBER_LINE_RED);
+    numberLineEnterG.append('line')
+        .attr('class', 'numberLinePos')
+        .attr('x1', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))))
+        .attr('y1', height/2)
+        .attr('x2', xScale(EXTENT[1]))
+        .attr('y2', height/2)
+        .attr('stroke-width', STROKE_WIDTH)
+        .attr('stroke', NUMBER_LINE_BLUE);
+    numberLineSelection.selectAll('.numberLineNeg')
+        .attr('x1', xScale(EXTENT[0]))
+        .attr('x2', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))));
+    numberLineSelection.selectAll('.numberLinePos')
+        .attr('x1', Math.max(xScale(EXTENT[0]), Math.min(xScale(0), xScale(EXTENT[1]))))
+        .attr('x2', xScale(EXTENT[1]));
+    numberLineSelection.exit().remove();
 
     for (i in data) {
-        var currentData = data[i];
+        var currentData = data[i].data;
         const CLASS = "numberLineDot" + i;
         var select = svg.selectAll('.' + CLASS).data(currentData);
         select.enter().append('circle')
@@ -735,8 +837,92 @@ function drawNumberLine(svg, width, height, ...data) {
             .attr('cx', (d) => xScale(d.value))
             .attr('cy', height/2)
             .attr('r', 5)
-            .attr('fill', colorScale(i));
+            .attr('fill', data[i].color)
+            .style('opacity', dot_opacity.UNFOCUSED);
+        select
+            .attr('cx', (d) => xScale(d.value))
+            .attr('cy', height/2);
         select.exit().remove();
+
+        // If a tie point function is specified, also give tie point info
+        if (data[i].roundingTieFunc) {
+            var tiePoints = computeAllTiePoints(currentData, data[i].roundingTieFunc);
+
+            var tiePointSelect = svg.selectAll('.tiePoint' + i).data(tiePoints);
+            tiePointSelect.enter().append('rect')
+                .attr('class', 'tiePoint' + i)
+                .attr('x', (d) => xScale(d.value) - TICK_WIDTH/2)
+                .attr('y', height/2 - TICK_HEIGHT/2)
+                .attr('width', TICK_WIDTH)
+                .attr('height', TICK_HEIGHT)
+                .attr('fill', data[i].color);
+            tiePointSelect
+                .attr('x', (d) => xScale(d.value) - TICK_WIDTH/2)
+                .attr('y', height/2 - TICK_HEIGHT/2);
+            tiePointSelect.exit().remove();
+        }
     }
 
+    // Legend
+    const legend = svg
+          .selectAll(".legend")
+          .data(data)
+          .enter()
+          .append('g')
+          .attr("class", "legend")
+          .attr("transform", function(d,i) {
+              return `translate(0, ${i * 20})`;
+          });
+
+    // The legend is <box> <text>, this creates the colored box portion
+    legend.append('rect')
+        .attr('class', 'legend-rect')
+        .attr('x', width)
+        .attr('y', 65)
+        .attr('width', 12)
+        .attr('height', 12)
+        .style('fill', (d) => d.color);
+
+    // This creates the text portion
+    legend.append("text")
+        .attr('class', 'legend-text')
+        .attr("x", width)
+        .attr("y", 70)
+        .style('font-size', "12px")
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text(function(d) { return d.name;});
+
+}
+
+function createNumberLine(svg, width, height, n, es) {
+    var posits = selectedPosits.map((d) => d.posit);
+    posits.sort(positCompareByValue);
+    drawNumberLine(numberLine, 620-40, 300-40,
+                   {
+                       name: 'Posits',
+                       data: posits,
+                       roundingTieFunc: (p1, p2) => calculatePositRoundingTiePoint(p1, p2, n, es),
+                       color: 'black'
+                   }
+                  );
+}
+
+/**
+ * Given numbers in a specific datatype/format, compute the rounding tie points
+ * between each adjacent pair of numbers.
+ * @param numbers the list of numbers, sorted (in either order)
+ * @param computeRoundingTiePoint the function for computing the rounding tie
+ * point for this datatype
+ */
+function computeAllTiePoints(numbers, calculateRoundingTiePoint) {
+    var roundingTiePoints = numbers.reduce(function(acc, number) {
+        if (acc === null) return [number, []];
+        var lastNumber = acc[0];
+        var currentList = acc[1];
+        return [number, currentList.concat([
+            {value: calculateRoundingTiePoint(number, lastNumber)}])];
+    }, null);
+    roundingTiePoints = (roundingTiePoints === null) ? [] : roundingTiePoints[1];
+    return roundingTiePoints;
 }

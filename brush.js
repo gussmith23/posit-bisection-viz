@@ -1,23 +1,22 @@
-
+var selectedPosits = [];
 
 var selectionBrush = d3.svg.circularbrush()
-                           .range([0,360])
-                           .extent([90, 270]);
+                     .range([0,360])
+                     .extent([90, 270]);
 
 function drawBrush(x_center, y_center, radius, data) {
     selectionBrush.innerRadius(radius - 10)
                   .outerRadius(radius + 10)
+                  .handleSize(.05)
                   .data(data)
+    updateBrushedData()
 
     svg_viz_container.select('.selection_brush').remove()
     svg_viz_container.append('g')
         .attr('class', 'selection_brush')
         .attr('transform', 'translate(' + x_center + ',' + y_center + ')')
-        .style('opacity', 1E-6)
-        .call(selectionBrush)
-        .transition()
-        .duration(750)
         .style('opacity', dot_opacity.UNFOCUSED)
+        .call(selectionBrush)
     
 }
 
@@ -48,11 +47,17 @@ function updateBrushedData() {
                                 .concat(posits.inf);
 
     var positive_dthetas = calculateDTheta(n, positive_posits);
+    positive_dthetas = positive_dthetas.map(function(d) {
+        return 180 - d;
+    })
     var negative_dthetas = calculateDTheta(n, negative_posits);
+    negative_dthetas = negative_dthetas.map(function(d) {
+        return d + 180;
+    })
 
-    var dthetas_as_array = [0].concat(negative_dthetas)
+    var dthetas_as_array = [180].concat(negative_dthetas)
                               .concat(positive_dthetas)
-                              .concat([180]);
+                              .concat([0]);
 
     var combined_array = posits_as_array.map(function(d, i) {
         return {
@@ -73,16 +78,17 @@ function updateBrushedData() {
             return 0
         }
         else {
-            var coord = getDotCoordsFromPosit(x_center, y_center, radius, d.angle, d.posit)
-            return coord.endAngle;
+            return d.angle;
         }
     })
 
-    console.log(filtered_data)
+    selectedPosits = filtered_data;
 }
-/* 
+/**
  * @brief This gets called when you stop brushing (when you stop clicking on the brush area)
  */
 function onBrushEnd() {
     console.log("Brushing ending")
+
+    update(width, height, n, es);
 }
