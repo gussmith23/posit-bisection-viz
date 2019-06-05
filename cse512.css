@@ -94,3 +94,10 @@ p { margin: 0 0 10px 0; }
     -o-user-select: none;
     user-select: none;
 }
+
+.modeSelectText{
+    cursor: hand;
+}
+.scaleSelectText{
+    cursor: hand;
+}

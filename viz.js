@@ -60,6 +60,7 @@ function drawControls(width) {
         .text("ES:");
 
     svg_viz_container.append('text')
+        .attr("class", "modeSelectText")
         .attr("transform", `translate(${width / 2},${format_button_y})`)
         .style('text-anchor', 'middle')
         .style('font-weight', 400)
@@ -84,6 +85,7 @@ function drawControls(width) {
         .attr('transform', `translate(${width / 2 - button_width/2}, ${format_button_y-20})`);
 
     svg_viz_container.append('text')
+        .attr("class", "scaleSelectText")
         .attr("transform", `translate(${width / 2},${scale_button_y})`)
         .style('text-anchor', 'middle')
         .style('font-weight', 400)
@@ -292,7 +294,7 @@ function drawProjectiveRealsLine(width, height, n, es) {
 
     drawZero(x_center, y_center, radius, posits.zero, displayFormat);
     drawInfinityDot(x_center, y_center, radius, posits.inf, displayFormat);
-
+    
 }
 
 
@@ -619,7 +621,10 @@ function drawZero(x_center, y_center, radius, zero, format) {
     zeroDot
         .transition()
         .duration(750)
-        .attr('transform', "translate(" + x_center + "," + circle_bottom + ")");
+        .attr('transform', "translate(" + x_center + "," + circle_bottom + ")")
+        .each(function(d) {
+            this.parentNode.appendChild(this);
+        });
     zeroDot.exit().remove();
 
     zero_text = (format == label_format.FRACTION) ? "0" : ((d) => d.bitstring.join(""));
