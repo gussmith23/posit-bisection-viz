@@ -13,8 +13,9 @@ function decodebfloat16(bitstring) {
     };
 
     var sgn = parseInt(bitstring[0]);
-    var exp = parseInt(bitstring.slice(1,8).join(""))
-    var fra = parseInt(bitstring.slice(9, 15).join(""))
+    var exp = parseInt(bitstring.slice(1,8).join(""), 2) - 127
+    var sub = (parseInt(bitstring.slice(1,8).join(""), 2) == 0)
+    var fra = (1.0-sub) + parseInt(bitstring.slice(9, 15).join(""), 2) / 2**7
 
     var value = (0-sgn) * 2**exp * fra; 
 
@@ -34,6 +35,8 @@ function decodebfloat16(bitstring) {
     out.pnan = pnan;
     out.nnan = nnan;
 
+    console.log(value)
+
     return out
 }
 
@@ -49,9 +52,10 @@ function decodefloat16(bitstring) {
         'ninfinity' : false
     };
 
-    var sgn = parseInt(bitstring[0]);
-    var exp = parseInt(bitstring.slice(1,5).join(""))
-    var fra = parseInt(bitstring.slice(6, 15).join(""))
+    var sgn = parseInt(bitstring[0], 2);
+    var exp = parseInt(bitstring.slice(1,5).join(""), 2) - 15
+    var sub = (parseInt(bitstring.slice(1,5).join(""), 2) == 0) 
+    var fra = (1.0-sub) + parseInt(bitstring.slice(6, 15).join(""), 2) / 2**10
 
     var value = (0-sgn) * 2**exp * fra; 
 
@@ -71,8 +75,12 @@ function decodefloat16(bitstring) {
     out.pnan = pnan;
     out.nnan = nnan;
 
+    //console.log(value);
+
     return out
 }
+
+console.log(decodefloat16([0,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1]))
 
 function bFloatCompare(bfloat1, bfloat2) {
     return bfloat1.value - bfloat2.value;
@@ -137,3 +145,5 @@ function generateFloats() {
         inf: infinity
     }
 }
+
+
