@@ -16,7 +16,7 @@
  * For a given posit, calculate the rounding tie point between the numbers.
  * We assume that the two posits are adjacent. This assumption is not checked.
  */
-function calculateRoundingTiePoint(posit1, posit2, n, es) {
+function calculatePositRoundingTiePoint(posit1, posit2, n, es) {
     console.assert(posit1.value != posit2.value);
     var lowerPosit = (Math.abs(posit1.value) < Math.abs(posit2.value)) ? posit1 : posit2;
     var upperPosit = (Math.abs(posit1.value) > Math.abs(posit2.value)) ? posit1 : posit2;
@@ -41,13 +41,13 @@ function calculateRoundingTiePoint(posit1, posit2, n, es) {
 
 {
     var testPosits = generatePositsOfLength(6, 1);
-    var out = calculateRoundingTiePoint(testPosits.pos[29], testPosits.pos[30], 6, 1);
+    var out = calculatePositRoundingTiePoint(testPosits.pos[29], testPosits.pos[30], 6, 1);
     expect(out).to.be(128);
-    var out = calculateRoundingTiePoint(testPosits.pos[28], testPosits.pos[29], 6, 1);
+    var out = calculatePositRoundingTiePoint(testPosits.pos[28], testPosits.pos[29], 6, 1);
     expect(out).to.be(48);
-    var out = calculateRoundingTiePoint(testPosits.neg[29], testPosits.neg[30], 6, 1);
+    var out = calculatePositRoundingTiePoint(testPosits.neg[29], testPosits.neg[30], 6, 1);
     expect(out).to.be(-128);
-    var out = calculateRoundingTiePoint(testPosits.neg[28], testPosits.neg[29], 6, 1);
+    var out = calculatePositRoundingTiePoint(testPosits.neg[28], testPosits.neg[29], 6, 1);
     expect(out).to.be(-48);
 }
 

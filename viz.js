@@ -885,14 +885,9 @@ function createNumberLine(svg, width, height, n, es) {
     var posits = selectedPosits.map((d) => d.posit);
     posits.sort(positCompareByValue);
 
-    var roundingTiePoints = posits.reduce(function(acc, posit) {
-        if (acc === null) return [posit, []];
-        var lastPosit = acc[0];
-        var currentList = acc[1];
-        return [posit, currentList.concat([
-            {value: calculateRoundingTiePoint(posit, lastPosit, n, es)}])];
-    }, null);
-    roundingTiePoints = (roundingTiePoints === null) ? [] : roundingTiePoints[1];
+    var roundingTiePoints =
+        computeAllTiePoints(posits, (p1, p2) =>
+                            calculatePositRoundingTiePoint(p1, p2, n, es));
     drawNumberLine(numberLine, 620-40, 300-40,
                    {
                        name: 'Posits',
@@ -905,4 +900,23 @@ function createNumberLine(svg, width, height, n, es) {
                        mark: 'tick'
                    }
                   );
+}
+
+/**
+ * Given numbers in a specific datatype/format, compute the rounding tie points
+ * between each adjacent pair of numbers.
+ * @param numbers the list of numbers, sorted (in either order)
+ * @param computeRoundingTiePoint the function for computing the rounding tie
+ * point for this datatype
+ */
+function computeAllTiePoints(numbers, calculateRoundingTiePoint) {
+    var roundingTiePoints = numbers.reduce(function(acc, number) {
+        if (acc === null) return [number, []];
+        var lastNumber = acc[0];
+        var currentList = acc[1];
+        return [number, currentList.concat([
+            {value: calculateRoundingTiePoint(number, lastNumber)}])];
+    }, null);
+    roundingTiePoints = (roundingTiePoints === null) ? [] : roundingTiePoints[1];
+    return roundingTiePoints;
 }
