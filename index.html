@@ -79,6 +79,7 @@
      const nLowerBound = 4; const nUpperBound = 8;
      const esLowerBound = 0;
      const sliderLowerBound = esLowerBound;
+     const esUpperBound = 7;
      const sliderUpperBound = nUpperBound;
      const es_slider_width = 200;
      const n_slider_width = 200;
@@ -103,9 +104,9 @@
 
      var sliderES = d3
          .sliderBottom()
-         .domain([sliderLowerBound, sliderUpperBound])
+         .domain([sliderLowerBound, esUpperBound])
          .step(1)
-         .ticks(sliderUpperBound - sliderLowerBound)
+         .ticks(esUpperBound - sliderLowerBound)
          .width(es_slider_width)
          .default(es)
          .displayFormat(d3.format('d'))
