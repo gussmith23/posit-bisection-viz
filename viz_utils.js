@@ -29,6 +29,11 @@ const dot_radius = {
     UNFOCUSED: 5
 };
 
+const path_gap = {
+    DEGREES: 3,
+    RADIANS: 3 * (Math.PI/180)
+}
+
 /**
  * @brief Calculate the radius of the posit circle
  * @param n is the current n used for decoding posits

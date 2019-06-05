@@ -380,12 +380,12 @@ function formatFractionalString(bitstring, n, es) {
 function drawPath(x_center, y_center, radius, zero, arrowheadMarkerId, sign) {
     var animation_len = 750;
     if (sign == psign.POSITIVE) { // positive path
-        arc = describeArc(x_center, y_center, radius, psign.POSITIVE, 180, 3);
+        arc = describeArc(x_center, y_center, radius, psign.POSITIVE, 180, 0 + path_gap.DEGREES);
         color = '#2464FF';
         className = "positivePositPath";
         transitionFunc = positivePathTween;
     } else {
-        arc = describeArc(x_center, y_center, radius, psign.NEGATIVE, 180, 357);
+        arc = describeArc(x_center, y_center, radius, psign.NEGATIVE, 180, 360 - path_gap.DEGREES);
         color = '#FF0000';
         className = "negativePositPath";
         transitionFunc = negativePathTween;
@@ -824,7 +824,6 @@ function drawNumberLine(svg, width, height, ...data) {
 }
 
 function createNumberLine(svg, width, height, n, es) {
-
     var posits = selectedPosits.map((d) => d.posit);
     posits.sort(positCompareByValue);
 
