@@ -799,8 +799,6 @@ function drawNumberLine(svg, width, height, ...data) {
         .domain(EXTENT)
         .range([0,width]);
 
-    var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
-
     // Draw the line itself.
     // The line is a dataset with one point.
     var numberLineSelection = svg.selectAll('.numberLine').data([EXTENT]);
@@ -839,7 +837,7 @@ function drawNumberLine(svg, width, height, ...data) {
             .attr('cx', (d) => xScale(d.value))
             .attr('cy', height/2)
             .attr('r', 5)
-            .attr('fill', colorScale(i))
+            .attr('fill', data[i].color)
             .style('opacity', dot_opacity.UNFOCUSED);
         select
             .attr('cx', (d) => xScale(d.value))
@@ -857,7 +855,7 @@ function drawNumberLine(svg, width, height, ...data) {
                 .attr('y', height/2 - TICK_HEIGHT/2)
                 .attr('width', TICK_WIDTH)
                 .attr('height', TICK_HEIGHT)
-                .attr('fill', colorScale(i));
+                .attr('fill', data[i].color);
             tiePointSelect
                 .attr('x', (d) => xScale(d.value) - TICK_WIDTH/2)
                 .attr('y', height/2 - TICK_HEIGHT/2);
@@ -868,7 +866,7 @@ function drawNumberLine(svg, width, height, ...data) {
     // Legend
     const legend = svg
           .selectAll(".legend")
-          .data(colorScale.domain())
+          .data(data)
           .enter()
           .append('g')
           .attr("class", "legend")
@@ -883,7 +881,7 @@ function drawNumberLine(svg, width, height, ...data) {
         .attr('y', 65)
         .attr('width', 12)
         .attr('height', 12)
-        .style('fill', colorScale);
+        .style('fill', (d) => d.color);
 
     // This creates the text portion
     legend.append("text")
@@ -893,7 +891,7 @@ function drawNumberLine(svg, width, height, ...data) {
         .style('font-size', "12px")
         .attr("dy", ".35em")
         .style("text-anchor", "end")
-        .text(function(d) { return data[d].name;});
+        .text(function(d) { return d.name;});
 
 }
 
@@ -904,7 +902,8 @@ function createNumberLine(svg, width, height, n, es) {
                    {
                        name: 'Posits',
                        data: posits,
-                       roundingTieFunc: (p1, p2) => calculatePositRoundingTiePoint(p1, p2, n, es)
+                       roundingTieFunc: (p1, p2) => calculatePositRoundingTiePoint(p1, p2, n, es),
+                       color: 'black'
                    }
                   );
 }
