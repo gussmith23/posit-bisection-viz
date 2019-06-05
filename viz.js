@@ -775,7 +775,8 @@ function drawNumberLine(svg, width, height, ...data) {
                 .attr('cx', (d) => xScale(d.value))
                 .attr('cy', height/2)
                 .attr('r', 5)
-                .attr('fill', colorScale(i));
+                .attr('fill', colorScale(i))
+                .style('opacity', dot_opacity.UNFOCUSED)
             select
                 .attr('cx', (d) => xScale(d.value))
                 .attr('cy', height/2);
