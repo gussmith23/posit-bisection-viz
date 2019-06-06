@@ -34,6 +34,7 @@ function onBrushStart() {
 function whileBrushing() {
     console.log("Currently brushing")
     updateBrushedData()
+    createNumberLine(svg_viz_container, width, height, n, es)
 }
 
 function updateBrushedData() {
