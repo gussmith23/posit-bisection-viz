@@ -59,58 +59,22 @@ function drawControls(width) {
         .style('font-weight', 700)
         .text("ES:");
 
-    svg_viz_container.append('text')
-        .attr("class", "modeSelectText")
-        .attr("transform", `translate(${width / 2},${format_button_y})`)
-        .style('text-anchor', 'middle')
-        .style('font-weight', 400)
-        .text('See Fraction Values')
-        .on('click', function (d) {
-            if (d3.select(this).text() == 'See Fraction Values') {
-                d3.select(this).text('See Bitstring Values');
-                displayFormat = label_format.FRACTION;
-            } else {
-                d3.select(this).text('See Fraction Values');
-                displayFormat = label_format.BITSTRING;
-            }
-            update(width, height, n, es);
-        });
+    var format = d3.select(".formatSelection");
+    format.append('option').attr('value', label_format.BITSTRING).text("Bitstring Values");
+    format.append('option').attr('value', label_format.FRACTION).text("Fraction Values");
+    format.on('change', function(event) {
+        displayFormat = d3.select(this).property('value');
+        update(width, height, n, es);
+    });
 
-    svg_viz_container.append('rect')
-        .attr('width', button_width)
-        .attr('height', 30)
-        .style('fill', 'none')
-        .style('stroke', 'black')
-        .attr('rx', 10)
-        .attr('transform', `translate(${width / 2 - button_width/2}, ${format_button_y-20})`);
-
-    svg_viz_container.append('text')
-        .attr("class", "scaleSelectText")
-        .attr("transform", `translate(${width / 2},${scale_button_y})`)
-        .style('text-anchor', 'middle')
-        .style('font-weight', 400)
-        .text('Ordinal Scale')
-        .on('click', function (d) {
-            if (scaleFormat == scale_format.ORDINAL) {
-                d3.select(this).text('Linear Scale');
-                scaleFormat = scale_format.LINEAR;
-            } else if (scaleFormat == scale_format.LINEAR) {
-                d3.select(this).text('Log Scale');
-                scaleFormat = scale_format.LOG;
-            } else {
-                d3.select(this).text('Ordinal Scale');
-                scaleFormat = scale_format.ORDINAL;
-            }
-            update(width, height, n, es);
-        });
-
-    svg_viz_container.append('rect')
-        .attr('width', button_width)
-        .attr('height', 30)
-        .style('fill', 'none')
-        .style('stroke', 'black')
-        .attr('rx', 10)
-        .attr('transform', `translate(${width / 2 - button_width/2}, ${scale_button_y-20})`);
+    var scale = d3.select(".scaleSelection");
+    scale.append('option').attr('value', scale_format.ORDINAL).text("Ordinal Scale");
+    scale.append('option').attr('value', scale_format.LINEAR).text("Linear Scale");
+    scale.append('option').attr('value', scale_format.LOG).text("Log Scale");
+    scale.on('change', function(event) {
+        scaleFormat = d3.select(this).property('value');
+        update(width, height, n, es);
+    });
 }
 
 /**
