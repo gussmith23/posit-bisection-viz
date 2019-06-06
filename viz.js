@@ -817,13 +817,13 @@ function drawNumberLine(svg, width, height, ...data) {
             var tiePointSelect = svg.selectAll('.tiePoint' + i).data(tiePoints);
             tiePointSelect.enter().append('rect')
                 .attr('class', 'tiePoint' + i)
-                .attr('x', (d) => xScale(d.value) - TICK_WIDTH/2)
+                .attr('x', (d) => xScale(d[0]) - TICK_WIDTH/2)
                 .attr('y', height/2 - TICK_HEIGHT/2)
                 .attr('width', TICK_WIDTH)
                 .attr('height', TICK_HEIGHT)
                 .attr('fill', data[i].color);
             tiePointSelect
-                .attr('x', (d) => xScale(d.value) - TICK_WIDTH/2)
+                .attr('x', (d) => xScale(d[0]) - TICK_WIDTH/2)
                 .attr('y', height/2 - TICK_HEIGHT/2);
             tiePointSelect.exit().remove();
         }
@@ -886,7 +886,7 @@ function computeAllTiePoints(numbers, calculateRoundingTiePoint) {
         var lastNumber = acc[0];
         var currentList = acc[1];
         return [number, currentList.concat([
-            {value: calculateRoundingTiePoint(number, lastNumber)}])];
+            calculateRoundingTiePoint(number, lastNumber)])];
     }, null);
     roundingTiePoints = (roundingTiePoints === null) ? [] : roundingTiePoints[1];
     return roundingTiePoints;

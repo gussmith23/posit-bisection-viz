@@ -13,8 +13,12 @@
  */
 
 /**
- * For a given posit, calculate the rounding tie point between the numbers.
+ * For a given posit, calculate the rounding tie point and direction between
+ * the numbers.
  * We assume that the two posits are adjacent. This assumption is not checked.
+ * @return [tiePointValue, tieBreakDirection] where the direction is specified
+ * as "less" for breaking towards the lesser number, "greater" for breaking
+ * towards the greater number.
  */
 function calculatePositRoundingTiePoint(posit1, posit2, n, es) {
     console.assert(posit1.value != posit2.value);
@@ -22,33 +26,53 @@ function calculatePositRoundingTiePoint(posit1, posit2, n, es) {
     var upperPosit = (Math.abs(posit1.value) > Math.abs(posit2.value)) ? posit1 : posit2;
     console.assert(!lowerPosit.infinity && ! upperPosit.zero);
 
-    // Clamping.
-    if (lowerPosit.zero) return upperPosit.value;
-    if (upperPosit.infinity) return lowerPosit.value;
+    // Clamping. Between an extreme (0 and inf) and a finite posit, we never
+    // round to the extreme. There is really no tiebreak point; anything in the
+    // range (extreme, posit] goes to posit. To represent this, we put the tie
+    // point on the extreme and round towards the finite posit.
+    if (lowerPosit.zero) return [0, upperPosit.value > 0 ? "greater" : "less"];
+    if (upperPosit.infinity) return [Infinity, lowerPosit.value > 0 ? "less" : "greater"];
 
     // Figure out what kind of bit is being rounded.
     var exponentRounded = lowerPosit.actualValueBitfields.exponent.length !== es;
 
+    // Figure out which way the tie will break.
+    var tieBreakDirection =
+        (lowerPosit.bitstring[n-1] == 0) ?
+        // lowerPosit is the "even" representation; round towards this.
+        // Figure out which actual direction lowerPosit is in.
+        ((lowerPosit.value > 0) ? "less" : "greater") :
+        // upperPosit is the "even" representation; round towards this.
+        // Figure out which actual direction upperPosit is in.
+        ((lowerPosit.value > 0) ? "greater" : "less");
+
     // If exponent is being rounded, the tie point is the geometric mean;
     // otherwise, it's the arithmetic mean.
     if (exponentRounded) {
-        return Math.sqrt(lowerPosit.value * upperPosit.value)
-            * (lowerPosit.value < 0 ? -1 : 1);
+        return [
+            Math.sqrt(lowerPosit.value * upperPosit.value)
+                * (lowerPosit.value < 0 ? -1 : 1),
+            tieBreakDirection
+        ];
     } else {
-        return (lowerPosit.value + upperPosit.value)/2;
+        return [
+            (lowerPosit.value + upperPosit.value)/2,
+            tieBreakDirection
+        ];
+
     }
 }
 
 {
     var testPosits = generatePositsOfLength(6, 1);
     var out = calculatePositRoundingTiePoint(testPosits.pos[29], testPosits.pos[30], 6, 1);
-    expect(out).to.be(128);
+    expect(out[0]).to.be(128);
     var out = calculatePositRoundingTiePoint(testPosits.pos[28], testPosits.pos[29], 6, 1);
-    expect(out).to.be(48);
+    expect(out[0]).to.be(48);
     var out = calculatePositRoundingTiePoint(testPosits.neg[29], testPosits.neg[30], 6, 1);
-    expect(out).to.be(-128);
+    expect(out[0]).to.be(-128);
     var out = calculatePositRoundingTiePoint(testPosits.neg[28], testPosits.neg[29], 6, 1);
-    expect(out).to.be(-48);
+    expect(out[0]).to.be(-48);
 }
 
 /**
