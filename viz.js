@@ -258,7 +258,8 @@ function drawProjectiveRealsLine(width, height, n, es) {
 
     drawZero(x_center, y_center, radius, posits.zero, displayFormat);
     drawInfinityDot(x_center, y_center, radius, posits.inf, displayFormat);
-    
+
+    drawHistogram(x_center, y_center, radius, n, es, posits)
 }
 
 

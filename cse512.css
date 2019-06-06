@@ -121,3 +121,9 @@ p { margin: 0 0 10px 0; }
     top: 290px;
     left: 465px;
 }
+.positiveHistogramBar {
+    opacity: 0.6
+}
+.negativeHistogramBar {
+    opacity: 0.6
+}
