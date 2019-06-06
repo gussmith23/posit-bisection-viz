@@ -260,6 +260,7 @@ function drawProjectiveRealsLine(width, height, n, es) {
     drawInfinityDot(x_center, y_center, radius, posits.inf, displayFormat);
 
     drawHistogram(x_center, y_center, radius, n, es, posits)
+    createBinTooltip();
 }
 
 

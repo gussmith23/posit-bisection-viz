@@ -1,3 +1,29 @@
+function createBinTooltip() {
+    const tip = d3.tip()
+        .attr('class', "d3-tip")
+        .style("color", "black")
+        .style("background-color", "lightgrey")
+        .style("padding", "6px")
+        .style("border-radius", "4px")
+        .style("font-size", "14px")
+        .offset([-10, 0])
+        .html(function(d) {
+            var num_posits = d.values.length
+            return String(num_posits) + "values in bin"
+        });
+    svg_viz_container.call(tip);
+    binMouseInteractionHelper(svg_viz_container.selectAll('.positiveHistogramBar'), tip); 
+    binMouseInteractionHelper(svg_viz_container.selectAll('.negativeHistogramBar'), tip); 
+}
+
+function binMouseInteractionHelper(nodes, tip) {
+    nodes.on('mouseover', function(d) {
+        tip.show(d, this); 
+    })
+    nodes.on('mouseout', function(d) {
+        tip.hide();
+    })
+}
 
 function calculateBinSize(n) {
     var num_posits = (1 << n);
@@ -35,7 +61,8 @@ function getBinning(n, es, posits, sign) {
 
     for (var i = 0; i < num_bins; i++) {
         bin_counts.push({
-            count: 0
+            count: 0,
+            values: []
         })
     }
 
@@ -51,10 +78,8 @@ function getBinning(n, es, posits, sign) {
             var half_index = Math.floor(dThetas[i]/(bin_width/2));
             bin_index = Math.floor((half_index + 1)/2)
         }
-        console.log("binning")
-        console.log(bin_index)
-        console.log(posits[i]);
         bin_counts[bin_index].count += 1;
+        bin_counts[bin_index].values.push(posits[i])
 
     }
     return bin_counts; 
@@ -68,8 +93,14 @@ function drawHistogram(x_center, y_center, radius, n, es, posits) {
 function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
     var bin_counts = getBinning(n, es, posits, psign.POSITIVE)
     var bin_width = calculateBinSize(n)
+    var max = d3.max(bin_counts, d => d.count);
+    console.log(max)
+    if (max < 5) {
+        max = 5;
+    }
+
     var barScale = d3.scaleLinear()
-        .domain([0, d3.max(bin_counts, d => d.count)])
+        .domain([0, max])
         .range([radius + 90, radius + 150]); 
 
     var arc = d3.arc()
@@ -88,7 +119,12 @@ function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
         .endAngle(function(d,i) {
             // if this is the start arc, it needs to be half the size and start at 0
             if (i === 0) {
-                return (180 - bin_width/2) * (Math.PI/180)
+                if (n === 8) {
+                    return (180 - bin_width/2) * (Math.PI/180) - 0.01
+                }
+                else {
+                    return (180 - bin_width/2) * (Math.PI/180)
+                }
             }
             else {
                 var bin_end = 180 - (((i + 1) * bin_width) - bin_width/2)
@@ -103,7 +139,12 @@ function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
         })
         .innerRadius(barScale(0))
         .outerRadius(function(d) {
-            return barScale(+d.count);
+            if (d.count === 0) {
+                return radius + 90
+            }
+            else {
+                return barScale(+d.count)
+            }
         })
         .padAngle(0.01);
 
@@ -124,9 +165,15 @@ function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
 function drawNegativePosits(x_center, y_center, radius, n, es, posits) {
     var bin_counts = getBinning(n, es, posits, psign.NEGATIVE)
     var bin_width = calculateBinSize(n)
+    var bin_width = calculateBinSize(n)
+    var max = d3.max(bin_counts, d => d.count);
+    console.log(max)
+    if (max < 5) {
+        max = 5;
+    }
     var barScale = d3.scaleLinear()
-        .domain([0, d3.max(bin_counts, d => d.count)])
-        .range([radius + 90, radius + 150]); 
+        .domain([0, max])
+        .range([radius + 95, radius + 150]); 
 
     var arc = d3.arc()
         .startAngle(function(d,i) { 
@@ -144,7 +191,12 @@ function drawNegativePosits(x_center, y_center, radius, n, es, posits) {
         .endAngle(function(d,i) {
             // if this is the start arc, it needs to be half the size and start at 0
             if (i === 0) {
-                return (180 + bin_width/2) * (Math.PI/180)
+                if (n === 8) {
+                    return (180 + bin_width/2) * (Math.PI/180) + 0.01
+                }
+                else {
+                    return (180 + bin_width/2) * (Math.PI/180)
+                }
             }
             else {
                 var bin_end = 180 + (((i + 1) * bin_width) - bin_width/2)
@@ -157,9 +209,14 @@ function drawNegativePosits(x_center, y_center, radius, n, es, posits) {
                 }
             }
         })
-        .innerRadius(barScale(0))
+        .innerRadius(radius + 90)
         .outerRadius(function(d) {
-            return barScale(+d.count)
+            if (d.count === 0) {
+                return radius + 90
+            }
+            else {
+                return barScale(+d.count)
+            }
         })
         .padAngle(0.01);
 
