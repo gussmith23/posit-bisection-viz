@@ -231,28 +231,37 @@ d3.svg.circularbrush = function() {
 		{startAngle: _newEndAngle, endAngle: _newEndAngle + _handleSize, class: "resize w"}
         ]
 
+		if (_newStartAngle > (Math.PI * 2)) {
+			_newStartAngle = (_newStartAngle - (Math.PI * 2));
+		}
+		else if (_newStartAngle < -(Math.PI * 2)) {
+			_newStartAngle = (_newStartAngle + (Math.PI * 2));
+		}
+
+		if (_newEndAngle > (Math.PI * 2)) {
+			_newEndAngle = (_newEndAngle - (Math.PI * 2));
+		}
+		else if (_newEndAngle < -(Math.PI * 2)) {
+			_newEndAngle = (_newEndAngle + (Math.PI * 2));
+        }
+
+        // make both angles positive
+        if (_newStartAngle < 0) {
+            _newStartAngle = _newStartAngle + (Math.PI * 2);
+        }
+        if (_newEndAngle < 0) {
+            _newEndAngle = _newEndAngle + (Math.PI * 2);
+        }
+
+
         if (_newStartAngle - _handleSize < 0 + path_gap.RADIANS
             || _newEndAngle + _handleSize > (Math.PI * 2) - path_gap.RADIANS
-            || _newEndAngle + _handleSize < _newStartAngle - _handleSize) {
+            || _newEndAngle < _newStartAngle ) { 
             _newBrushData = _brushData
             var extent = _circularbrush.extent()
             _extent = ([extent[0] * (Math.PI/180), extent[1] * (Math.PI/180)]);
         }
         else {
-		    if (_newStartAngle > (Math.PI * 2)) {
-		    	_newStartAngle = (_newStartAngle - (Math.PI * 2));
-		    }
-		    else if (_newStartAngle < -(Math.PI * 2)) {
-		    	_newStartAngle = (_newStartAngle + (Math.PI * 2));
-		    }
-
-		    if (_newEndAngle > (Math.PI * 2)) {
-		    	_newEndAngle = (_newEndAngle - (Math.PI * 2));
-		    }
-		    else if (_newEndAngle < -(Math.PI * 2)) {
-		    	_newEndAngle = (_newEndAngle + (Math.PI * 2));
-		    }
-
 		    _extent = ([_newStartAngle,_newEndAngle]);
         }
 
