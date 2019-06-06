@@ -886,13 +886,12 @@ function drawNumberLine(svg, width, height, ...data) {
     // This creates the text portion
     legend.append("text")
         .attr('class', 'legend-text')
-        .attr("x", width)
+        .attr("x", width-5)
         .attr("y", 70)
         .style('font-size', "12px")
         .attr("dy", ".35em")
         .style("text-anchor", "end")
         .text(function(d) { return d.name;});
-
 }
 
 function createNumberLine(svg, width, height, n, es) {
