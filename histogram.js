@@ -9,7 +9,14 @@ function createBinTooltip() {
         .offset([-10, 0])
         .html(function(d) {
             var num_posits = d.values.length
-            return String(num_posits) + "values in bin"
+            var values_string;
+            if (num_posits === 1) {
+                values_string = "value in bin"
+            }
+            else {
+                values_string = "values in bin"
+            }
+            return String(num_posits) + " " + values_string
         });
     svg_viz_container.call(tip);
     binMouseInteractionHelper(svg_viz_container.selectAll('.positiveHistogramBar'), tip); 
@@ -101,7 +108,7 @@ function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
 
     var barScale = d3.scaleLinear()
         .domain([0, max])
-        .range([radius + 90, radius + 150]); 
+        .range([radius + 95, radius + 150]); 
 
     var arc = d3.arc()
         .startAngle(function(d,i) { 
