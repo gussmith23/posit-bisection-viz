@@ -90,6 +90,4 @@ function updateBrushedData() {
  */
 function onBrushEnd() {
     console.log("Brushing ending")
-
-    update(width, height, n, es);
 }
