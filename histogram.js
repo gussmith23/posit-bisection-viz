@@ -144,7 +144,7 @@ function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
                 }
             }
         })
-        .innerRadius(barScale(0))
+        .innerRadius(radius + 90)
         .outerRadius(function(d) {
             if (d.count === 0) {
                 return radius + 90
