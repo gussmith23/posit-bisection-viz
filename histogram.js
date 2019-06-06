@@ -101,7 +101,6 @@ function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
     var bin_counts = getBinning(n, es, posits, psign.POSITIVE)
     var bin_width = calculateBinSize(n)
     var max = d3.max(bin_counts, d => d.count);
-    console.log(max)
     if (max < 5) {
         max = 5;
     }
@@ -174,7 +173,6 @@ function drawNegativePosits(x_center, y_center, radius, n, es, posits) {
     var bin_width = calculateBinSize(n)
     var bin_width = calculateBinSize(n)
     var max = d3.max(bin_counts, d => d.count);
-    console.log(max)
     if (max < 5) {
         max = 5;
     }
