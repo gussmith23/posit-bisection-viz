@@ -34,10 +34,8 @@ const path_gap = {
     RADIANS: 3 * (Math.PI/180)
 }
 
-const histogram = {
-    NUM_BINS: 34,
-    BIN_WIDTH_DEGREES: 170/34,
-    BIN_WIDTH_RADIANS: (170/34) * (Math.PI/180)
+const dot_total_angle = {
+    DEGREES: 170
 }
 
 /**
@@ -78,7 +76,7 @@ function calculateYCenter(n) {
  * TODO return a list of angles instead, intervals based scaleFormat
  */
 function calculateDTheta(n, posits) {
-    var total_angle = 170; // How many degrees we have to play with
+    var total_angle = dot_total_angle.DEGREES; // How many degrees we have to play with
     var dthetas = [];
     var angle, max_val, min_val, val_range, val, percent_of_range;
     var num_posits = 1 << n;

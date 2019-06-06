@@ -1,6 +1,24 @@
 
+function calculateBinSize(n) {
+    var num_posits = (1 << n);
+    var bin_size = dot_total_angle.DEGREES/(num_posits/2)
+    return bin_size;
+}
+
+function calculateNumBins(n) {
+    var bin_width = calculateBinSize(n);
+    // we need an extra bin, because we may have a dot that falls right on the end of the range
+    // of valid angles as defined by dot_total_angle.DEGREES
+    var num_bins = Math.ceil(dot_total_angle.DEGREES/bin_width) + 1;
+    return num_bins;
+}
+
 /**
  * @brief Calculate the bins for drawing posit distribution around the circle
+ * The number/width of bins is calculated such that for ordinal, there is one posit in each bin.
+ * Furthermore, bins are centered on a point, in ordinal, so the angles are a little tricky. All
+ * bins are essentially shifted a bin_width/2 backwards except for the zero bin which is half
+ * the size
  */
 function getBinning(n, es, posits, sign) {
     var dThetas;
@@ -11,8 +29,8 @@ function getBinning(n, es, posits, sign) {
         dThetas = calculateDTheta(n, posits)
     }
 
-    var num_bins = histogram.NUM_BINS;
-    var bin_width = histogram.BIN_WIDTH_DEGREES;
+    var bin_width = calculateBinSize(n);
+    var num_bins = calculateNumBins(n); 
     var bin_counts = [];
 
     for (var i = 0; i < num_bins; i++) {
@@ -22,11 +40,20 @@ function getBinning(n, es, posits, sign) {
     }
 
     for (var i = 0; i < dThetas.length; i++) {
-        var bin_index = Math.floor(dThetas[i]/bin_width) 
-        if (bin_index == num_bins) {
-            bin_index -= 1;
+        var bin_index;
+        // check if we could be in the 0th bin. This one is tricky, because it's half the size
+        if (dThetas[i] < bin_width/2) {
+            bin_index = 0;
         }
-        console.log(bin_index + " " + dThetas[i]);
+        else {
+            // 1 and 2 in half index map to bin 1,
+            // 3 and 4 to bin 2, so on
+            var half_index = Math.floor(dThetas[i]/(bin_width/2));
+            bin_index = Math.floor((half_index + 1)/2)
+        }
+        console.log("binning")
+        console.log(bin_index)
+        console.log(posits[i]);
         bin_counts[bin_index].count += 1;
 
     }
@@ -40,64 +67,110 @@ function drawHistogram(x_center, y_center, radius, n, es, posits) {
 
 function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
     var bin_counts = getBinning(n, es, posits, psign.POSITIVE)
+    var bin_width = calculateBinSize(n)
     var barScale = d3.scaleLinear()
-                     .domain([0, d3.max(bin_counts, d => d.count)])
-                     .range([radius + 90, radius + 150]); 
+        .domain([0, d3.max(bin_counts, d => d.count)])
+        .range([radius + 90, radius + 150]); 
 
     var arc = d3.arc()
-                .startAngle(function(d,i) { 
-                    return (Math.PI - (i * histogram.BIN_WIDTH_RADIANS)); 
-                })
-                .endAngle(function(d,i) { 
-                    return (Math.PI - ((i + 1) * histogram.BIN_WIDTH_RADIANS));
-                })
-                .innerRadius(barScale(0))
-                .outerRadius(function(d) {
-                    return barScale(+d.count);
-                })
-                .padAngle(0.01);
-      
+        .startAngle(function(d,i) { 
+            // if this is the start arc, it needs to be half the size and start at 0
+            // (which is 180 in degrees)
+            if (i === 0) {
+                return Math.PI
+            }
+            else {
+                var bin_start = 180 - ((i * bin_width) - bin_width/2)    
+                // convert to radians
+                return bin_start * (Math.PI/180)
+            }
+        })
+        .endAngle(function(d,i) {
+            // if this is the start arc, it needs to be half the size and start at 0
+            if (i === 0) {
+                return (180 - bin_width/2) * (Math.PI/180)
+            }
+            else {
+                var bin_end = 180 - (((i + 1) * bin_width) - bin_width/2)
+                // if the bin_end would go past the start of the circle, bump it up
+                if (bin_end < 0) {
+                    return 0
+                }
+                else {
+                    return bin_end * (Math.PI/180)
+                }
+            }
+        })
+        .innerRadius(barScale(0))
+        .outerRadius(function(d) {
+            return barScale(+d.count);
+        })
+        .padAngle(0.01);
+
 
     var segments = svg_viz_container.selectAll(".positiveHistogramBar").data(bin_counts)
     segments.enter().append("path")
-            .attr("class", "positiveHistogramBar")
-            .attr("d", arc)
-            .attr('transform', "translate(" + x_center +"," + y_center + ")");
-    
+        .attr("class", "positiveHistogramBar")
+        .attr("d", arc)
+        .attr('transform', "translate(" + x_center +"," + y_center + ")");
+
     segments
-            .attr("d", arc)
-            .attr('transform', "translate(" + x_center +"," + y_center + ")");
+        .attr("d", arc)
+        .attr('transform', "translate(" + x_center +"," + y_center + ")");
     segments.exit().remove();
 
 }
 
 function drawNegativePosits(x_center, y_center, radius, n, es, posits) {
     var bin_counts = getBinning(n, es, posits, psign.NEGATIVE)
+    var bin_width = calculateBinSize(n)
     var barScale = d3.scaleLinear()
-                     .domain([0, d3.max(bin_counts, d => d.count)])
-                     .range([radius + 90, radius + 150]); 
+        .domain([0, d3.max(bin_counts, d => d.count)])
+        .range([radius + 90, radius + 150]); 
 
     var arc = d3.arc()
-                .startAngle(function(d,i) { 
-                    return (Math.PI + (i * histogram.BIN_WIDTH_RADIANS)); 
-                })
-                .endAngle(function(d,i) { 
-                    return (Math.PI + ((i + 1) * histogram.BIN_WIDTH_RADIANS));
-                })
-                .innerRadius(barScale(0))
-                .outerRadius(function(d) {
-                    return barScale(+d.count)
-                })
-                .padAngle(0.01);
-      
+        .startAngle(function(d,i) { 
+            // if this is the start arc, it needs to be half the size and start at 0
+            // (which is 180 degrees)
+            if (i === 0) {
+                return Math.PI
+            }
+            else {
+                var bin_start = 180 + ((i * bin_width) - bin_width/2)    
+                // convert to radians
+                return bin_start * (Math.PI/180)
+            }
+        })
+        .endAngle(function(d,i) {
+            // if this is the start arc, it needs to be half the size and start at 0
+            if (i === 0) {
+                return (180 + bin_width/2) * (Math.PI/180)
+            }
+            else {
+                var bin_end = 180 + (((i + 1) * bin_width) - bin_width/2)
+                // if bin_end would go past the end of the circle, bump it back
+                if (bin_end > 360) {
+                    return 2*Math.PI
+                }
+                else {
+                    return bin_end * (Math.PI/180)
+                }
+            }
+        })
+        .innerRadius(barScale(0))
+        .outerRadius(function(d) {
+            return barScale(+d.count)
+        })
+        .padAngle(0.01);
+
 
     var segments = svg_viz_container.selectAll(".negativeHistogramBar").data(bin_counts)
     segments.enter().append("path")
-            .attr("class", "negativeHistogramBar")
-            .attr("d", arc)
-            .attr('transform', "translate(" + x_center +"," + y_center + ")");
+        .attr("class", "negativeHistogramBar")
+        .attr("d", arc)
+        .attr('transform', "translate(" + x_center +"," + y_center + ")");
     segments
-            .attr('transform', "translate(" + x_center +"," + y_center + ")")
-            .attr("d", arc)
+        .attr('transform', "translate(" + x_center +"," + y_center + ")")
+        .attr("d", arc)
     segments.exit().remove();
 }
