@@ -56,10 +56,10 @@ function calculateNumBins(n) {
 function getBinning(n, es, posits, sign) {
     var dThetas;
     if (sign === psign.POSITIVE) {
-        dThetas = calculateDTheta(n, posits)
+        dThetas = calculateDTheta(n, posits.map((p)=>p.value));
     }
     else {
-        dThetas = calculateDTheta(n, posits)
+        dThetas = calculateDTheta(n, posits.map((p)=>p.value));
     }
 
     var bin_width = calculateBinSize(n);
