@@ -1,5 +1,6 @@
 // @note svg_viz_container is a global variable defined in index.html
-COLORS = ["#FF2100", "#C98700", "#2867FF", "magenta"];
+// Changed to match JG paper, fractional bits were previously 'magenta'
+COLORS = ["#FF2100", "#C98700", "#2867FF", "#000000"];
 ANGLE_MIN = 1.4
 
 const NUMBER_LINE_BLUE = '#2464FF';
