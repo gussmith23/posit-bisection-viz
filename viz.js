@@ -284,7 +284,7 @@ function drawLabels(posits, width, height, n, es, format, sign) {
         x_center: width/2,
         y_center: calculateYCenter(n),
         text_radius: calculateTextRadius(radius),
-        dtheta: calculateDTheta(n, posits),
+        dtheta: calculateDTheta(n, posits.map((p)=>p.value)),
         n: n,
         es: es
     };
@@ -449,7 +449,7 @@ function positivePathTween(a) {
  */
 function drawDots(x_center, y_center, posits, n, es, sign) {
     var radius = calculateRadius(n);
-    var dtheta = calculateDTheta(n, posits);
+    var dtheta = calculateDTheta(n, posits.map((p)=>p.value));
     className = (sign == psign.POSITIVE) ? 'positiveDot' : 'negativeDot';
     
     var dots = svg_viz_container.selectAll('.'.concat(className)).data(posits);

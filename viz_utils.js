@@ -71,38 +71,38 @@ function calculateYCenter(n) {
  * @brief Calculate the angle difference between the placement of a point
  *        and the bottom of the circle.
  * @param n is the current n used for decoding posits
- * @param posits A list of positive or negative posits that correspond to n
+ * @param values A list of positive or negative values that correspond to n
  * @returns A list of absolute angles
  * TODO return a list of angles instead, intervals based scaleFormat
  */
-function calculateDTheta(n, posits) {
+function calculateDTheta(n, values) {
     var total_angle = dot_total_angle.DEGREES; // How many degrees we have to play with
     var dthetas = [];
     var angle, max_val, min_val, val_range, val, percent_of_range;
-    var num_posits = 1 << n;
+    var num_numbers = 1 << n;
     if (scaleFormat == scale_format.ORDINAL) {
         var last_angle = 0;
-        for (i = 0; i < posits.length; i++) {
-            angle = total_angle/(num_posits/2) + last_angle;
+        for (i = 0; i < values.length; i++) {
+            angle = total_angle/(num_numbers/2) + last_angle;
             dthetas.push(angle);
             last_angle = angle;
         }
     } else if (scaleFormat == scale_format.LINEAR) {
-        max_val = Math.abs(posits[posits.length - 1].value);
-        min_val = Math.abs(posits[0].value);
+        max_val = Math.abs(values[values.length - 1]);
+        min_val = Math.abs(values[0]);
         val_range = max_val - min_val;
-        for (i = 0; i < posits.length; i++) {
-            val = Math.abs(posits[i].value);
+        for (i = 0; i < values.length; i++) {
+            val = Math.abs(values[i]);
             percent_of_range = (val - min_val) / val_range;
             angle = total_angle * percent_of_range;
             dthetas.push(angle);
         }
     } else { // Log scale format
-        max_val = Math.log2(Math.abs(posits[posits.length - 1].value));
-        min_val = Math.log2(Math.abs(posits[0].value));
+        max_val = Math.log2(Math.abs(values[values.length - 1]));
+        min_val = Math.log2(Math.abs(values[0]));
         val_range = max_val - min_val;
-        for (i = 0; i < posits.length; i++) {
-            val = Math.log2(Math.abs(posits[i].value));
+        for (i = 0; i < values.length; i++) {
+            val = Math.log2(Math.abs(values[i]));
             percent_of_range = (val - min_val) / val_range;
             angle = total_angle * percent_of_range;
             dthetas.push(angle);
