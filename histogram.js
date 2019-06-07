@@ -53,7 +53,7 @@ function calculateNumBins(n) {
  * bins are essentially shifted a bin_width/2 backwards except for the zero bin which is half
  * the size
  */
-function getBinning(n, es, posits, sign) {
+function getPositBinning(n, es, data, sign) {
     var dThetas;
     if (sign === psign.POSITIVE) {
         dThetas = calculateDTheta(n, posits.map((p)=>p.value));
@@ -86,20 +86,80 @@ function getBinning(n, es, posits, sign) {
             bin_index = Math.floor((half_index + 1)/2)
         }
         bin_counts[bin_index].count += 1;
-        bin_counts[bin_index].values.push(posits[i])
+        bin_counts[bin_index].values.push(data[i])
+
+    }
+    return bin_counts; 
+}
+
+function getFloatBinning(data, sign) {
+    var dThetas;
+    var n = 16;
+    if (sign === psign.POSITIVE) {
+        dThetas = calculateDTheta(n, data.map((p) => p.value))
+    }
+    else {
+        dThetas = calculateDTheta(n, data.map((p) => p.value))
+    }
+
+    var bin_width = calculateBinSize(8);
+    var num_bins = calculateNumBins(8); 
+    var bin_counts = [];
+
+    for (var i = 0; i < num_bins; i++) {
+        bin_counts.push({
+            count: 0,
+            values: []
+        })
+    }
+
+    for (var i = 0; i < dThetas.length; i++) {
+        var bin_index;
+        // check if we could be in the 0th bin. This one is tricky, because it's half the size
+        if (dThetas[i] < bin_width/2) {
+            bin_index = 0;
+        }
+        else {
+            // 1 and 2 in half index map to bin 1,
+            // 3 and 4 to bin 2, so on
+            var half_index = Math.floor(dThetas[i]/(bin_width/2));
+            bin_index = Math.floor((half_index + 1)/2)
+        }
+        bin_counts[bin_index].count += 1;
+        bin_counts[bin_index].values.push(data[i])
 
     }
     return bin_counts; 
 }
 
 function drawHistogram(x_center, y_center, radius, n, es, posits) {
-    drawPositivePosits(x_center, y_center, radius, n, es, posits.pos)
-    drawNegativePosits(x_center, y_center, radius, n, es, posits.neg)
+    if (showPositHistogram) {
+        drawPositiveBins(x_center, y_center, radius, n, es, posits.pos, "positivePositBar")
+        drawNegativeBins(x_center, y_center, radius, n, es, posits.neg, "negativePositBar")
+    }
+    if (showFloat16Histogram) {
+        var floats = generateFloats()
+        drawPositiveBins(x_center, y_center, radius, n, es, floats.pos, "positiveFloatBar")
+        drawNegativeBins(x_center, y_center, radius, n, es, floats.neg, "negativeFloatBar")
+    }
+    if (showBfloat16Histogram) {
+        var bfloats = generateBFloats()
+        drawPositiveBins(x_center, y_center, radius, n, es, bfloats.pos, "positiveBfloatBar")
+        drawNegativeBins(x_center, y_center, radius, n, es, bfloats.neg, "negativeBfloatBar")
+    }
 }
 
-function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
-    var bin_counts = getBinning(n, es, posits, psign.POSITIVE)
-    var bin_width = calculateBinSize(n)
+function drawPositiveBins(x_center, y_center, radius, n, es, data, className) {
+    var bin_counts;
+    var bin_width;
+    if (className === "positivePositBar") {
+        bin_counts = getPositBinning(n, es, data, psign.POSITIVE)
+        bin_width = calculateBinSize(n)
+    }
+    if (className === "positiveFloatBar" || className === "positiveBfloatBar") {
+        bin_counts = getFloatBinning(data, psign.POSITIVE)
+        bin_width = calculateBinSize(8)
+    }
     var max = d3.max(bin_counts, d => d.count);
     if (max < 5) {
         max = 5;
@@ -155,9 +215,9 @@ function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
         .padAngle(0.01);
 
 
-    var segments = svg_viz_container.selectAll(".positiveHistogramBar").data(bin_counts)
+    var segments = svg_viz_container.selectAll("." + className).data(bin_counts)
     segments.enter().append("path")
-        .attr("class", "positiveHistogramBar")
+        .attr("class", className)
         .attr("d", arc)
         .attr('transform', "translate(" + x_center +"," + y_center + ")");
 
@@ -168,10 +228,18 @@ function drawPositivePosits(x_center, y_center, radius, n, es, posits) {
 
 }
 
-function drawNegativePosits(x_center, y_center, radius, n, es, posits) {
-    var bin_counts = getBinning(n, es, posits, psign.NEGATIVE)
-    var bin_width = calculateBinSize(n)
-    var bin_width = calculateBinSize(n)
+function drawNegativeBins(x_center, y_center, radius, n, es, data, className) {
+    var bin_counts;
+    var bin_width;
+    if (className === "negativePositBar") {
+        bin_counts = getPositBinning(n, es, data, psign.POSITIVE)
+        bin_width = calculateBinSize(n)
+    }
+    if (className === "negativeFloatBar" || className === "negativeBfloatBar") {
+        bin_counts = getFloatBinning(data, psign.POSITIVE)
+        bin_width = calculateBinSize(8)
+    }
+
     var max = d3.max(bin_counts, d => d.count);
     if (max < 5) {
         max = 5;
@@ -226,9 +294,9 @@ function drawNegativePosits(x_center, y_center, radius, n, es, posits) {
         .padAngle(0.01);
 
 
-    var segments = svg_viz_container.selectAll(".negativeHistogramBar").data(bin_counts)
+    var segments = svg_viz_container.selectAll("." + className).data(bin_counts)
     segments.enter().append("path")
-        .attr("class", "negativeHistogramBar")
+        .attr("class", className)
         .attr("d", arc)
         .attr('transform', "translate(" + x_center +"," + y_center + ")");
     segments

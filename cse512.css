@@ -121,9 +121,26 @@ p { margin: 0 0 10px 0; }
     top: 390px;
     left: 450px;
 }
-.positiveHistogramBar {
+
+.positivePositBar {
     opacity: 0.6
 }
-.negativeHistogramBar {
+.negativePositBar {
+    opacity: 0.6
+}
+.positiveFloatBar {
+    fill: blue;
+    opacity: 0.6
+}
+.negativeFloatBar {
+    fill: blue; 
+    opacity: 0.6
+}
+.positiveBfloatBar {
+    fill: green;
+    opacity: 0.6
+}
+.negativeBfloatBar {
+    fill: green; 
     opacity: 0.6
 }
