@@ -47,11 +47,11 @@ function updateBrushedData() {
                                 .concat(positive_posits)
                                 .concat(posits.inf);
 
-    var positive_dthetas = calculateDTheta(n, positive_posits);
+    var positive_dthetas = calculateDTheta(n, positive_posits.map((p)=>p.value));
     positive_dthetas = positive_dthetas.map(function(d) {
         return 180 - d;
     })
-    var negative_dthetas = calculateDTheta(n, negative_posits);
+    var negative_dthetas = calculateDTheta(n, negative_posits.map((p)=>p.value));
     negative_dthetas = negative_dthetas.map(function(d) {
         return d + 180;
     })
