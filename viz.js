@@ -813,20 +813,58 @@ function drawNumberLine(svg, width, height, ...data) {
 
         // If a tie point function is specified, also give tie point info
         if (data[i].roundingTieFunc) {
-            var tiePoints = computeAllTiePoints(currentData, data[i].roundingTieFunc);
+            // For a blog post explaining how to do more complex d3 stuff like this, see:
+            // https://coderwall.com/p/xszhkg/manipulating-sets-of-elements-using-d3-js
 
-            var tiePointSelect = svg.selectAll('.tiePoint' + i).data(tiePoints);
-            tiePointSelect.enter().append('rect')
+            const ARROW_BASE = 3;
+            const ARROW_WIDTH = 3;
+
+            var tiePoints = computeAllTiePoints(currentData, data[i].roundingTieFunc);
+            var ticks = svg.selectAll('.tiePoint' + i).data(tiePoints, d=>d[0]);
+            ticks.each(function(d) {
+                d3.select(this)
+                    .attr('transform', d => `translate(${xScale(d[0])}, ${height/2})`);
+
+                d3.select(this).selectAll("polygon")
+                    .attr('points', d => {
+                        console.dir(currentData);
+                        console.dir(tiePoints);
+                        // First point: top right or left corner.
+                        return ((d[1] === "less") ? `${-TICK_WIDTH/2},${-TICK_HEIGHT/2}` : `${TICK_WIDTH/2},${-TICK_HEIGHT/2}`)
+                            + " " +
+                            // Second point: top right or left corner, shifted by the base length.
+                            ((d[1] === "less") ? `${-TICK_WIDTH/2},${-TICK_HEIGHT/2 + ARROW_BASE}` : `${TICK_WIDTH/2},${-TICK_HEIGHT/2 + ARROW_BASE}`)
+                            + " " +
+                            // Last point: out in space
+                            ((d[1] === "less") ? `${-TICK_WIDTH/2 - ARROW_WIDTH},${-TICK_HEIGHT/2 + ARROW_BASE/2}` : `${TICK_WIDTH/2 + ARROW_WIDTH},${-TICK_HEIGHT/2 + ARROW_BASE/2}`);
+                    });
+            });
+
+            var enter = ticks.enter().append('g')
                 .attr('class', 'tiePoint' + i)
-                .attr('x', (d) => xScale(d[0]) - TICK_WIDTH/2)
-                .attr('y', height/2 - TICK_HEIGHT/2)
+                .attr('transform', d => `translate(${xScale(d[0])}, ${height/2})`);
+            enter.append('rect')
+                .attr('x', -TICK_WIDTH/2)
+                .attr('y', -TICK_HEIGHT/2)
                 .attr('width', TICK_WIDTH)
                 .attr('height', TICK_HEIGHT)
                 .attr('fill', data[i].color);
-            tiePointSelect
-                .attr('x', (d) => xScale(d[0]) - TICK_WIDTH/2)
-                .attr('y', height/2 - TICK_HEIGHT/2);
-            tiePointSelect.exit().remove();
+            enter.append('polygon')
+                .attr('class', 'arrow')
+                .attr('points', d => {
+                    console.dir(currentData);
+                    console.dir(tiePoints);
+                      // First point: top right or left corner.
+                      return ((d[1] === "less") ? `${-TICK_WIDTH/2},${-TICK_HEIGHT/2}` : `${TICK_WIDTH/2},${-TICK_HEIGHT/2}`)
+                      + " " +
+                      // Second point: top right or left corner, shifted by the base length.
+                      ((d[1] === "less") ? `${-TICK_WIDTH/2},${-TICK_HEIGHT/2 + ARROW_BASE}` : `${TICK_WIDTH/2},${-TICK_HEIGHT/2 + ARROW_BASE}`)
+                      + " " +
+                      // Last point: out in space
+                        ((d[1] === "less") ? `${-TICK_WIDTH/2 - ARROW_WIDTH},${-TICK_HEIGHT/2 + ARROW_BASE/2}` : `${TICK_WIDTH/2 + ARROW_WIDTH},${-TICK_HEIGHT/2 + ARROW_BASE/2}`);
+                });
+
+            ticks.exit().remove();
         }
     }
 
