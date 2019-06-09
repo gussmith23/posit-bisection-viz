@@ -53,7 +53,7 @@ function calculateNumBins(n) {
  * bins are essentially shifted a bin_width/2 backwards except for the zero bin which is half
  * the size
  */
-function getPositBinning(n, es, data, sign) {
+function getPositBinning(n, data, sign) {
     var dThetas;
     if (sign === psign.POSITIVE) {
         dThetas = calculateDTheta(n, posits.map((p)=>p.value));
@@ -153,7 +153,7 @@ function drawPositiveBins(x_center, y_center, radius, n, es, data, className) {
     var bin_counts;
     var bin_width;
     if (className === "positivePositBar") {
-        bin_counts = getPositBinning(n, es, data, psign.POSITIVE)
+        bin_counts = getPositBinning(n, data, psign.POSITIVE)
         bin_width = calculateBinSize(n)
     }
     if (className === "positiveFloatBar" || className === "positiveBfloatBar") {
@@ -232,7 +232,7 @@ function drawNegativeBins(x_center, y_center, radius, n, es, data, className) {
     var bin_counts;
     var bin_width;
     if (className === "negativePositBar") {
-        bin_counts = getPositBinning(n, es, data, psign.POSITIVE)
+        bin_counts = getPositBinning(n, data, psign.POSITIVE)
         bin_width = calculateBinSize(n)
     }
     if (className === "negativeFloatBar" || className === "negativeBfloatBar") {
