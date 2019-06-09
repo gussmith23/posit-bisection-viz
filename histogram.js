@@ -63,14 +63,14 @@ function getPositBinning(n, es, data, sign) {
     }
 
     var bin_width = calculateBinSize(n);
-    var num_bins = calculateNumBins(n); 
+    var num_bins = calculateNumBins(n);
     var bin_counts = [];
 
     for (var i = 0; i < num_bins; i++) {
         bin_counts.push({
             count: 0,
             values: []
-        })
+        });
     }
 
     for (var i = 0; i < dThetas.length; i++) {
@@ -83,34 +83,34 @@ function getPositBinning(n, es, data, sign) {
             // 1 and 2 in half index map to bin 1,
             // 3 and 4 to bin 2, so on
             var half_index = Math.floor(dThetas[i]/(bin_width/2));
-            bin_index = Math.floor((half_index + 1)/2)
+            bin_index = Math.floor((half_index + 1)/2);
         }
         bin_counts[bin_index].count += 1;
-        bin_counts[bin_index].values.push(data[i])
+        bin_counts[bin_index].values.push(data[i]);
 
     }
-    return bin_counts; 
+    return bin_counts;
 }
 
 function getFloatBinning(data, sign) {
     var dThetas;
     var n = 16;
     if (sign === psign.POSITIVE) {
-        dThetas = calculateDTheta(n, data.map((p) => p.value))
+        dThetas = calculateDTheta(n, data.map((p) => p.value));
     }
     else {
-        dThetas = calculateDTheta(n, data.map((p) => p.value))
+        dThetas = calculateDTheta(n, data.map((p) => p.value));
     }
 
     var bin_width = calculateBinSize(8);
-    var num_bins = calculateNumBins(8); 
+    var num_bins = calculateNumBins(8);
     var bin_counts = [];
 
     for (var i = 0; i < num_bins; i++) {
         bin_counts.push({
             count: 0,
             values: []
-        })
+        });
     }
 
     for (var i = 0; i < dThetas.length; i++) {
@@ -123,13 +123,13 @@ function getFloatBinning(data, sign) {
             // 1 and 2 in half index map to bin 1,
             // 3 and 4 to bin 2, so on
             var half_index = Math.floor(dThetas[i]/(bin_width/2));
-            bin_index = Math.floor((half_index + 1)/2)
+            bin_index = Math.floor((half_index + 1)/2);
         }
         bin_counts[bin_index].count += 1;
-        bin_counts[bin_index].values.push(data[i])
+        bin_counts[bin_index].values.push(data[i]);
 
     }
-    return bin_counts; 
+    return bin_counts;
 }
 
 function drawHistogram(x_center, y_center, radius, n, es, posits) {
