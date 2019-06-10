@@ -24,7 +24,6 @@ function drawBrush(x_center, y_center, radius, data) {
  * @brief This gets called when you start brushing (when you click on the brush area)
  */
 function onBrushStart() {
-    console.log("Brushing starting")
 }
 
 /* 
@@ -32,7 +31,6 @@ function onBrushStart() {
  * or drag one of the handles)
  */
 function whileBrushing() {
-    console.log("Currently brushing")
     updateBrushedData()
     createNumberLine(svg_viz_container, width, height, n, es)
 }
@@ -89,5 +87,4 @@ function updateBrushedData() {
  * @brief This gets called when you stop brushing (when you stop clicking on the brush area)
  */
 function onBrushEnd() {
-    console.log("Brushing ending")
 }

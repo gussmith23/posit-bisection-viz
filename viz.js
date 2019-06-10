@@ -827,8 +827,8 @@ function drawNumberLine(svg, width, height, ...data) {
 
                 d3.select(this).selectAll("polygon")
                     .attr('points', d => {
-                        console.dir(currentData);
-                        console.dir(tiePoints);
+                        //console.dir(currentData);
+                        //console.dir(tiePoints);
                         // First point: top right or left corner.
                         return ((d[1] === "less") ? `${-TICK_WIDTH/2},${-TICK_HEIGHT/2}` : `${TICK_WIDTH/2},${-TICK_HEIGHT/2}`)
                             + " " +
@@ -852,8 +852,8 @@ function drawNumberLine(svg, width, height, ...data) {
             enter.append('polygon')
                 .attr('class', 'arrow')
                 .attr('points', d => {
-                    console.dir(currentData);
-                    console.dir(tiePoints);
+                    //console.dir(currentData);
+                    //console.dir(tiePoints);
                       // First point: top right or left corner.
                       return ((d[1] === "less") ? `${-TICK_WIDTH/2},${-TICK_HEIGHT/2}` : `${TICK_WIDTH/2},${-TICK_HEIGHT/2}`)
                       + " " +
