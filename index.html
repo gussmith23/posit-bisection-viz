@@ -34,7 +34,7 @@
                     Numerical datatypes&mdash;how real numbers are represented in computer hardware&mdash;are absolutely foundational to the design of every computer in the world. It is surprising, then, that these datatypes have been largely unchanged for decades! For the most part, all computers rely on the IEEE 754 floating point specification, which gives us the <tt>float</tt> and <tt>double</tt> types that computer programmers may be familiar with. Today, though, these datatypes are finally coming under the microscope, as computer architects seek to squeeze every ounce of performance out of their hardware.
                 </p>
                 <p>
-                    This visualization seeks to educate the user on numerical datatypes&mdash;both old IEEE floating point, and a variety of new formats. Specifically, we present both the <tt>posit</tt> and the <tt>bfloat16</tt>, and compare them with the IEEE "half" type, <tt>float16</tt>.
+                    This visualization seeks to educate the user on numerical datatypes&mdash;both old IEEE floating point, and a variety of new formats. Specifically, we present the <tt>posit</tt>, an interesting new numerical datatype.
                 </p>
                 <p>
                     <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf"><i>Posits</i></a> are a new numerical datatype developed to compete with the standard IEEE 754 format. Posits add a number of very interesting features over IEEE floating point, but the most interesting at a high level are (1) the addition of the <tt>es</tt> parameter, and (2) the addition of the <i>regime</i> bitfield.
@@ -57,15 +57,15 @@
                 </p>
 
                 <p>
-                    In this project, we present an interactive version of the visualization shown on page 2 of <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf">John Gustafson's original posit paper</a> and page 16 of <a href="https://posithub.org/conga/2019/docs/13/1000-PeterLindstrom.pdf">Peter Lindstrom's CoNGA 2019 slides</a>. This visualization shows the posits laid out on the <i>projectively-extended real number line</i>, which is the real number line we are used to, but with both infinities being represented by the same point. This makes sense for posits, as posits only have one representation for infinity. The process of filling out the values on this circle is often called <i>posit bisection</i>, hence the original title of our A3 project: <i>Posit Bisection</i>.
+                    In this project, we present an interactive version of the visualization shown on page 2 of <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf">John Gustafson's original posit paper</a> and page 16 of <a href="https://posithub.org/conga/2019/docs/13/1000-PeterLindstrom.pdf">Peter Lindstrom's CoNGA 2019 slides</a>. This visualization shows the posits laid out on the <i>projectively-extended real number line</i>, which is actually a circle, rather than a line. This is the number line we're used to, but with both infinities being represented by the same point. This makes sense for posits, as posits only have one representation for infinity. The process of filling out the values on this circle is often called <i>posit bisection</i>, hence the original title of our A3 project: <i>Posit Bisection</i>.
                 </p>
             </section>
             <section>
                 <h2>Interaction</h2>
                 <p>
-                    To illustrate the effect that the <tt>n</tt> and <tt>es</tt> parameters have on the posit representation, we provide sliders that allow the user to change these values. 
+                    To illustrate the effect that the <tt>n</tt> and <tt>es</tt> parameters have on the posit representation, we provide sliders that allow the user to change these values.
                     This affects the visualization in a variety of ways. The two main ways are that changing <tt>n</tt> affects the number of dots on the circle and changing <tt>es</tt> affects the coloring
-                    of the bitstrings if there are bits available for the exponent field. 
+                    of the bitstrings if there are bits available for the exponent field.
                 </p>
                 <p>
                     The bitstrings in the posit representation are colored to differentiate between fields in the posit representation. Details on demand about how the posit value is calculated is available
