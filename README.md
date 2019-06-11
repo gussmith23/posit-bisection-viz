@@ -2,7 +2,7 @@
 
 Final project for UW CSE 512, Data Visualization, taught by Jeffrey Heer.
 
-Please see the project's [index.html](https://github.com/gussmith23/posit-bisection-viz/blob/master/index.html) for background.
+Please see the project's [index.html](https://github.com/gussmith23/posit-bisection-viz/blob/master/index.html) for background. This page is hosted at [https://cse512-19s.github.io/FP-Well-Rounded/](https://cse512-19s.github.io/FP-Well-Rounded/).
 
 ## Work Split
 
