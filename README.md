@@ -6,12 +6,12 @@ Please see the project's [index.html](https://github.com/gussmith23/posit-bisect
 
 ## Work Split
 
-| Team Member  | Responsibility                                                   |
-|--------------|------------------------------------------------------------------|
-| Neil Ryan    | Tooltips, dropdowns, other D3 work, paper writing, poster design |
-| Katie Lim    | Brushing, histogram, other D3 work, paper writing, poster design |
-| Gus Smith    | Posit library, poster design, paper writing, other D3 work       |
-| Dan Petrisko | Float library, bfloat library, paper organization                |
+| Team Member       | Responsibility                                                   |
+|-------------------|------------------------------------------------------------------|
+| Mara Kirdani-Ryan | Tooltips, dropdowns, other D3 work, paper writing, poster design |
+| Katie Lim         | Brushing, histogram, other D3 work, paper writing, poster design |
+| Gus Smith         | Posit library, poster design, paper writing, other D3 work       |
+| Dan Petrisko      | Float library, bfloat library, paper organization                |
 
 ## Development Process
 
